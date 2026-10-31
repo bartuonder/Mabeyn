@@ -1,0 +1,37 @@
+from collections.abc import AsyncIterator
+
+import pytest
+import pytest_asyncio
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+
+from mabeyn.core.config import get_settings
+from tests.factories import SeededTenant, delete_tenant, seed_tenant
+
+
+@pytest_asyncio.fixture(scope="session")
+async def admin_engine() -> AsyncIterator[AsyncEngine]:
+    engine = create_async_engine(get_settings().admin_database_url)
+    try:
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+    except (OSError, SQLAlchemyError):
+        await engine.dispose()
+        pytest.skip("database is not available")
+    yield engine
+    await engine.dispose()
+
+
+@pytest_asyncio.fixture(scope="session")
+async def tenant_a(admin_engine: AsyncEngine) -> AsyncIterator[SeededTenant]:
+    seeded = await seed_tenant(admin_engine, "A")
+    yield seeded
+    await delete_tenant(admin_engine, seeded.id)
+
+
+@pytest_asyncio.fixture(scope="session")
+async def tenant_b(admin_engine: AsyncEngine) -> AsyncIterator[SeededTenant]:
+    seeded = await seed_tenant(admin_engine, "B")
+    yield seeded
+    await delete_tenant(admin_engine, seeded.id)
