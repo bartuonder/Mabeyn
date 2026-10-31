@@ -6,6 +6,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from mabeyn.core.config import get_settings
+from mabeyn.db import models  # noqa: F401
 from mabeyn.db.base import Base
 
 config = context.config
