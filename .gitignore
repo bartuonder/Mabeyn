@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+
+# Local planning material
+*.pdf
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Eval outputs are committed selectively
+evals/results/*.tmp.json
