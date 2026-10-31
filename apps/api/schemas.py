@@ -1,4 +1,7 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+import uuid
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class StrictRequest(BaseModel):
@@ -21,5 +24,31 @@ class RefreshRequest(StrictRequest):
 class TokenResponse(Response):
     access_token: str
     refresh_token: str
+    token_type: str = "bearer"  # noqa: S105
+    expires_in: int
+
+
+class ApiKeyCreate(StrictRequest):
+    name: str = Field(min_length=1, max_length=100)
+
+
+class ApiKeyOut(Response):
+    id: uuid.UUID
+    name: str
+    prefix: str
+    created_at: datetime
+    revoked_at: datetime | None
+
+
+class ApiKeyCreated(ApiKeyOut):
+    key: str
+
+
+class SessionRequest(StrictRequest):
+    customer_id: str = Field(min_length=1, max_length=128)
+
+
+class SessionResponse(Response):
+    token: str
     token_type: str = "bearer"  # noqa: S105
     expires_in: int
