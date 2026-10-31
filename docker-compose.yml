@@ -4,15 +4,25 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql+asyncpg://mabeyn:mabeyn@postgres:5432/mabeyn
+      DATABASE_URL: postgresql+asyncpg://mabeyn_app:mabeyn_app@postgres:5432/mabeyn
       REDIS_URL: redis://redis:6379/0
     env_file:
       - path: .env
         required: false
     depends_on:
-      postgres:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
       redis:
+        condition: service_healthy
+
+  migrate:
+    build: .
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://mabeyn_app:mabeyn_app@postgres:5432/mabeyn
+      ADMIN_DATABASE_URL: postgresql+asyncpg://mabeyn:mabeyn@postgres:5432/mabeyn
+    depends_on:
+      postgres:
         condition: service_healthy
 
   postgres:

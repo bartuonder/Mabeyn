@@ -23,7 +23,8 @@ jobs:
           --health-timeout 3s
           --health-retries 10
     env:
-      DATABASE_URL: postgresql+asyncpg://mabeyn:mabeyn@localhost:5432/mabeyn
+      DATABASE_URL: postgresql+asyncpg://mabeyn_app:mabeyn_app@localhost:5432/mabeyn
+      ADMIN_DATABASE_URL: postgresql+asyncpg://mabeyn:mabeyn@localhost:5432/mabeyn
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
