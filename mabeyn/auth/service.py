@@ -6,9 +6,10 @@ from sqlalchemy import select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from mabeyn.auth import tokens
+from mabeyn.auth.api_keys import hash_api_key
 from mabeyn.auth.passwords import verify_dummy, verify_password
 from mabeyn.core.config import get_settings
-from mabeyn.db.models import AdminUser, RefreshToken
+from mabeyn.db.models import AdminUser, ApiKey, RefreshToken
 from mabeyn.db.session import anonymous_session, tenant_session
 
 
@@ -95,3 +96,19 @@ async def refresh(refresh_token: str) -> TokenPair:
     if reuse_detected:
         raise AuthenticationError("refresh token reuse detected")
     return pair
+
+
+async def resolve_api_key(raw_key: str) -> ApiKey | None:
+    async with anonymous_session() as session:
+        statement = select(ApiKey).from_statement(
+            text("SELECT * FROM auth_get_api_key(:hash)").bindparams(hash=hash_api_key(raw_key))
+        )
+        return (await session.scalars(statement)).one_or_none()
+
+
+async def create_customer_session(raw_key: str, customer_id: str) -> tuple[str, int]:
+    api_key = await resolve_api_key(raw_key)
+    if api_key is None:
+        raise AuthenticationError("invalid api key")
+    ttl_seconds = get_settings().customer_token_ttl_minutes * 60
+    return tokens.create_customer_token(api_key.tenant_id, customer_id), ttl_seconds
