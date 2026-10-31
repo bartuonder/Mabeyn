@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from mabeyn.db.models import DocumentSource, DocumentStatus, MessageRole, RiskLevel
 
@@ -16,7 +16,7 @@ class Response(BaseModel):
 
 
 class LoginRequest(StrictRequest):
-    email: EmailStr
+    email: str = Field(min_length=3, max_length=320)
     password: str
 
 
