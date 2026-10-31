@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
+from mabeyn.auth.passwords import hash_password
 from mabeyn.db import models as m
 
 
@@ -20,7 +21,7 @@ class SeededTenant:
 
 
 async def seed_tenant(
-    engine: AsyncEngine, label: str, password: str = "", password_hash: str = "x"
+    engine: AsyncEngine, label: str, password: str = "correct-password"
 ) -> SeededTenant:
     """Create one tenant with a row in every tenant-scoped table (owner connection)."""
     suffix = uuid.uuid4().hex[:8]
@@ -33,7 +34,7 @@ async def seed_tenant(
         admin = m.AdminUser(
             tenant_id=tid,
             email=f"{label.lower()}-{suffix}@example.com",
-            password_hash=password_hash,
+            password_hash=hash_password(password),
         )
         document = m.Document(
             tenant_id=tid, title=f"Doc {label}", source_type=m.DocumentSource.MARKDOWN
