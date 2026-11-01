@@ -1,3 +1,7 @@
+from mabeyn.rag.prompts import MIRROR_LANGUAGE, language_rule
+
+__all__ = ["MIRROR_LANGUAGE", "language_rule"]
+
 PROMPT_VERSION = "agents-v9"
 
 SUPERVISOR_SYSTEM = """\
@@ -98,14 +102,3 @@ question yourself."""
 BLOCKED_SYSTEM = """\
 Write one short, polite sentence for the customer. {language_rule} Say that you cannot process \
 this message and ask them to rephrase it."""
-
-MIRROR_LANGUAGE = (
-    "Write in the language the customer used: an English message gets an English reply, "
-    "a Turkish message a Turkish reply."
-)
-
-
-def language_rule(language: str | None) -> str:
-    """Name the reply language when the router detected it, otherwise ask to mirror the customer."""
-    name = (language or "").strip()
-    return f"Write in {name}." if name else MIRROR_LANGUAGE

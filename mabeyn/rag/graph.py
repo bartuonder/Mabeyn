@@ -46,6 +46,7 @@ class RagState(TypedDict, total=False):
     question: str
     history: list[ChatMessage]
     company: str
+    language: str | None
     query: str
     rewrites: int
     ranked: list[RetrievedChunk]
@@ -158,6 +159,7 @@ def build_rag_graph(llm: LLM, config: RagConfig, reranker: Reranker | None = Non
             state["relevant"],
             state.get("history", []),
             strict=strict,
+            language=state.get("language"),
         ):
             pieces.append(piece)
             writer({"type": "token", "text": piece})
@@ -239,12 +241,14 @@ class GraphRag:
         question: str,
         history: Sequence[ChatMessage],
         company: str,
+        language: str | None = None,
     ) -> AsyncIterator[RagEvent]:
         initial: RagState = {
             "tenant_id": tenant_id,
             "question": question,
             "history": list(history),
             "company": company,
+            "language": language,
         }
         run_config = {
             "run_name": f"rag-{self.config.name}",

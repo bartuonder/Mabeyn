@@ -41,6 +41,7 @@ class RagService(Protocol):
         question: str,
         history: Sequence[ChatMessage],
         company: str,
+        language: str | None = None,
     ) -> AsyncIterator[RagEvent]: ...
 
 
@@ -65,6 +66,7 @@ class BaselineRag:
         question: str,
         history: Sequence[ChatMessage],
         company: str,
+        language: str | None = None,
     ) -> AsyncIterator[RagEvent]:
         chunks = await retrieve_vector(
             tenant_id, self.llm, question, self.top_k, self.embedding_model
@@ -73,7 +75,9 @@ class BaselineRag:
             yield Final(answer="", citations=[], chunks=chunks, ranked=chunks)
             return
         pieces: list[str] = []
-        async for piece in stream_answer(self.llm, company, question, chunks, history):
+        async for piece in stream_answer(
+            self.llm, company, question, chunks, history, language=language
+        ):
             pieces.append(piece)
             yield Token(piece)
         answer = "".join(pieces).strip()

@@ -29,8 +29,11 @@ def build_messages(
     chunks: Sequence[RetrievedChunk],
     history: Sequence[ChatMessage] = (),
     strict: bool = False,
+    language: str | None = None,
 ) -> list[ChatMessage]:
-    system = prompts.ANSWER_SYSTEM.format(company=company)
+    system = prompts.ANSWER_SYSTEM.format(
+        company=company, language_rule=prompts.language_rule(language)
+    )
     if strict:
         system += "\n" + prompts.STRICT_RULE
     user = prompts.ANSWER_USER.format(sources=format_sources(chunks), question=question)
@@ -50,8 +53,9 @@ def stream_answer(
     history: Sequence[ChatMessage] = (),
     model: str | None = None,
     strict: bool = False,
+    language: str | None = None,
 ) -> AsyncIterator[str]:
-    messages = build_messages(company, question, chunks, history, strict)
+    messages = build_messages(company, question, chunks, history, strict, language)
     return llm.stream(
         messages, model=model or get_settings().llm_model, max_tokens=MAX_ANSWER_TOKENS
     )

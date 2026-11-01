@@ -19,6 +19,13 @@ async def test_knowledge_question_streams_the_answer_without_any_tools(fresh_ten
     assert env.llm.tool_turns == [] and await env.tool_calls() == []
 
 
+async def test_the_detected_language_reaches_the_knowledge_agent(fresh_tenant, checkpointer):
+    env = await build_env(fresh_tenant, checkpointer, Brain(language="English"))
+    await env.ask("Do you ship to Germany?")
+
+    assert env.rag.languages == ["English"]
+
+
 async def test_order_lookup_calls_a_read_tool_for_the_session_customer(fresh_tenant, checkpointer):
     brain = Brain(
         route=["action"],
@@ -274,16 +281,11 @@ async def test_an_abstaining_knowledge_agent_is_not_passed_on(fresh_tenant, chec
 
 
 async def test_the_detected_language_reaches_every_reply_prompt(fresh_tenant, checkpointer):
-    brain = Brain(route=["action"], tool_turns=[tool_call("request_refund", **REFUND)])
-    original = brain.chat
-
-    def with_language(messages, model):
-        text = original(messages, model)
-        return (
-            text.replace('"reason"', '"language": "English", "reason"') if "route" in text else text
-        )
-
-    brain.chat = with_language  # type: ignore[method-assign]
+    brain = Brain(
+        route=["action"],
+        language="English",
+        tool_turns=[tool_call("request_refund", **REFUND)],
+    )
     env = await build_env(fresh_tenant, checkpointer, brain)
     env.llm.handler = brain.chat
     await env.ask("Refund KS-1001 please")

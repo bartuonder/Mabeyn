@@ -99,6 +99,13 @@ def test_cite_tag_uses_document_and_last_heading():
     assert chunk.cite == "Return  Policy  v2:Eligibility"
 
 
+def test_answer_prompt_names_the_reply_language_when_it_is_known():
+    named = build_messages("Shop", "q", [], language="English")[0]["content"]
+    assert "Write in English." in named
+    mirrored = build_messages("Shop", "q", [])[0]["content"]
+    assert prompts.MIRROR_LANGUAGE in mirrored
+
+
 def test_prompt_marks_sources_as_data_and_includes_dates():
     chunk = make_chunk(effective_date=date(2025, 1, 1))
     messages = build_messages("KargoShop", "Can I return it?", [chunk])

@@ -30,11 +30,18 @@ class StubRag:
         self.answer = answer
         self.abstain = abstain
         self.calls: list[str] = []
+        self.languages: list[str | None] = []
 
     async def run(
-        self, tenant_id: uuid.UUID, question: str, history: Sequence[ChatMessage], company: str
+        self,
+        tenant_id: uuid.UUID,
+        question: str,
+        history: Sequence[ChatMessage],
+        company: str,
+        language: str | None = None,
     ) -> AsyncIterator[RagEvent]:
         self.calls.append(question)
+        self.languages.append(language)
         yield Token(self.answer)
         yield Final(answer=self.answer, citations=[], chunks=[], abstained=self.abstain)
 
@@ -44,6 +51,7 @@ class Brain:
     """Scripted model behaviour keyed by the system prompt of each call."""
 
     route: list[str] = field(default_factory=lambda: ["knowledge"])
+    language: str = ""
     tool_turns: list[ToolChatResult] = field(default_factory=list)
     replies: dict[str, str] = field(default_factory=dict)
     seen: list[str] = field(default_factory=list)
@@ -77,7 +85,12 @@ class Brain:
         if kind == "route":
             question = "What are the return rules?" if len(self.route) > 1 else ""
             return json.dumps(
-                {"route": self.route, "reason": "scripted", "knowledge_question": question}
+                {
+                    "route": self.route,
+                    "reason": "scripted",
+                    "knowledge_question": question,
+                    "language": self.language,
+                }
             )
         return self.replies.get(kind, self.DEFAULTS.get(kind, "ok"))
 

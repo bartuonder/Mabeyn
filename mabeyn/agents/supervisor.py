@@ -128,6 +128,7 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
             question,
             [] if mixed else state.get("history", []),
             state["company"],
+            state.get("language") or None,
         ):
             if isinstance(event, Token) and live:
                 writer({"type": "token", "text": event.text})
