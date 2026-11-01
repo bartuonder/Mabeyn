@@ -23,6 +23,7 @@ action agent ── read / write tool ──> executes, audits in tool_calls
 
 - Tenant isolation is enforced by PostgreSQL Row-Level Security ([ADR-0001](docs/adr/0001-row-level-security.md)).
 - Answers cite `[document:section]`; the citation points at the section inside the retrieved chunk that holds the fact.
+- The full workflow, with diagrams generated from the code, is in [docs/architecture.md](docs/architecture.md).
 - Retrieval combines pgvector similarity with Turkish/English full text search (Reciprocal Rank Fusion), then an LLM reranker narrows 30 candidates to 6.
 - A supervisor routes each message to a knowledge agent, an action agent or a human ([ADR-0002](docs/adr/0002-supervisor-and-two-agents.md)). Tools are registered per tenant with a JSON Schema and a risk level (`read`, `write`, `sensitive`); the platform, not the model, supplies the customer identity.
 - `sensitive` tools such as refunds never run directly: the graph pauses, an admin approves or rejects, and the paused conversation survives restarts. Walk-through: [docs/demo-scenarios.md](docs/demo-scenarios.md).
@@ -52,6 +53,8 @@ curl -N -X POST localhost:8000/chat -H "Authorization: Bearer $SESSION" \
   -H 'content-type: application/json' -d '{"message": "How long does delivery to KKTC take?"}'
 ```
 
+Treat API keys as secrets: until [ADR-0005](docs/adr/0005-customer-session-trust.md) is implemented, anyone holding a key can open a session as any customer.
+
 Documents are added with `POST /documents` (PDF, Markdown, HTML upload) or `POST /documents/url`. Tools are managed with `POST /tools` and `DELETE /tools/{id}`; pending refunds are listed with `GET /approvals?status=pending` and decided with `POST /approvals/{id}`.
 
 ## Development
@@ -67,23 +70,36 @@ make test lint typecheck
 
 Demo tenant KargoShop: 26 Turkish and 6 English documents, including an old and a new return policy that contradict each other. 80 Turkish golden questions (16 unanswerable). Chunks of 300–600 tokens, `text-embedding-3-small`, `gpt-4.1-mini` for answers and judging, `gpt-4o-mini` for rewriting, grading, reranking and faithfulness checks. Raw runs: [`evals/results`](evals/results).
 
-### RAG ablation
+### RAG ablation (development set, 80 questions)
 
-Each row adds one technique to the row above (`evals/results/ablation.md`).
+Each row adds one technique to the row above. Accuracy and faithfulness show a 95% interval (`evals/results/ablation.md`). This set was used while tuning, so treat the scores as optimistic.
 
 | Configuration | Recall@1 | Recall@5 | MRR | Accuracy | Faithfulness | p95 latency (s) | Cost / query ($) |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Vector only | 0.766 | 0.953 | 0.850 | 0.900 | 0.975 | 1.20 | 0.00081 |
-| + Hybrid (full text + RRF) | 0.812 | 0.969 | 0.883 | 0.912 | 0.963 | 1.20 | 0.00082 |
-| + Reranker (30 → 6) | 0.969 | 1.000 | 0.984 | 0.950 | 0.988 | 2.84 | 0.00200 |
-| + CRAG grading | 0.969 | 1.000 | 0.984 | 0.975 | 0.975 | 7.52 | 0.00195 |
-| + Faithfulness check | 0.969 | 1.000 | 0.984 | 0.975 | 0.975 | 7.08 | 0.00203 |
+| Vector only | 0.766 | 0.953 | 0.850 | 0.900 [0.81-0.95] | 0.975 [0.91-0.99] | 1.20 | 0.00081 |
+| + Hybrid (full text + RRF) | 0.812 | 0.969 | 0.883 | 0.912 [0.83-0.96] | 0.963 [0.90-0.99] | 1.36 | 0.00082 |
+| + Reranker (30 to 6) | 0.969 | 1.000 | 0.984 | 0.938 [0.86-0.97] | 0.975 [0.91-0.99] | 3.97 | 0.00200 |
+| + CRAG grading | 0.969 | 1.000 | 0.984 | 0.975 [0.91-0.99] | 0.988 [0.93-1.00] | 7.29 | 0.00195 |
+| + Faithfulness check | 0.969 | 1.000 | 0.984 | 0.975 [0.91-0.99] | 0.988 [0.93-1.00] | 7.30 | 0.00203 |
 
-- Hybrid search fixes the questions where vector search misses Turkish suffixed terms ("KKTC'ye", "Almanya'ya").
-- The reranker is the largest single gain in ranking quality; the grader then removes the superseded 2023 return policy and answers every answerable question correctly (accuracy 1.00 on answerable questions, 0.875 on unanswerable ones).
-- CRAG raises p95 latency because unanswerable questions go through two query rewrites before the assistant declines.
-- The faithfulness check showed no measurable change on this set; it stays as a guard because it costs about $0.00008 per query.
-- English set (20 questions, 17 answerable): Recall@5 1.00, accuracy 0.95 with the full pipeline.
+- Ranking quality improves clearly with hybrid search and the reranker (Recall@1 0.77 to 0.97, MRR 0.85 to 0.98).
+- Accuracy rises from 0.90 to 0.975, but neighbouring rows overlap and the set was used for tuning; the CRAG step in particular is a hint, not a proof (see the held-out set below).
+- The faithfulness check shows no measurable effect; it costs about $0.00008 per query.
+- Latency is the RAG subgraph only. Measured end to end on the knowledge path the first streamed token arrives after about 4.1 s (median), the whole answer after about 5.6 s, because routing, query handling, reranking and grading run first.
+- The same vector-only answers judged by `gpt-4.1` instead of `gpt-4.1-mini` score 0.925 instead of 0.900 (two verdicts differ), so the judge model moves the numbers by a couple of points.
+- English set (20 questions, 17 answerable), measured earlier with the full pipeline: Recall@5 1.00, accuracy 0.95.
+
+### Held-out set (30 questions, judge `gpt-4.1`)
+
+Written before the final measurement and never used for tuning (`evals/results/heldout.md`).
+
+| Configuration | Recall@1 | MRR | Accuracy | Faithfulness | p95 latency (s) | Cost / query ($) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Vector only | 0.917 | 0.948 | 1.000 [0.89-1.00] | 0.967 [0.83-0.99] | 1.77 | 0.00085 |
+| Hybrid + reranker | 1.000 | 1.000 | 1.000 [0.89-1.00] | 0.967 [0.83-0.99] | 3.47 | 0.00205 |
+| Full pipeline | 1.000 | 1.000 | 1.000 [0.89-1.00] | 0.967 [0.83-0.99] | 8.78 | 0.00204 |
+
+This set is easier than the development set: even vector-only answers all 30 questions correctly (including 2 questions asked in English over Turkish documents and 6 unanswerable ones). It confirms the ranking gain of the reranker but cannot confirm or refute the accuracy gain of CRAG, so that claim rests on the development set only.
 
 ### Experiments (retrieval only, 80 questions)
 
@@ -115,22 +131,24 @@ On 20 sampled answers the LLM judge agrees with the manual labels on 20 of 20 (C
 
 ### Tool use and approvals
 
-40 scenarios on the supervisor with the mock shop (`evals/datasets/tools.jsonl`, [how it is scored](docs/evaluation.md#tool-use-evaluation)). The reply language is checked with a heuristic and the reply content by an LLM judge.
+Scenarios on the supervisor with the mock shop ([how they are scored](docs/evaluation.md#tool-use-evaluation)). The development set (40) was used for tuning; the held-out set (15, judge `gpt-4.1`) was not.
 
-| Metric | Result |
-| --- | ---: |
-| Scenarios passed | 0.975 |
-| Correct tool selection | 1.000 |
-| Correct arguments | 1.000 |
-| Unnecessary tool calls | 0.000 |
-| Sensitive calls that reached approval | 1.000 |
-| Sensitive actions executed without approval | 0 |
-| Routing accuracy | 1.000 |
-| Replies in the customer's language | 1.000 |
-| Other customer's data in a reply | 0 |
-| Cost per scenario | $0.002 |
+| Metric | Development (40) | Held-out (15) |
+| --- | ---: | ---: |
+| Scenarios passed | 0.975 [0.87-1.00] | 0.867 [0.62-0.96] |
+| Correct tool selection | 1.000 | 1.000 |
+| Correct arguments | 1.000 | 1.000 |
+| Unnecessary tool calls | 0.000 | 0.000 |
+| Sensitive calls that reached approval | 1.000 | 1.000 |
+| Sensitive actions executed without approval | 0 | 0 |
+| Routing accuracy | 1.000 | 1.000 |
+| Reply judged correct | 0.975 | 0.933 |
+| Reply in the customer's language | 1.000 | 0.933 |
+| Other customer's data in a reply | 0 | 0 |
+| Cost per scenario | $0.002 | $0.002 |
 
-The one failing scenario is an English question asked against Turkish-only documents ("Do you ship to Germany?"); retrieval across languages is not handled yet.
+- Tool choice, arguments and the approval gate hold on unseen scenarios, including two multi-turn ones. The approval rate is 100% by construction (the graph routes every `sensitive` call to approval); the real risk is the model not calling a tool, which tool selection measures.
+- Open defects found by the held-out set: an English question answered over Turkish documents is answered in Turkish when it takes the knowledge-only path (the supervisor knows the language but the RAG answer prompt is not told), and one scenario failed because the judge insisted on the word "delivered". The development set has one known failure: an English question that finds nothing in Turkish documents.
 
 ## Status
 
