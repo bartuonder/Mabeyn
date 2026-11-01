@@ -35,4 +35,5 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run mypy mabeyn apps evals
       - run: uv run alembic upgrade head
+      - run: uv run python -m mabeyn.agents.checkpoint
       - run: uv run pytest

@@ -6,6 +6,7 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://mabeyn_app:mabeyn_app@postgres:5432/mabeyn
       REDIS_URL: redis://redis:6379/0
+      TOOL_ALLOWED_HOSTS: kargoshop-mock
     env_file:
       - path: .env
         required: false
@@ -14,6 +15,12 @@ services:
         condition: service_completed_successfully
       redis:
         condition: service_healthy
+
+  kargoshop-mock:
+    build: .
+    command: ["uvicorn", "apps.kargoshop_mock.main:app", "--host", "0.0.0.0", "--port", "9000"]
+    ports:
+      - "9000:9000"
 
   worker:
     build: .
@@ -32,7 +39,7 @@ services:
 
   migrate:
     build: .
-    command: ["alembic", "upgrade", "head"]
+    command: ["sh", "-c", "alembic upgrade head && python -m mabeyn.agents.checkpoint"]
     environment:
       DATABASE_URL: postgresql+asyncpg://mabeyn_app:mabeyn_app@postgres:5432/mabeyn
       ADMIN_DATABASE_URL: postgresql+asyncpg://mabeyn:mabeyn@postgres:5432/mabeyn
