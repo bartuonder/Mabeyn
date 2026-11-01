@@ -55,5 +55,6 @@ def get_customer(
 
 
 Admin = Annotated[AdminClaims, Depends(get_admin)]
-TenantDb = Annotated[AsyncSession, Depends(get_tenant_db)]
+# scope="function" commits before the response is sent, so clients never read stale data.
+TenantDb = Annotated[AsyncSession, Depends(get_tenant_db, scope="function")]
 Customer = Annotated[CustomerClaims, Depends(get_customer)]
