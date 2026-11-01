@@ -87,13 +87,20 @@ uv run python -m evals.runners.tool_eval --name tool-eval
 
 The development sets (`rag.jsonl`, `tools.jsonl`) were used while building and tuning the pipeline: prompts and rules were changed after looking at the questions that failed. Their scores are therefore optimistic.
 
-`rag_heldout.jsonl` (30 questions) and `tools_heldout.jsonl` (15 scenarios) were written before the final measurement and are **not** used for tuning. They are run once per report, with a stronger judge model that is not the answer model (`JUDGE_MODEL=gpt-4.1`). If a held-out failure leads to a fix, the set is partly consumed: say so in the report and write a new held-out set before the next one.
+| Held-out set | Size | Status |
+| --- | --- | --- |
+| `rag_heldout.jsonl` | 30 questions | consumed: its failure (an English question answered in Turkish) led to the language fix in `rag-v5` |
+| `tools_heldout.jsonl` | 15 scenarios | consumed: same fix |
+| `rag_heldout_v2.jsonl` | 30 questions (25 answerable, 5 not) | fresh, measured once; gold sections are ones no other set uses |
+| `tools_heldout_v2.jsonl` | 15 scenarios | fresh, measured once |
+
+Held-out sets are written before the measurement and are **not** used for tuning. They are run once per report with a stronger judge that is not the answer model (`JUDGE_MODEL=gpt-4.1`). If a held-out failure leads to a fix, mark the set consumed here and write a new one before the next report. A consumed set stays in the repository as a regression test, but its numbers are no longer an unbiased estimate.
 
 ```bash
-JUDGE_MODEL=gpt-4.1 uv run python -m evals.runners.ablation --prefix heldout \
-  --dataset rag_heldout.jsonl --configs vector hybrid-rerank full
-JUDGE_MODEL=gpt-4.1 uv run python -m evals.runners.tool_eval --name tool-eval-heldout \
-  --dataset tools_heldout.jsonl
+JUDGE_MODEL=gpt-4.1 uv run python -m evals.runners.ablation --prefix heldout2 \
+  --dataset rag_heldout_v2.jsonl --configs vector hybrid-rerank full
+JUDGE_MODEL=gpt-4.1 uv run python -m evals.runners.tool_eval --name tool-eval-heldout2 \
+  --dataset tools_heldout_v2.jsonl
 ```
 
 Reading the tables:
