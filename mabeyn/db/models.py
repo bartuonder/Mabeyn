@@ -1,14 +1,17 @@
 import enum
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     Boolean,
+    Date,
     DateTime,
     Enum,
     ForeignKey,
     Integer,
+    LargeBinary,
     String,
     Text,
     UniqueConstraint,
@@ -20,6 +23,8 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from mabeyn.db.base import Base
+
+EMBEDDING_DIMENSIONS = 1536
 
 
 class DocumentSource(enum.StrEnum):
@@ -143,6 +148,9 @@ class Document(TenantModel):
     )
     error: Mapped[str | None] = mapped_column(Text)
     size_bytes: Mapped[int | None] = mapped_column(Integer)
+    language: Mapped[str] = mapped_column(String(8), server_default="tr")
+    effective_date: Mapped[date | None] = mapped_column(Date)
+    raw_content: Mapped[bytes | None] = mapped_column(LargeBinary, deferred=True)
 
 
 class Chunk(TenantModel):
@@ -158,6 +166,7 @@ class Chunk(TenantModel):
     section: Mapped[str | None] = mapped_column(Text)
     page: Mapped[int | None] = mapped_column(Integer)
     token_count: Mapped[int] = mapped_column(Integer)
+    embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIMENSIONS))
 
 
 class Conversation(TenantModel):
