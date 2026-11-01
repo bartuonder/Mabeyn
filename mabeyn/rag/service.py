@@ -27,6 +27,8 @@ class Final:
     ranked: list[RetrievedChunk] = field(default_factory=list)
     abstained: bool = False
     trace: dict[str, object] = field(default_factory=dict)
+    status: str = "answered"
+    approval_id: uuid.UUID | None = None
 
 
 RagEvent = Token | Retract | Final
