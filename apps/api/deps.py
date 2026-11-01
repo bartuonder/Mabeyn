@@ -5,7 +5,13 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from mabeyn.auth.tokens import AdminClaims, TokenError, decode_access_token
+from mabeyn.auth.tokens import (
+    AdminClaims,
+    CustomerClaims,
+    TokenError,
+    decode_access_token,
+    decode_customer_token,
+)
 from mabeyn.db.session import tenant_session
 
 bearer = HTTPBearer(auto_error=False)
@@ -37,5 +43,17 @@ async def get_tenant_db(
         yield session
 
 
+def get_customer(
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
+) -> CustomerClaims:
+    if credentials is None:
+        raise unauthorized()
+    try:
+        return decode_customer_token(credentials.credentials)
+    except TokenError:
+        raise unauthorized() from None
+
+
 Admin = Annotated[AdminClaims, Depends(get_admin)]
 TenantDb = Annotated[AsyncSession, Depends(get_tenant_db)]
+Customer = Annotated[CustomerClaims, Depends(get_customer)]

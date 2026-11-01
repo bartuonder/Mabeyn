@@ -102,3 +102,8 @@ class ToolOut(Response):
     http_method: str
     url_template: str
     created_at: datetime
+
+
+class ChatRequest(StrictRequest):
+    message: str = Field(min_length=1, max_length=2000)
+    conversation_id: uuid.UUID | None = None

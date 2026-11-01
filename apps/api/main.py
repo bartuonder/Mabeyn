@@ -3,7 +3,16 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from apps.api.routers import api_keys, auth, conversations, documents, health, sessions, tools
+from apps.api.routers import (
+    api_keys,
+    auth,
+    chat,
+    conversations,
+    documents,
+    health,
+    sessions,
+    tools,
+)
 from mabeyn.core.config import get_settings
 from mabeyn.core.logging import configure_logging
 from mabeyn.db.session import get_engine
@@ -27,6 +36,7 @@ def create_app() -> FastAPI:
     app.include_router(documents.router)
     app.include_router(conversations.router)
     app.include_router(tools.router)
+    app.include_router(chat.router)
     return app
 
 
