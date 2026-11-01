@@ -6,6 +6,8 @@ from evals.datasets import load_questions
 from mabeyn.ingestion.parse import parse_markdown
 from mabeyn.seed import SEED_ROOT, load_seed_documents
 
+RAG_SETS = ["rag.jsonl", "rag_en.jsonl", "rag_heldout.jsonl", "rag_heldout_v2.jsonl"]
+
 
 def headings() -> dict[str, set[str]]:
     result = {}
@@ -15,7 +17,7 @@ def headings() -> dict[str, set[str]]:
     return result
 
 
-@pytest.mark.parametrize("name", ["rag.jsonl", "rag_en.jsonl", "rag_heldout.jsonl"])
+@pytest.mark.parametrize("name", RAG_SETS)
 def test_gold_references_point_to_real_sections(name):
     available = headings()
     for question in load_questions(name):
@@ -26,7 +28,7 @@ def test_gold_references_point_to_real_sections(name):
             )
 
 
-@pytest.mark.parametrize("name", ["rag.jsonl", "rag_en.jsonl", "rag_heldout.jsonl"])
+@pytest.mark.parametrize("name", RAG_SETS)
 def test_ids_are_unique_and_unanswerable_have_no_gold(name):
     questions = load_questions(name)
     assert len({q.id for q in questions}) == len(questions)
@@ -75,3 +77,16 @@ def test_heldout_set_is_separate_from_the_development_set():
     assert len(heldout) == 30 and sum(not q.answerable for q in heldout) == 6
     assert all(q.set == "heldout" for q in heldout)
     assert not dev & {q.question.casefold() for q in heldout}
+
+
+def test_second_heldout_set_is_fresh():
+    """The first held-out set was consumed by a fix, so the second must repeat nothing."""
+    seen = {
+        q.question.casefold()
+        for name in ("rag.jsonl", "rag_en.jsonl", "rag_heldout.jsonl")
+        for q in load_questions(name)
+    }
+    fresh = load_questions("rag_heldout_v2.jsonl")
+    assert len(fresh) == 30 and sum(not q.answerable for q in fresh) == 5
+    assert all(q.set == "heldout2" for q in fresh)
+    assert not seen & {q.question.casefold() for q in fresh}

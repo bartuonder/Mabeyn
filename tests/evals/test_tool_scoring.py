@@ -183,9 +183,12 @@ def test_every_scenario_states_its_expected_outcome():
     assert all(s.outcome.strip() for s in load_scenarios())
 
 
-def test_heldout_scenarios_are_valid_and_do_not_repeat_development_ones():
-    heldout = load_scenarios("tools_heldout.jsonl")
+@pytest.mark.parametrize("name", ["tools_heldout.jsonl", "tools_heldout_v2.jsonl"])
+def test_heldout_scenarios_are_valid_and_do_not_repeat_development_ones(name):
+    heldout = load_scenarios(name)
     dev_messages = {s.message.casefold() for s in load_scenarios()}
+    if name.endswith("_v2.jsonl"):
+        dev_messages |= {s.message.casefold() for s in load_scenarios("tools_heldout.jsonl")}
     tools = {d["name"]: d for d in load_tool_definitions("http://shop")}
 
     assert len(heldout) == 15 and len({s.id for s in heldout}) == 15
