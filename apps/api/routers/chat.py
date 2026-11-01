@@ -14,7 +14,8 @@ from apps.api.schemas import ChatRequest
 from mabeyn.db.models import Conversation, Message, MessageRole, Tenant
 from mabeyn.db.session import tenant_session
 from mabeyn.llm.client import ChatMessage
-from mabeyn.rag.service import Final, RagService, Retract, Token, get_rag_service
+from mabeyn.rag.factory import get_rag_service
+from mabeyn.rag.service import Final, RagService, Retract, Token
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 log = structlog.get_logger()

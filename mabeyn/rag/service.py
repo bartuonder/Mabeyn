@@ -1,10 +1,9 @@
 import uuid
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass, field
-from functools import lru_cache
 from typing import Protocol
 
-from mabeyn.llm.client import LLM, ChatMessage, get_llm
+from mabeyn.llm.client import LLM, ChatMessage
 from mabeyn.rag.generate import extract_citations, safe_fallback, stream_answer
 from mabeyn.rag.retrieval import retrieve_vector
 from mabeyn.rag.types import Citation, RetrievedChunk
@@ -84,8 +83,3 @@ async def collect(events: AsyncIterator[RagEvent]) -> Final:
     if final is None:
         raise RuntimeError("RAG service finished without a final event")
     return final
-
-
-@lru_cache
-def get_rag_service() -> RagService:
-    return BaselineRag(get_llm())

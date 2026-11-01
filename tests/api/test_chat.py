@@ -9,7 +9,8 @@ from apps.api.main import app
 from mabeyn.auth.tokens import create_customer_token
 from mabeyn.db import models as m
 from mabeyn.db.session import tenant_session
-from mabeyn.rag.service import BaselineRag, get_rag_service
+from mabeyn.rag.factory import get_rag_service
+from mabeyn.rag.service import BaselineRag
 from tests.factories import SeededTenant
 from tests.fakes import FakeLLM
 from tests.rag.test_retrieval_and_generate import seed
