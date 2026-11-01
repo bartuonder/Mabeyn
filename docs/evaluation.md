@@ -62,3 +62,5 @@ python -m evals.runners.judge_agreement sample evals/results/<run>.json   # draw
 # fill in "label" (true/false) and set "reviewed": true in judge_calibration.jsonl
 python -m evals.runners.judge_agreement                                    # agreement and Cohen's kappa
 ```
+
+Calibration labels are provisional until `reviewed` is set to `true` for every row. Labels written while looking at the judge's verdict tend to overstate agreement, so label blind where possible.
