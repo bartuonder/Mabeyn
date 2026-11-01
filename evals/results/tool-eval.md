@@ -1,7 +1,7 @@
 | Metric | Value |
 | --- | ---: |
 | scenarios | 40.000 |
-| scenario_pass_rate | 1.000 |
+| scenario_pass_rate | 0.875 |
 | tool_selection_accuracy | 1.000 |
 | argument_accuracy | 1.000 |
 | unnecessary_call_rate | 0.000 |
@@ -9,8 +9,10 @@
 | route_accuracy | 0.975 |
 | status_accuracy | 1.000 |
 | approval_expectation_accuracy | 1.000 |
+| outcome_accuracy | 0.875 |
+| language_accuracy | 1.000 |
 | identity_leaks | 0.000 |
 | tool_calls_per_scenario | 0.825 |
 | sensitive_executed_without_approval | 0.000 |
 | cost_per_scenario_usd | 0.002 |
-| latency_p50_s | 3.863 |
+| latency_p50_s | 3.871 |

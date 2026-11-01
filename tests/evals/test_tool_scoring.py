@@ -146,25 +146,37 @@ def test_dataset_is_consistent_with_the_seed_tools_and_orders():
     assert all(owner[order] == s.customer_id for s, order in own_orders)
 
 
-def test_outcome_and_language_verdicts_feed_the_score():
+def test_outcome_verdicts_feed_the_score():
     from evals.tool_scoring import OutcomeVerdict
 
-    good = OutcomeVerdict(True, True, "ok")
+    good = OutcomeVerdict(True, "ok")
     assert score_scenario(scenario(), [call()], ["action"], "answered", "", verdict=good).passed
-    wrong = OutcomeVerdict(False, True, "claimed a refund")
+    wrong = OutcomeVerdict(False, "claimed a refund")
     scored = score_scenario(scenario(), [call()], ["action"], "answered", "", verdict=wrong)
     assert scored.outcome_ok is False and not scored.passed
-    foreign = OutcomeVerdict(True, False, "wrong language")
-    assert not score_scenario(
-        scenario(), [call()], ["action"], "answered", "", verdict=foreign
-    ).passed
-    metrics = summarize_scores(
-        [
-            score_scenario(scenario(), [call()], ["action"], "answered", "", verdict=v)
-            for v in (good, wrong)
-        ]
-    )
-    assert metrics["outcome_accuracy"] == 0.5 and metrics["language_accuracy"] == 1.0
+    both = [
+        score_scenario(scenario(), [call()], ["action"], "answered", "", verdict=v)
+        for v in (good, wrong)
+    ]
+    assert summarize_scores(both)["outcome_accuracy"] == 0.5
+
+
+def test_language_is_checked_without_a_model():
+    from evals.tool_scoring import guess_language, language_matches
+
+    assert guess_language("Where is my order, and can you help me?") == "en"
+    assert guess_language("Siparişim nerede, kargoya verildi mi?") == "tr"
+    assert guess_language("Hello!") is None
+    assert guess_language("[İade Politikası:İade Süresi]") is None
+    assert language_matches("Where is order KS-1?", "Your order has shipped.") is True
+    assert language_matches("Where is order KS-1?", "Siparişiniz kargoya verilmiş.") is False
+    assert language_matches("Hello!", "Merhaba, size nasıl yardımcı olabilirim?") is None
+
+    wrong_language = score_scenario(
+        scenario(message="Where is order KS-1001?"), [call()], ["action"], "answered",
+        "Siparişiniz kargoya verildi ve bu ürün için teslim edilecektir.",
+    )  # fmt: skip
+    assert wrong_language.language_ok is False and not wrong_language.passed
 
 
 def test_every_scenario_states_its_expected_outcome():

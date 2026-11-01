@@ -4,6 +4,7 @@ import os
 import time
 import uuid
 from dataclasses import asdict
+from datetime import date
 from typing import Any
 
 from httpx import ASGITransport
@@ -40,6 +41,7 @@ from mabeyn.tools.executor import HttpToolExecutor
 from mabeyn.tools.service import ToolRunner
 
 SHOP_URL = "http://shop"
+MOCK_TODAY = date(2026, 11, 1)  # matches the date in seed/kargoshop/orders.json
 
 
 async def _approval_counts(tenant_id: uuid.UUID, conversation_id: uuid.UUID) -> tuple[int, int]:
@@ -78,7 +80,9 @@ async def run_scenario(
     store = Store()
     runner = ToolRunner(HttpToolExecutor(transport=ASGITransport(app=create_app(store))))
     service = SupervisorService(llm, rag, runner, saver)
-    turn = TurnContext(tenant_id, scenario.customer_id, conversation_id, "KargoShop")
+    turn = TurnContext(
+        tenant_id, scenario.customer_id, conversation_id, "KargoShop", today=MOCK_TODAY
+    )
 
     with usage.measure() as meter:
         started = time.perf_counter()

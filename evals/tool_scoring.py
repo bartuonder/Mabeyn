@@ -1,5 +1,6 @@
 import json
 import math
+import re
 import unicodedata
 from collections.abc import Sequence
 from dataclasses import dataclass, field
@@ -37,7 +38,6 @@ class Scenario:
 @dataclass(frozen=True)
 class OutcomeVerdict:
     outcome_ok: bool
-    language_ok: bool
     reason: str
 
 
@@ -127,6 +127,35 @@ def _matches(expected: ExpectedCall, observed: ObservedCall) -> bool:
     )
 
 
+TURKISH_WORDS = frozenset(
+    "ve bir bu için ile de da mi mı mu mü ne nasıl kaç var yok lütfen istiyorum değil evet hayır "
+    "bana benim siparişim siparişimi siparişimin siparişiniz ürün ürünler iade kargo teslim "
+    "olarak daha çok veya ama gibi şu ben sizin sizi bilgi talebiniz talebinizi olur edebilirsiniz "
+    "misiniz miyim bulunmaktadır olan nedir nerede".split()
+)
+ENGLISH_WORDS = frozenset(
+    "the and is are to of for you your my can i a in on it that this with not we will have has "
+    "do does was were be please if an or at by what where how when order refund been from "
+    "could would should there their about".split()
+)
+CITATION_TAG = re.compile(r"\[[^\[\]]+:[^\[\]]+\]")
+
+
+def guess_language(text: str) -> str | None:
+    """Turkish or English by function words; None when the text gives no clear signal."""
+    words = re.findall(r"[^\W\d_]+", CITATION_TAG.sub(" ", text).casefold())
+    turkish = sum(w in TURKISH_WORDS or any(c in w for c in "çğışöü") for w in words)
+    english = sum(w in ENGLISH_WORDS for w in words)
+    if turkish == english:
+        return None
+    return "tr" if turkish > english else "en"
+
+
+def language_matches(message: str, answer: str) -> bool | None:
+    asked, answered = guess_language(message), guess_language(answer)
+    return None if asked is None or answered is None else asked == answered
+
+
 def route_matches(expected: str, plan: Sequence[str]) -> bool:
     wanted = {"both": {"knowledge", "action"}}.get(expected, {expected})
     # A refund request may be answered by the action agent alone; both are acceptable.
@@ -177,7 +206,7 @@ def score_scenario(
         sensitive_calls=sensitive_calls,
         sensitive_with_approval=sensitive_with_approval,
         outcome_ok=verdict.outcome_ok if verdict else None,
-        language_ok=verdict.language_ok if verdict else None,
+        language_ok=language_matches(scenario.message, answer),
         judge_reason=verdict.reason if verdict else "",
         notes=notes,
     )

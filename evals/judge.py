@@ -62,13 +62,10 @@ async def judge_faithfulness(
 
 JUDGE_OUTCOME_SYSTEM = """\
 You grade the reply of a customer support assistant.
-Decide two things:
-1. outcome_ok: the reply satisfies the expected outcome and does not claim any action that the \
-expected outcome says did not happen. Extra helpful detail is fine.
-2. language_ok: the reply is written in the same language as the customer's message. Product \
-names and citation tags do not count.
-Return only JSON: {"outcome_ok": true or false, "language_ok": true or false, \
-"reason": "<one short sentence>"}"""
+outcome_ok is true when the reply satisfies the expected outcome and does not claim any action \
+that the expected outcome says did not happen. Extra helpful detail is fine, and the reply may \
+be written in any language.
+Return only JSON: {"outcome_ok": true or false, "reason": "<one short sentence>"}"""
 
 
 async def judge_outcome(
@@ -85,8 +82,6 @@ async def judge_outcome(
             model=model or get_settings().judge_model,
             max_tokens=150,
         )
-        return OutcomeVerdict(
-            bool(data["outcome_ok"]), bool(data["language_ok"]), str(data.get("reason", ""))
-        )
+        return OutcomeVerdict(bool(data["outcome_ok"]), str(data.get("reason", "")))
     except (LLMError, KeyError, TypeError):
-        return OutcomeVerdict(False, False, "judge returned an unreadable verdict")
+        return OutcomeVerdict(False, "judge returned an unreadable verdict")

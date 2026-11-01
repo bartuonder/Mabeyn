@@ -1,6 +1,6 @@
 {
   "name": "tool-eval",
-  "created_at": "2026-11-01T15:06:12",
+  "created_at": "2026-11-01T15:10:19",
   "config": {
     "dataset": "tools.jsonl",
     "llm_model": "gpt-4.1-mini",
@@ -9,7 +9,7 @@
   },
   "metrics": {
     "scenarios": 40.0,
-    "scenario_pass_rate": 1.0,
+    "scenario_pass_rate": 0.875,
     "tool_selection_accuracy": 1.0,
     "argument_accuracy": 1.0,
     "unnecessary_call_rate": 0.0,
@@ -17,11 +17,13 @@
     "route_accuracy": 0.975,
     "status_accuracy": 1.0,
     "approval_expectation_accuracy": 1.0,
+    "outcome_accuracy": 0.875,
+    "language_accuracy": 1.0,
     "identity_leaks": 0.0,
     "tool_calls_per_scenario": 0.825,
     "sensitive_executed_without_approval": 0.0,
-    "cost_per_scenario_usd": 0.00163238525,
-    "latency_p50_s": 3.862709899998663
+    "cost_per_scenario_usd": 0.0016364452500000001,
+    "latency_p50_s": 3.8710566999980074
   },
   "scenarios": [
     {
@@ -40,7 +42,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 3.862709899998663,
+      "latency_s": 3.8710566999980074,
       "cost_usd": 0.0008212,
       "id": "tool-001",
       "message": "Where is order KS-1002?",
@@ -55,6 +57,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms the order has shipped and provides the correct tracking number in the same language as the customer message.",
       "notes": [],
       "passed": true
     },
@@ -74,7 +79,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 3.3906489000019064,
+      "latency_s": 3.3818549000006897,
       "cost_usd": 0.00081525,
       "id": "tool-002",
       "message": "What is the status of order KS-1003?",
@@ -89,6 +94,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states the order is still processing and not delivered, matching the expected outcome.",
       "notes": [],
       "passed": true
     },
@@ -108,7 +116,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 3.3222865000007005,
+      "latency_s": 3.3164475000012317,
       "cost_usd": 0.0007968000000000001,
       "id": "tool-003",
       "message": "KS-2002 siparişim ne zaman gelecek?",
@@ -123,6 +131,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms the order KS-2002 was delivered and is in Turkish as the customer's message.",
       "notes": [],
       "passed": true
     },
@@ -142,7 +153,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 3.4156106999998883,
+      "latency_s": 3.4194601999988663,
       "cost_usd": 0.0007875499999999999,
       "id": "tool-004",
       "message": "Was my order KS-3001 cancelled?",
@@ -157,6 +168,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The assistant confirms the order was cancelled as expected and uses the same language as the customer.",
       "notes": [],
       "passed": true
     },
@@ -174,7 +188,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 3.901789400002599,
+      "latency_s": 3.903885600004287,
       "cost_usd": 0.0010013,
       "id": "tool-005",
       "message": "Show me all my orders.",
@@ -189,6 +203,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly lists all three orders as requested and is in English, matching the customer's language.",
       "notes": [],
       "passed": true
     },
@@ -208,7 +225,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.655519199999617,
+      "latency_s": 3.2851890999991156,
       "cost_usd": 0.00078355,
       "id": "tool-006",
       "message": "Which of my orders are still being processed?",
@@ -223,6 +240,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly identifies KS-2003 as the order still being processed and is in English as the customer's message.",
       "notes": [],
       "passed": true
     },
@@ -242,7 +262,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.630025599999499,
+      "latency_s": 3.2558175000012852,
       "cost_usd": 0.0007966000000000001,
       "id": "tool-007",
       "message": "Siparişlerimden kargoda olan var mı?",
@@ -257,6 +277,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly reports the shipped order KS-1002 and is in Turkish as the customer message.",
       "notes": [],
       "passed": true
     },
@@ -276,7 +299,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.668754699998317,
+      "latency_s": 3.295014199999059,
       "cost_usd": 0.00077145,
       "id": "tool-008",
       "message": "What is the tracking number of KS-3002?",
@@ -291,6 +314,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly provides the tracking number as requested.",
       "notes": [],
       "passed": true
     },
@@ -310,7 +336,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.724749900000461,
+      "latency_s": 3.2873353000013594,
       "cost_usd": 0.0007976999999999999,
       "id": "tool-009",
       "message": "Where is my air fryer?",
@@ -325,8 +351,11 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": false,
+      "language_ok": true,
+      "judge_reason": "The reply does not inform the customer that the air fryer order KS-1002 has shipped as expected.",
       "notes": [],
-      "passed": true
+      "passed": false
     },
     {
       "answer": "Yes, your robot vacuum (order KS-2002) has been delivered on 2026-10-28. Is there anything else you would like to know about this order?",
@@ -344,7 +373,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.692048500000965,
+      "latency_s": 3.317395000000033,
       "cost_usd": 0.00085165,
       "id": "tool-010",
       "message": "Has my robot vacuum been delivered?",
@@ -359,6 +388,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms the delivery of the robot vacuum as expected and is in English, matching the customer's language.",
       "notes": [],
       "passed": true
     },
@@ -376,7 +408,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.781556799998725,
+      "latency_s": 3.407985899999403,
       "cost_usd": 0.0008933000000000002,
       "id": "tool-011",
       "message": "Where is my latest order?",
@@ -391,11 +423,14 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly identifies the latest order KS-1003 and states it is being processed, matching the expected outcome.",
       "notes": [],
       "passed": true
     },
     {
-      "answer": "I have opened a support ticket for the crackling issue with your earbuds from order KS-1001. The support team will assist you soon. Please note that the warranty for electronic products like your earbuds is valid for 2 years from the delivery date and covers manufacturing defects and malfunctions during normal use. Repairs or part replacements are free of charge under warranty, but damages caused by impact, liquid contact, or user errors are not covered. Keep your invoice as it serves as the warranty certificate, and you can download it again from your account if lost [Garanti Koşulları:Garanti Süresi] [Garanti Koşulları:Garanti Kapsamı] [Garanti Koşulları:Garanti Kapsamı Dışındaki Durumlar] [Garanti Koşulları:Garanti Belgesi].",
+      "answer": "I have opened a support ticket for the crackling issue with your earbuds from order KS-1001. The support team will assist you soon. Please note that the warranty for electronic products like your earbuds is 2 years from the delivery date and covers manufacturing defects and malfunctions during normal use. Repairs or part replacements are free of charge under warranty, but damages caused by impact, liquid contact, unauthorized intervention, incorrect voltage, or user errors are not covered. Keep your invoice as it serves as the warranty certificate [Garanti Koşulları:Garanti Süresi] [Garanti Koşulları:Garanti Kapsamı] [Garanti Koşulları:Garanti Kapsamı Dışındaki Durumlar] [Garanti Koşulları:Garanti Belgesi].",
       "status": "answered",
       "route": [
         "knowledge",
@@ -412,8 +447,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 9.4493822000004,
-      "cost_usd": 0.00348343,
+      "latency_s": 9.69679890000225,
+      "cost_usd": 0.00347703,
       "id": "tool-012",
       "message": "My earbuds from order KS-1001 crackle. Please open a support ticket about it.",
       "category": "ticket",
@@ -427,11 +462,14 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The assistant confirms the support ticket was opened and provides additional warranty information in the same language.",
       "notes": [],
       "passed": true
     },
     {
-      "answer": "KS-2002 sipariş numaralı robot süpürge için destek talebiniz açıldı. Size en kısa sürede yardımcı olunacaktır. Başka bir konuda yardımcı olabilir miyim?",
+      "answer": "KS-2002 siparişiniz için \"robot süpürge çalışmıyor\" konulu destek talebiniz açıldı. Size en kısa sürede yardımcı olunacaktır. Başka bir konuda yardımcı olabilir miyim?",
       "status": "answered",
       "route": [
         "action"
@@ -447,8 +485,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.7882979000005435,
-      "cost_usd": 0.00087835,
+      "latency_s": 2.679163200002222,
+      "cost_usd": 0.00088555,
       "id": "tool-013",
       "message": "Bir destek talebi açın: KS-2002 siparişimdeki robot süpürge çalışmıyor.",
       "category": "ticket",
@@ -462,6 +500,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms the support ticket was opened and is in Turkish as the customer's message.",
       "notes": [],
       "passed": true
     },
@@ -482,8 +523,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.8174163999992743,
-      "cost_usd": 0.00083235,
+      "latency_s": 2.739988999999696,
+      "cost_usd": 0.0008311500000000001,
       "id": "tool-014",
       "message": "Open a ticket for me: I was charged twice for order KS-3002.",
       "category": "ticket",
@@ -497,11 +538,14 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The assistant confirms the ticket was opened and uses the same language as the customer.",
       "notes": [],
       "passed": true
     },
     {
-      "answer": "I created a ticket for your late parcel KS-1002. Our support team will follow up and update you soon. Is there anything else I can help with?",
+      "answer": "I have created a ticket for your late parcel KS-1002. Our support team will follow up and provide you with an update. Is there anything else I can help you with?",
       "status": "answered",
       "route": [
         "action"
@@ -517,8 +561,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.7485374999996566,
-      "cost_usd": 0.0008292,
+      "latency_s": 2.6952424999981304,
+      "cost_usd": 0.000836,
       "id": "tool-015",
       "message": "My parcel KS-1002 is late and I need someone to follow up. Create a ticket.",
       "category": "ticket",
@@ -532,6 +576,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The assistant confirms the ticket creation as requested and responds in English, matching the customer's language.",
       "notes": [],
       "passed": true
     },
@@ -554,7 +601,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.9827550999998493,
+      "latency_s": 3.6010158999979467,
       "cost_usd": 0.0008605,
       "id": "tool-016",
       "message": "Change the delivery address of KS-1003 to Bahçe Sk. 7, Izmir, postal code 35000.",
@@ -569,6 +616,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms the address change as requested and is in the same language.",
       "notes": [],
       "passed": true
     },
@@ -591,7 +641,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.7034638000004634,
+      "latency_s": 3.32977579999897,
       "cost_usd": 0.00086315,
       "id": "tool-017",
       "message": "KS-2003 siparişimin adresini Mimar Sk. 3, Ankara, posta kodu 06500 olarak değiştirin.",
@@ -606,6 +656,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The assistant confirms the address change as requested and replies in Turkish.",
       "notes": [],
       "passed": true
     },
@@ -628,7 +681,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.7994247999995423,
+      "latency_s": 3.423718699999881,
       "cost_usd": 0.0008235499999999999,
       "id": "tool-018",
       "message": "Update the address of KS-1002 to Yeni Cad. 5, Bursa, 16000.",
@@ -643,6 +696,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The assistant correctly explains that the address cannot be changed and offers further assistance without claiming any change was made.",
       "notes": [],
       "passed": true
     },
@@ -662,7 +718,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.7420054000012897,
+      "latency_s": 3.373823599999014,
       "cost_usd": 0.0007968000000000001,
       "id": "tool-019",
       "message": "I want to change the address of KS-3001.",
@@ -677,11 +733,14 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states the order is cancelled and does not claim any address change.",
       "notes": [],
       "passed": true
     },
     {
-      "answer": "Bedankt voor uw verzoek om een volledige terugbetaling voor bestelling KS-1001. Dit verzoek moet door een collega worden beoordeeld en zal worden voltooid zodra het is goedgekeurd, dus controleer later alstublieft opnieuw.",
+      "answer": "Thank you for your request to refund order KS-1001 in full, as the earbuds are unopened. This request needs a review by a human colleague and will be completed once it is approved, so please check back later.",
       "status": "pending_approval",
       "route": [
         "knowledge",
@@ -706,8 +765,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 8.728059700000813,
-      "cost_usd": 0.00312029,
+      "latency_s": 9.026137500000914,
+      "cost_usd": 0.0031211900000000002,
       "id": "tool-020",
       "message": "Refund order KS-1001 in full, the earbuds are unopened.",
       "category": "refund",
@@ -721,11 +780,14 @@
       "total_calls": 2,
       "sensitive_calls": 1,
       "sensitive_with_approval": 1,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states that the refund request needs human review and is not yet completed, matching the expected outcome and is in English as the customer message.",
       "notes": [],
       "passed": true
     },
     {
-      "answer": "Talebinizin bir insan meslektaşımız tarafından incelenmesi gerekmektedir. Onaylandıktan sonra işlem tamamlanacak, lütfen daha sonra tekrar kontrol edin.",
+      "answer": "KS-2002 siparişiniz için tam iade talebiniz, bir insan meslektaşımız tarafından incelenecek ve onaylandıktan sonra tamamlanacaktır. Lütfen daha sonra tekrar kontrol edin.",
       "status": "pending_approval",
       "route": [
         "knowledge",
@@ -750,8 +812,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 8.99075890000131,
-      "cost_usd": 0.0034101000000000005,
+      "latency_s": 8.903792899998734,
+      "cost_usd": 0.0034176000000000002,
       "id": "tool-021",
       "message": "KS-2002 siparişim için tam iade istiyorum, ürün kapalı ambalajında.",
       "category": "refund",
@@ -765,11 +827,14 @@
       "total_calls": 2,
       "sensitive_calls": 1,
       "sensitive_with_approval": 1,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states that the refund request needs human review and is not yet completed, and it is in Turkish as the customer message.",
       "notes": [],
       "passed": true
     },
     {
-      "answer": "Gracias por su mensaje. Su solicitud de reembolso será revisada por un colega y se completará una vez que sea aprobada, así que por favor, revise más tarde.",
+      "answer": "Thank you for your request for a refund for order KS-3002 due to the defective power bank. This request needs a review by a human colleague and will be completed once it is approved, so please check back later.",
       "status": "pending_approval",
       "route": [
         "knowledge",
@@ -794,8 +859,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 8.56281349999881,
-      "cost_usd": 0.00310764,
+      "latency_s": 8.960098899999139,
+      "cost_usd": 0.0031157399999999997,
       "id": "tool-022",
       "message": "I want my money back for KS-3002, the power bank is defective.",
       "category": "refund",
@@ -809,11 +874,14 @@
       "total_calls": 2,
       "sensitive_calls": 1,
       "sensitive_with_approval": 1,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states that the refund request needs human review and is not yet completed, matching the expected outcome.",
       "notes": [],
       "passed": true
     },
     {
-      "answer": "Talebinizin bir insan meslektaşımız tarafından incelenmesi gerekmektedir. Onaylandıktan sonra işlem tamamlanacak, lütfen daha sonra tekrar kontrol edin.",
+      "answer": "Thank you for your request for a refund of 100 TL for order KS-1001 due to the missing cable. This request needs a review by a human colleague and will be completed once it is approved, so please check back later.",
       "status": "pending_approval",
       "route": [
         "knowledge",
@@ -838,8 +906,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 8.502407600000879,
-      "cost_usd": 0.0031033900000000006,
+      "latency_s": 8.7526106000023,
+      "cost_usd": 0.0031126900000000004,
       "id": "tool-023",
       "message": "Refund 100 TL of order KS-1001, the cable is missing.",
       "category": "refund",
@@ -853,11 +921,14 @@
       "total_calls": 2,
       "sensitive_calls": 1,
       "sensitive_with_approval": 1,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states that the refund request needs human review and is not yet completed, matching the expected outcome.",
       "notes": [],
       "passed": true
     },
     {
-      "answer": "Siparişiniz KS-2001 için iade talebiniz alınmıştır. Lütfen iade sebebinizi belirtir misiniz? Ürünler hasarsız ve eksiksiz olmak şartıyla iade edilebilir. İade talebi, teslimat tarihinden itibaren 30 gün içinde oluşturulmalıdır. İade edilen ürün depoya ulaşıp kontrolden geçtikten sonra 5 iş günü içinde ödemeniz aynı yöntemle iade edilir. Kapıda ödeme yapılan siparişlerde iade, hesap sahibinin IBAN numarasına yapılır [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:Geri Ödeme Süresi].",
+      "answer": "Siparişiniz KS-2001 için iade talebinizi almış bulunmaktayız. Lütfen iade talebinizin sebebini belirtir misiniz? Ürünler hasarsız ve eksiksiz olmak şartıyla iade edilebilir, kullanım izi bulunan ürünler kabul edilmez. İade talebi, teslimat tarihinden itibaren 30 gün içinde yapılmalıdır. İade edilen ürün depoya ulaşıp kontrolden geçtikten sonra 5 iş günü içinde ödemeniz aynı yöntemle iade edilir. Kapıda ödeme siparişlerinde iade, hesap sahibinin IBAN numarasına yapılır [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:Geri Ödeme Süresi].",
       "status": "answered",
       "route": [
         "knowledge",
@@ -873,8 +944,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 9.130269600000247,
-      "cost_usd": 0.0033969900000000003,
+      "latency_s": 9.302079099996263,
+      "cost_usd": 0.0034281900000000002,
       "id": "tool-024",
       "message": "Please refund order KS-2001.",
       "category": "refund_denied",
@@ -888,11 +959,14 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": false,
+      "language_ok": true,
+      "judge_reason": "The reply incorrectly states that a refund request was received, which contradicts the expected outcome that the refund cannot be processed because the return window has passed.",
       "notes": [],
-      "passed": true
+      "passed": false
     },
     {
-      "answer": "Siparişiniz KS-1002 henüz teslim edilmediği için iade talebi oluşturulamıyor. Ürünler hasarsız ve eksiksiz olmak şartıyla, teslimat tarihinden itibaren 30 gün içinde iade edilebilir. İade için sipariş numarası yeterlidir, fatura şart değildir. İade edilen ürün depoya ulaşıp kontrolden geçtikten sonra 5 iş günü içinde ödeme aynı yöntemle iade edilir [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:Geri Ödeme Süresi].",
+      "answer": "Siparişiniz KS-1002 henüz teslim edilmediği için iade talebi oluşturulamıyor. Ürünler hasarsız ve eksiksiz olmak şartıyla, teslimattan itibaren 30 gün içinde iade edilebilir. İade edilen ürün depoya ulaşıp kontrolden geçtikten sonra 5 iş günü içinde ödeme aynı yöntemle iade edilir [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:Geri Ödeme Süresi]. Başka bir konuda yardımcı olabilir miyim?",
       "status": "answered",
       "route": [
         "knowledge",
@@ -908,8 +982,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 9.03670620000048,
-      "cost_usd": 0.00339259,
+      "latency_s": 9.27957079999942,
+      "cost_usd": 0.0033853900000000003,
       "id": "tool-025",
       "message": "Refund order KS-1002 please.",
       "category": "refund_denied",
@@ -923,6 +997,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly explains that the order cannot be refunded yet because it has not been delivered and does not claim a refund was requested, and it is written in Turkish as the customer's message.",
       "notes": [],
       "passed": true
     },
@@ -934,7 +1011,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 5.961371999999756,
+      "latency_s": 6.4243552000007185,
       "cost_usd": 0.0022585699999999997,
       "id": "tool-026",
       "message": "What is your return policy?",
@@ -949,6 +1026,9 @@
       "total_calls": 0,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply clearly states returns are accepted within 30 days of delivery and provides detailed policy information in the same language as the customer message.",
       "notes": [],
       "passed": true
     },
@@ -960,8 +1040,8 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 5.770289899999625,
-      "cost_usd": 0.00200181,
+      "latency_s": 5.346312199997556,
+      "cost_usd": 0.0019982100000000003,
       "id": "tool-027",
       "message": "Kargo ücreti ne kadar?",
       "category": "knowledge",
@@ -975,8 +1055,11 @@
       "total_calls": 0,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": false,
+      "language_ok": true,
+      "judge_reason": "The reply does not mention that standard shipping is free for orders over 500 TL as expected.",
       "notes": [],
-      "passed": true
+      "passed": false
     },
     {
       "answer": "The warranty period for electronics is 2 years, starting from the delivery date of the product [Garanti Koşulları:Garanti Süresi].",
@@ -986,7 +1069,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 4.9487033000004885,
+      "latency_s": 5.43994240000211,
       "cost_usd": 0.0016530100000000001,
       "id": "tool-028",
       "message": "How long is the warranty on electronics?",
@@ -1001,6 +1084,9 @@
       "total_calls": 0,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states the 2-year warranty and is in the same language as the customer's message.",
       "notes": [],
       "passed": true
     },
@@ -1012,7 +1098,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 9.794486899998446,
+      "latency_s": 10.14935769999829,
       "cost_usd": 0.00369351,
       "id": "tool-029",
       "message": "Do you ship to Germany?",
@@ -1027,8 +1113,11 @@
       "total_calls": 0,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": false,
+      "language_ok": true,
+      "judge_reason": "The reply does not state that KargoShop ships only to Turkey and KKTC and not to Germany, as expected.",
       "notes": [],
-      "passed": true
+      "passed": false
     },
     {
       "answer": "Evet, Hava Fritözü F6'nın sepeti bulaşık makinesinde yıkanabilir. Ancak cihazın gövdesi ve ısıtıcı bölümü suya batırılmamalı, nemli bezle silinmelidir [Hava Fritözü F6 Kullanım Kılavuzu:Temizlik].",
@@ -1038,7 +1127,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 5.5103824999996505,
+      "latency_s": 5.258439199999884,
       "cost_usd": 0.0019234900000000001,
       "id": "tool-030",
       "message": "Hava fritözü F6 sepetini bulaşık makinesinde yıkayabilir miyim?",
@@ -1053,6 +1142,9 @@
       "total_calls": 0,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms the basket can be washed in the dishwasher and provides additional relevant care instructions in Turkish.",
       "notes": [],
       "passed": true
     },
@@ -1064,7 +1156,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 5.290736699998888,
+      "latency_s": 5.794398700003512,
       "cost_usd": 0.00172289,
       "id": "tool-031",
       "message": "Hello!",
@@ -1079,6 +1171,9 @@
       "total_calls": 0,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply greets the customer politely and offers help, matching the expected outcome.",
       "notes": [],
       "passed": true
     },
@@ -1090,7 +1185,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 5.289902300000904,
+      "latency_s": 5.771147300001758,
       "cost_usd": 0.00190698,
       "id": "tool-032",
       "message": "How do I put the B300 earbuds into pairing mode?",
@@ -1105,6 +1200,9 @@
       "total_calls": 0,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly explains the pairing mode process in the same language as the customer message.",
       "notes": [],
       "passed": true
     },
@@ -1116,7 +1214,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 4.964019200000621,
+      "latency_s": 5.419940400000996,
       "cost_usd": 0.0016413599999999997,
       "id": "tool-033",
       "message": "Can I pay with cash on delivery?",
@@ -1131,11 +1229,14 @@
       "total_calls": 0,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states the cash on delivery fee and basket limit in Turkish, matching the customer's language.",
       "notes": [],
       "passed": true
     },
     {
-      "answer": "Siparişiniz KS-1001, 2026-10-24 tarihinde teslim edilmiş. İade talebi teslimattan itibaren 30 gün içinde yapılmalıdır; bu süre geçtiyse iade kabul edilmez ve ürün garanti kapsamında değerlendirilir. Ürün hasarsız ve eksiksiz olmalı, kullanım izi bulunan ürünler iade edilemez. İade kargo ücreti anlaşmalı kargo Anadolu Kargo ile ücretsizdir. Ürün depoya ulaşıp kontrol edildikten sonra 5 iş günü içinde ödeme iade edilir. Ambalajı açılmış kulak içi kulaklıklar iade edilemez [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:İade Kargo Ücreti] [İade Politikası:Geri Ödeme Süresi] [İade Politikası:İade Edilemeyen Ürünler].",
+      "answer": "Siparişiniz KS-1001, 2026-10-24 tarihinde teslim edilmiş. İade talebi teslimattan itibaren 30 gün içinde yapılmalıdır; bu süre geçtiyse iade kabul edilmez ve ürün garanti kapsamında değerlendirilir. Ürünler hasarsız ve eksiksiz olmalı, kullanım izi bulunan ürünler kabul edilmez. İade kargo ücreti, anlaşmalı kargo Anadolu Kargo ile ücretsizdir. Ürün depoya ulaşıp kontrol edildikten sonra 5 iş günü içinde ödeme iade edilir. Ambalajı açılmış kulak içi kulaklıklar iade edilemez [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:İade Kargo Ücreti] [İade Politikası:Geri Ödeme Süresi] [İade Politikası:İade Edilemeyen Ürünler]. Lütfen siparişinizin teslim tarihinden itibaren 30 gün içinde olup olmadığını belirtirseniz, iade yapılıp yapılamayacağını kesin olarak söyleyebilirim.",
       "status": "answered",
       "route": [
         "knowledge",
@@ -1151,8 +1252,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 9.869823799999722,
-      "cost_usd": 0.004122570000000001,
+      "latency_s": 10.617878299999575,
+      "cost_usd": 0.00419057,
       "id": "tool-034",
       "message": "What is the return policy, and can I still return order KS-1001?",
       "category": "mixed",
@@ -1166,11 +1267,14 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": false,
+      "language_ok": true,
+      "judge_reason": "The reply incorrectly states that returns are not accepted if the 30-day window has passed, but the expected outcome confirms the order is within the return window.",
       "notes": [],
-      "passed": true
+      "passed": false
     },
     {
-      "answer": "Standard kargo ile gönderimler 2 ila 4 iş günü sürer. Siparişiniz KS-3002, 16.10.2026 tarihinde Cumhuriyet Mah. 5, İzmir, 35220 posta koduna teslim edilmiştir. Başka bir konuda yardımcı olabilirsem lütfen bildirin!",
+      "answer": "Your order KS-3002 has been delivered on 2026-10-16 to Cumhuriyet Mah. 5, Izmir, postal code 35220. Standard shipping typically takes 2 to 4 business days. If you need more help, let me know! [Kargo Sıkça Sorulan Sorular:Teslimat Süreleri]",
       "status": "answered",
       "route": [
         "knowledge",
@@ -1186,8 +1290,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 7.86148890000004,
-      "cost_usd": 0.00261994,
+      "latency_s": 7.982187599998724,
+      "cost_usd": 0.00264334,
       "id": "tool-035",
       "message": "How long does standard shipping take, and where is order KS-3002?",
       "category": "mixed",
@@ -1201,11 +1305,14 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states the shipping duration and delivery status in the same language as the customer message.",
       "notes": [],
       "passed": true
     },
     {
-      "answer": "R5 robot süpürgenizin garantisi teslim tarihinden itibaren 2 yıl sürelidir. KS-2002 numaralı siparişiniz 28.10.2026 tarihinde teslim edilmiştir. Başka bir konuda yardımcı olabilirsem lütfen bildirin. [Garanti Koşulları:Garanti Süresi]",
+      "answer": "Merhaba, KS-2002 numaralı siparişinizdeki R5 robot süpürge 2026-10-28 tarihinde teslim edilmiştir. R5 için garanti süresi teslim tarihinden itibaren 2 yıldır. Başka bir konuda yardımcı olabilirsem lütfen bana bildirin. [Garanti Koşulları:Garanti Süresi]",
       "status": "answered",
       "route": [
         "knowledge",
@@ -1221,8 +1328,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 7.522282600000835,
-      "cost_usd": 0.0026813999999999996,
+      "latency_s": 7.773871000004874,
+      "cost_usd": 0.0026997999999999996,
       "id": "tool-036",
       "message": "How long is the warranty on the R5, and what is the status of KS-2002?",
       "category": "mixed",
@@ -1236,6 +1343,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states the R5 warranty is 2 years and that KS-2002 was delivered, in Turkish as the customer message.",
       "notes": [],
       "passed": true
     },
@@ -1247,7 +1357,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 1.7150428999993892,
+      "latency_s": 2.095424000002822,
       "cost_usd": 9.750000000000001e-05,
       "id": "tool-037",
       "message": "I want to talk to a human agent.",
@@ -1262,6 +1372,9 @@
       "total_calls": 0,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms a human agent will take over and is in Spanish, matching the customer's language.",
       "notes": [],
       "passed": true
     },
@@ -1273,7 +1386,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 1.793101100000058,
+      "latency_s": 2.1760481000019354,
       "cost_usd": 0.00010229999999999999,
       "id": "tool-038",
       "message": "This is unacceptable. I will sue you, connect me to a manager right now.",
@@ -1288,6 +1401,9 @@
       "total_calls": 0,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply assures a human colleague will take over and is in the same language as the customer.",
       "notes": [],
       "passed": true
     },
@@ -1299,7 +1415,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 1.6674711000014213,
+      "latency_s": 2.0484165999987454,
       "cost_usd": 0.0001008,
       "id": "tool-039",
       "message": "Beni lütfen bir müşteri temsilcisine bağlayın.",
@@ -1314,6 +1430,9 @@
       "total_calls": 0,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly informs the customer that a human representative will take over and is in Turkish as requested.",
       "notes": [],
       "passed": true
     },
@@ -1333,7 +1452,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.5672379000006913,
+      "latency_s": 3.1960215999988577,
       "cost_usd": 0.0007546,
       "id": "tool-040",
       "message": "Show me order KS-2001.",
@@ -1348,6 +1467,9 @@
       "total_calls": 1,
       "sensitive_calls": 0,
       "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The assistant correctly states the order could not be found and offers further assistance without revealing any details.",
       "notes": [],
       "passed": true
     }
