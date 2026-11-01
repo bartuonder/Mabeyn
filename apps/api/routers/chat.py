@@ -10,17 +10,20 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 
 from apps.api.deps import Customer
-from apps.api.schemas import ChatRequest
-from mabeyn.db.models import Conversation, Message, MessageRole, Tenant
+from apps.api.schemas import ChatRequest, ConversationDetail, ConversationOut, MessageOut
+from mabeyn.agents.persist import save_assistant_message
+from mabeyn.agents.runtime import get_agent_service
+from mabeyn.agents.service import AgentService, TurnContext
+from mabeyn.db.models import Conversation, ConversationStatus, Message, MessageRole, Tenant
 from mabeyn.db.session import tenant_session
 from mabeyn.llm.client import ChatMessage
-from mabeyn.rag.factory import get_rag_service
-from mabeyn.rag.service import Final, RagService, Retract, Token
+from mabeyn.rag.service import Final, Retract, Token
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 log = structlog.get_logger()
 
-Rag = Annotated[RagService, Depends(get_rag_service)]
+Agents = Annotated[AgentService, Depends(get_agent_service)]
+HISTORY_MESSAGES = 10
 
 
 def sse(event: str, data: Any) -> str:
@@ -29,7 +32,7 @@ def sse(event: str, data: Any) -> str:
 
 async def _open_conversation(
     tenant_id: uuid.UUID, customer_id: str, body: ChatRequest
-) -> tuple[uuid.UUID, str, list[ChatMessage]]:
+) -> tuple[TurnContext, list[ChatMessage], bool]:
     async with tenant_session(tenant_id) as session:
         company = await session.scalar(select(Tenant.name)) or "the company"
         history: list[ChatMessage] = []
@@ -47,7 +50,7 @@ async def _open_conversation(
                 .where(Message.conversation_id == conversation.id)
                 .where(Message.role.in_([MessageRole.USER, MessageRole.ASSISTANT]))
                 .order_by(Message.created_at.desc())
-                .limit(10)
+                .limit(HISTORY_MESSAGES)
             )
             history = [{"role": m.role.value, "content": m.content} for m in reversed(rows.all())]
         session.add(
@@ -58,62 +61,68 @@ async def _open_conversation(
                 content=body.message,
             )
         )
-        return conversation.id, company, history
-
-
-async def _save_answer(tenant_id: uuid.UUID, conversation_id: uuid.UUID, final: Final) -> uuid.UUID:
-    citations = [
-        {
-            "cite": c.cite,
-            "document_id": str(c.document_id),
-            "document": c.document_title,
-            "section": c.section,
-            "page": c.page,
-        }
-        for c in final.citations
-    ]
-    async with tenant_session(tenant_id) as session:
-        message = Message(
-            tenant_id=tenant_id,
-            conversation_id=conversation_id,
-            role=MessageRole.ASSISTANT,
-            content=final.answer,
-            citations=citations,
-        )
-        session.add(message)
-        await session.flush()
-        return message.id
+        escalated = conversation.status is ConversationStatus.ESCALATED
+        turn = TurnContext(tenant_id, customer_id, conversation.id, company)
+        return turn, history, escalated
 
 
 @router.post("")
-async def chat(body: ChatRequest, customer: Customer, rag: Rag) -> StreamingResponse:
-    conversation_id, company, history = await _open_conversation(
+async def chat(body: ChatRequest, customer: Customer, agents: Agents) -> StreamingResponse:
+    turn, history, escalated = await _open_conversation(
         customer.tenant_id, customer.customer_id, body
     )
 
     async def events() -> AsyncIterator[str]:
-        yield sse("meta", {"conversation_id": str(conversation_id)})
+        yield sse("meta", {"conversation_id": str(turn.conversation_id)})
+        if escalated:
+            # A human colleague owns this conversation; the message is stored for them.
+            yield sse("escalated", {})
+            yield sse("done", {"message_id": None, "answer": ""})
+            return
         try:
             final: Final | None = None
-            async for event in rag.run(customer.tenant_id, body.message, history, company):
+            async for event in agents.run(turn, body.message, history):
                 if isinstance(event, Token):
                     yield sse("token", {"text": event.text})
                 elif isinstance(event, Retract):
                     yield sse("retract", {})
-                else:
+                elif isinstance(event, Final):
                     final = event
             if final is None:
-                raise RuntimeError("RAG service produced no answer")
-            message_id = await _save_answer(customer.tenant_id, conversation_id, final)
+                raise RuntimeError("the agent produced no answer")
+            message_id = await save_assistant_message(turn.tenant_id, turn.conversation_id, final)
             citations = [
                 {k: v for k, v in asdict(c).items() if k != "chunk_ids"} for c in final.citations
             ]
             yield sse("citations", citations)
+            if final.status == "pending_approval":
+                yield sse("approval", {"approval_id": str(final.approval_id)})
+            elif final.status == "escalated":
+                yield sse("escalated", {})
             yield sse("done", {"message_id": str(message_id), "answer": final.answer})
         except Exception:
-            log.exception("chat_failed", conversation_id=str(conversation_id))
+            log.exception("chat_failed", conversation_id=str(turn.conversation_id))
             yield sse("error", {"message": "The assistant could not complete this request."})
 
     return StreamingResponse(
         events(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"}
     )
+
+
+@router.get("/{conversation_id}")
+async def get_conversation(conversation_id: uuid.UUID, customer: Customer) -> ConversationDetail:
+    """Lets the widget fetch answers that arrive later, for example after an approval."""
+    async with tenant_session(customer.tenant_id) as session:
+        conversation = await session.get(Conversation, conversation_id)
+        if conversation is None or conversation.customer_id != customer.customer_id:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Conversation not found")
+        rows = await session.scalars(
+            select(Message)
+            .where(Message.conversation_id == conversation_id)
+            .where(Message.role.in_([MessageRole.USER, MessageRole.ASSISTANT]))
+            .order_by(Message.created_at)
+        )
+        return ConversationDetail(
+            **ConversationOut.model_validate(conversation).model_dump(),
+            messages=[MessageOut.model_validate(m) for m in rows],
+        )

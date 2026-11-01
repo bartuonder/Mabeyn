@@ -1,10 +1,17 @@
 import uuid
 from datetime import date, datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from mabeyn.db.models import DocumentSource, DocumentStatus, MessageRole, RiskLevel
+from mabeyn.db.models import (
+    ApprovalStatus,
+    ConversationStatus,
+    DocumentSource,
+    DocumentStatus,
+    MessageRole,
+    RiskLevel,
+)
 
 
 class StrictRequest(BaseModel):
@@ -86,6 +93,8 @@ class MessageOut(Response):
 class ConversationOut(Response):
     id: uuid.UUID
     customer_id: str
+    status: ConversationStatus
+    escalation_reason: str | None
     created_at: datetime
 
 
@@ -116,3 +125,23 @@ class ToolOut(Response):
 class ChatRequest(StrictRequest):
     message: str = Field(min_length=1, max_length=2000)
     conversation_id: uuid.UUID | None = None
+
+
+class ApprovalDecision(StrictRequest):
+    decision: Literal["approve", "reject"]
+    note: str | None = Field(default=None, max_length=500)
+
+
+class ApprovalOut(Response):
+    id: uuid.UUID
+    conversation_id: uuid.UUID
+    tool_call_id: uuid.UUID | None
+    status: ApprovalStatus
+    payload: dict[str, Any]
+    decided_by: uuid.UUID | None
+    decided_at: datetime | None
+    created_at: datetime
+
+
+class ApprovalResolved(ApprovalOut):
+    answer: str

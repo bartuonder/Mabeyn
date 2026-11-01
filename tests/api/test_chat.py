@@ -6,14 +6,24 @@ from httpx import AsyncClient
 from sqlalchemy import select
 
 from apps.api.main import app
+from mabeyn.agents.runtime import get_agent_service
 from mabeyn.auth.tokens import create_customer_token
 from mabeyn.db import models as m
 from mabeyn.db.session import tenant_session
-from mabeyn.rag.factory import get_rag_service
 from mabeyn.rag.service import BaselineRag
 from tests.factories import SeededTenant
 from tests.fakes import FakeLLM
 from tests.rag.test_retrieval_and_generate import seed
+
+
+class RagAgent:
+    """Serves chat straight from a RAG service, without the supervisor."""
+
+    def __init__(self, rag):
+        self.rag = rag
+
+    def run(self, turn, question, history):
+        return self.rag.run(turn.tenant_id, question, history, turn.company)
 
 
 def parse_sse(text: str) -> list[tuple[str, object]]:
@@ -31,7 +41,7 @@ def reply(messages, model) -> str:
 @pytest.fixture
 def llm():
     fake = FakeLLM(reply)
-    app.dependency_overrides[get_rag_service] = lambda: BaselineRag(fake, top_k=3)
+    app.dependency_overrides[get_agent_service] = lambda: RagAgent(BaselineRag(fake, top_k=3))
     yield fake
     app.dependency_overrides.clear()
 
@@ -141,7 +151,7 @@ async def test_failures_are_reported_as_error_events_without_details(
             raise RuntimeError("database password is hunter2")
             yield  # pragma: no cover
 
-    app.dependency_overrides[get_rag_service] = lambda: Exploding()
+    app.dependency_overrides[get_agent_service] = lambda: Exploding()
     try:
         response = await client.post("/chat", json={"message": "hi"}, headers=auth(fresh_tenant))
     finally:
