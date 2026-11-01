@@ -1,6 +1,7 @@
 import hashlib
 import math
 import re
+import uuid
 from collections.abc import AsyncIterator, Callable, Sequence
 
 from mabeyn.core.config import get_settings
@@ -58,3 +59,17 @@ class FakeLLM:
     async def embed(self, texts: Sequence[str], *, model: str | None = None) -> list[list[float]]:
         self.embed_calls.append(list(texts))
         return [hash_embed(t) for t in texts]
+
+
+class FakeQueue:
+    def __init__(self, fail: bool = False) -> None:
+        self.jobs: list[tuple[uuid.UUID, uuid.UUID]] = []
+        self.fail = fail
+
+    async def enqueue(self, tenant_id: uuid.UUID, document_id: uuid.UUID) -> None:
+        if self.fail:
+            raise ConnectionError("redis is down")
+        self.jobs.append((tenant_id, document_id))
+
+    async def close(self) -> None:
+        return None
