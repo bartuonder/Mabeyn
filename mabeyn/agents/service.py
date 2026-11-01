@@ -150,13 +150,10 @@ class SupervisorService:
             "tool_calls_used": values.get("tool_calls_used", 0),
         }
         if paused:
-            knowledge = values.get("knowledge_answer", "")
-            notice = values.get("pending_message", "")
-            answer = f"{knowledge}\n\n{notice}".strip() if knowledge else notice
             approval = values.get("approval_id")
             return Final(
-                answer=answer,
-                citations=_citations(values.get("knowledge_citations", [])),
+                answer=values.get("pending_message", ""),
+                citations=[],
                 chunks=[],
                 trace=trace,
                 status="pending_approval",
