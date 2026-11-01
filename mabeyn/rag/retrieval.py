@@ -11,7 +11,7 @@ from mabeyn.llm.client import LLM
 from mabeyn.rag.types import RetrievedChunk
 
 
-def _to_chunk(row: Any, score: float) -> RetrievedChunk:
+def to_retrieved(row: Any, score: float) -> RetrievedChunk:
     chunk, title, source_uri, effective_date = row[0], row[1], row[2], row[3]
     return RetrievedChunk(
         chunk_id=chunk.id,
@@ -46,7 +46,7 @@ async def vector_search(
         .limit(k)
     )
     rows = (await session.execute(statement)).all()
-    return [_to_chunk(row, 1.0 - float(row[4])) for row in rows]
+    return [to_retrieved(row, 1.0 - float(row[4])) for row in rows]
 
 
 async def embed_query(llm: LLM, query: str, model: str | None = None) -> list[float]:
