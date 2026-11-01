@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     llm_ledger_path: str | None = None
 
     max_upload_bytes: int = 10 * 1024 * 1024
+    # Comma separated hosts that tools may call even though they are not public (dev, mock).
+    tool_allowed_hosts: str = ""
+    tool_timeout_seconds: float = 10.0
+    tool_max_response_bytes: int = 65536
     url_fetch_timeout_seconds: float = 15.0
 
     jwt_secret: SecretStr = Field(
