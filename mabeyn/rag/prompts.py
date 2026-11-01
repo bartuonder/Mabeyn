@@ -1,4 +1,4 @@
-PROMPT_VERSION = "rag-v3"
+PROMPT_VERSION = "rag-v4"
 
 ANSWER_SYSTEM = """\
 You are the customer support assistant of {company}.
