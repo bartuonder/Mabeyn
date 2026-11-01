@@ -30,7 +30,7 @@ async def _seed_kargoshop(args: argparse.Namespace) -> int:
     password = args.password or getpass.getpass("Demo admin password: ")
     engine = create_async_engine(get_settings().admin_database_url)
     try:
-        tenant_id = await seed_kargoshop(engine, get_llm(), password)
+        tenant_id = await seed_kargoshop(engine, get_llm(), password, args.shop_url)
     except (ValueError, IntegrityError) as exc:
         print(f"error: {exc.__class__.__name__}: {exc}")
         return 1
@@ -56,6 +56,9 @@ def main() -> int:
         "seed-kargoshop", help="create the demo tenant and ingest its documents"
     )
     seed.add_argument("--password", help="prompted when omitted")
+    seed.add_argument(
+        "--shop-url", default="http://localhost:9000", help="base URL of the shop API"
+    )
     seed.set_defaults(handler=_seed_kargoshop)
 
     args = parser.parse_args()

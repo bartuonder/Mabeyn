@@ -46,3 +46,34 @@ async def test_seed_documents_ingest_into_a_tenant(fresh_tenant):
     assert len(statuses) == len(documents)
     assert set(statuses) == {DocumentStatus.READY}
     assert chunk_count >= len(documents)
+
+
+def test_seed_tool_definitions_are_valid_and_cover_the_planned_tools():
+    from mabeyn.seed import load_tool_definitions
+    from mabeyn.tools.service import validate_definition
+
+    definitions = load_tool_definitions("http://shop")
+    assert {d["name"] for d in definitions} == {
+        "get_order_status",
+        "list_orders",
+        "create_ticket",
+        "request_refund",
+        "change_address",
+    }
+    for d in definitions:
+        validate_definition(
+            str(d["name"]), d["json_schema"], str(d["http_method"]), str(d["url_template"])
+        )  # type: ignore[arg-type]
+    risks = {d["name"]: d["risk_level"] for d in definitions}
+    assert risks["request_refund"] == "sensitive" and risks["get_order_status"] == "read"
+
+
+async def test_tools_register_idempotently(fresh_tenant):
+    from mabeyn.seed import register_kargoshop_tools
+    from mabeyn.tools.service import load_tools
+
+    assert await register_kargoshop_tools(fresh_tenant, "http://shop") == 5
+    assert await register_kargoshop_tools(fresh_tenant, "http://shop:9000") == 5
+    tools = await load_tools(fresh_tenant)
+    assert len(tools) == 5
+    assert all(t.url_template.startswith("http://shop:9000/") for t in tools)
