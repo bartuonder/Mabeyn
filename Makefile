@@ -1,4 +1,4 @@
-.PHONY: up down test lint typecheck migrate seed eval ablation experiments
+.PHONY: up down test lint typecheck migrate seed eval ablation experiments docs
 
 up:
 	docker compose up -d --build
@@ -30,3 +30,6 @@ ablation:
 
 experiments:
 	uv run python -m evals.runners.experiments
+
+docs:
+	uv run python -m mabeyn.docs_sync
