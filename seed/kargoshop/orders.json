@@ -1,0 +1,93 @@
+{
+  "today": "2026-11-01",
+  "orders": [
+    {
+      "id": "KS-1001",
+      "customer_id": "customer-1",
+      "status": "delivered",
+      "placed_at": "2026-10-20",
+      "delivered_at": "2026-10-24",
+      "items": [{"sku": "B300", "name": "Wireless Earbuds B300", "quantity": 1, "unit_price": 899.90}],
+      "total": 899.90,
+      "address": {"line": "Atatürk Cad. 12/3", "city": "Istanbul", "postal_code": "34710"},
+      "tracking_number": "AK100100"
+    },
+    {
+      "id": "KS-1002",
+      "customer_id": "customer-1",
+      "status": "shipped",
+      "placed_at": "2026-10-29",
+      "delivered_at": null,
+      "items": [{"sku": "F6", "name": "Air Fryer F6", "quantity": 1, "unit_price": 2499.00}],
+      "total": 2499.00,
+      "address": {"line": "Atatürk Cad. 12/3", "city": "Istanbul", "postal_code": "34710"},
+      "tracking_number": "AK100200"
+    },
+    {
+      "id": "KS-1003",
+      "customer_id": "customer-1",
+      "status": "processing",
+      "placed_at": "2026-10-31",
+      "delivered_at": null,
+      "items": [{"sku": "P20", "name": "Power Bank P20", "quantity": 2, "unit_price": 649.90}],
+      "total": 1299.80,
+      "address": {"line": "Atatürk Cad. 12/3", "city": "Istanbul", "postal_code": "34710"},
+      "tracking_number": null
+    },
+    {
+      "id": "KS-2001",
+      "customer_id": "customer-2",
+      "status": "delivered",
+      "placed_at": "2026-08-01",
+      "delivered_at": "2026-08-05",
+      "items": [{"sku": "X2", "name": "Smart Watch X2", "quantity": 1, "unit_price": 1999.00}],
+      "total": 1999.00,
+      "address": {"line": "Kızılay Sk. 8", "city": "Ankara", "postal_code": "06420"},
+      "tracking_number": "AK200100"
+    },
+    {
+      "id": "KS-2002",
+      "customer_id": "customer-2",
+      "status": "delivered",
+      "placed_at": "2026-10-24",
+      "delivered_at": "2026-10-28",
+      "items": [{"sku": "R5", "name": "Robot Vacuum R5", "quantity": 1, "unit_price": 8999.00}],
+      "total": 8999.00,
+      "address": {"line": "Kızılay Sk. 8", "city": "Ankara", "postal_code": "06420"},
+      "tracking_number": "AK200200"
+    },
+    {
+      "id": "KS-2003",
+      "customer_id": "customer-2",
+      "status": "processing",
+      "placed_at": "2026-11-01",
+      "delivered_at": null,
+      "items": [{"sku": "B300", "name": "Wireless Earbuds B300", "quantity": 2, "unit_price": 899.90}],
+      "total": 1799.80,
+      "address": {"line": "Kızılay Sk. 8", "city": "Ankara", "postal_code": "06420"},
+      "tracking_number": null
+    },
+    {
+      "id": "KS-3001",
+      "customer_id": "customer-3",
+      "status": "cancelled",
+      "placed_at": "2026-10-10",
+      "delivered_at": null,
+      "items": [{"sku": "F6", "name": "Air Fryer F6", "quantity": 1, "unit_price": 2499.00}],
+      "total": 2499.00,
+      "address": {"line": "Cumhuriyet Mah. 5", "city": "Izmir", "postal_code": "35220"},
+      "tracking_number": null
+    },
+    {
+      "id": "KS-3002",
+      "customer_id": "customer-3",
+      "status": "delivered",
+      "placed_at": "2026-10-12",
+      "delivered_at": "2026-10-16",
+      "items": [{"sku": "P20", "name": "Power Bank P20", "quantity": 1, "unit_price": 649.90}],
+      "total": 649.90,
+      "address": {"line": "Cumhuriyet Mah. 5", "city": "Izmir", "postal_code": "35220"},
+      "tracking_number": "AK300200"
+    }
+  ]
+}
