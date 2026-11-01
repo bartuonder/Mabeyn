@@ -7,13 +7,27 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "alembic>=1.20.1",
     "argon2-cffi>=25.1.0",
+    "arq>=0.28.0",
     "asyncpg>=0.32.0",
+    "beautifulsoup4>=4.15.0",
     "fastapi>=0.162.0",
+    "langgraph>=1.2.19",
+    "langsmith>=0.14.16",
+    "openai>=3.42.0",
+    "pgvector>=0.5.1",
     "pydantic-settings>=2.16.2",
     "pyjwt>=2.15.1",
+    "pypdf>=6.21.4",
+    "python-multipart>=0.0.33",
     "sqlalchemy[asyncio]>=2.1.6",
     "structlog>=26.1.0",
+    "tiktoken>=0.14.0",
     "uvicorn[standard]>=0.54.0",
+]
+
+[project.optional-dependencies]
+tracking = [
+    "wandb>=0.31.0",
 ]
 
 [dependency-groups]
