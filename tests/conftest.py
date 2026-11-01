@@ -1,3 +1,4 @@
+import uuid
 from collections.abc import AsyncIterator
 
 import pytest
@@ -7,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from mabeyn.core.config import get_settings
+from mabeyn.db.provisioning import create_tenant
 from tests.factories import SeededTenant, delete_tenant, seed_tenant
 
 
@@ -35,3 +37,13 @@ async def tenant_b(admin_engine: AsyncEngine) -> AsyncIterator[SeededTenant]:
     seeded = await seed_tenant(admin_engine, "B")
     yield seeded
     await delete_tenant(admin_engine, seeded.id)
+
+
+@pytest_asyncio.fixture
+async def fresh_tenant(admin_engine: AsyncEngine) -> AsyncIterator[uuid.UUID]:
+    suffix = uuid.uuid4().hex[:8]
+    tenant_id = await create_tenant(
+        admin_engine, "Fresh", f"fresh-{suffix}", f"fresh-{suffix}@example.com", "a-long-password-1"
+    )
+    yield tenant_id
+    await delete_tenant(admin_engine, tenant_id)
