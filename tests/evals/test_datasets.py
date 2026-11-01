@@ -15,7 +15,7 @@ def headings() -> dict[str, set[str]]:
     return result
 
 
-@pytest.mark.parametrize("name", ["rag.jsonl", "rag_en.jsonl"])
+@pytest.mark.parametrize("name", ["rag.jsonl", "rag_en.jsonl", "rag_heldout.jsonl"])
 def test_gold_references_point_to_real_sections(name):
     available = headings()
     for question in load_questions(name):
@@ -26,7 +26,7 @@ def test_gold_references_point_to_real_sections(name):
             )
 
 
-@pytest.mark.parametrize("name", ["rag.jsonl", "rag_en.jsonl"])
+@pytest.mark.parametrize("name", ["rag.jsonl", "rag_en.jsonl", "rag_heldout.jsonl"])
 def test_ids_are_unique_and_unanswerable_have_no_gold(name):
     questions = load_questions(name)
     assert len({q.id for q in questions}) == len(questions)
@@ -66,3 +66,12 @@ def test_conflict_questions_target_the_current_policy():
 def test_every_category_is_known():
     known = {"factual", "numeric", "procedure", "multi", "conflict", "unanswerable"}
     assert set(Counter(q.category for q in load_questions("rag.jsonl"))) <= known
+
+
+def test_heldout_set_is_separate_from_the_development_set():
+    """The held-out questions are never used for tuning, so they must not repeat dev questions."""
+    dev = {q.question.casefold() for q in load_questions("rag.jsonl")}
+    heldout = load_questions("rag_heldout.jsonl")
+    assert len(heldout) == 30 and sum(not q.answerable for q in heldout) == 6
+    assert all(q.set == "heldout" for q in heldout)
+    assert not dev & {q.question.casefold() for q in heldout}

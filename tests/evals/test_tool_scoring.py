@@ -181,3 +181,19 @@ def test_language_is_checked_without_a_model():
 
 def test_every_scenario_states_its_expected_outcome():
     assert all(s.outcome.strip() for s in load_scenarios())
+
+
+def test_heldout_scenarios_are_valid_and_do_not_repeat_development_ones():
+    heldout = load_scenarios("tools_heldout.jsonl")
+    dev_messages = {s.message.casefold() for s in load_scenarios()}
+    tools = {d["name"]: d for d in load_tool_definitions("http://shop")}
+
+    assert len(heldout) == 15 and len({s.id for s in heldout}) == 15
+    assert not dev_messages & {s.message.casefold() for s in heldout}
+    assert sum(bool(s.history) for s in heldout) >= 2
+    for s in heldout:
+        assert s.outcome.strip(), s.id
+        assert {c.name for c in s.required} <= set(tools), s.id
+        assert {*s.allowed, *s.forbidden} <= set(tools), s.id
+        for turn in s.history:
+            assert turn["role"] in {"user", "assistant"} and turn["content"].strip()

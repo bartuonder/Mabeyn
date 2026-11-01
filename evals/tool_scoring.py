@@ -33,6 +33,7 @@ class Scenario:
     approval: bool
     absent_in_answer: tuple[str, ...]
     outcome: str = ""
+    history: tuple[dict[str, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -101,6 +102,7 @@ def load_scenarios(name: str = "tools.jsonl", path: Path | None = None) -> list[
                 approval=expected["approval"],
                 absent_in_answer=tuple(expected["absent_in_answer"]),
                 outcome=expected.get("outcome", ""),
+                history=tuple(row.get("history", [])),
             )
         )
     return scenarios

@@ -35,7 +35,7 @@ from mabeyn.core.tracking import export_tracking_env
 from mabeyn.db import models as m
 from mabeyn.db.session import tenant_session
 from mabeyn.llm import usage
-from mabeyn.llm.client import get_llm
+from mabeyn.llm.client import ChatMessage, get_llm
 from mabeyn.rag.graph import GraphRag, RagConfig
 from mabeyn.rag.service import Final
 from mabeyn.seed import register_kargoshop_tools
@@ -86,10 +86,13 @@ async def run_scenario(
         tenant_id, scenario.customer_id, conversation_id, "KargoShop", today=MOCK_TODAY
     )
 
+    history: list[ChatMessage] = [
+        {"role": t["role"], "content": t["content"]} for t in scenario.history
+    ]
     with usage.measure() as meter:
         started = time.perf_counter()
         final: Final | None = None
-        async for event in service.run(turn, scenario.message, []):
+        async for event in service.run(turn, scenario.message, history):
             if isinstance(event, Final):
                 final = event
         wall = time.perf_counter() - started
@@ -134,7 +137,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
     get_settings.cache_clear()
     settings = get_settings()
 
-    scenarios = load_scenarios()
+    scenarios = load_scenarios(args.dataset)
     if args.categories:
         scenarios = [s for s in scenarios if s.category in args.categories]
     if args.limit:
@@ -177,7 +180,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
     metrics["scenario_pass_rate_ci95_low"], metrics["scenario_pass_rate_ci95_high"] = low, high
 
     config = {
-        "dataset": "tools.jsonl",
+        "dataset": args.dataset,
         "llm_model": settings.llm_model,
         "llm_model_small": settings.llm_model_small,
         "categories": args.categories,
@@ -219,6 +222,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser(prog="tool_eval")
     parser.add_argument("--name", default="tool-eval")
+    parser.add_argument("--dataset", default="tools.jsonl")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--categories", nargs="*")
     args = parser.parse_args()
