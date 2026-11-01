@@ -11,7 +11,14 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from evals.budget import ensure_within_budget
 from evals.datasets import Question
 from evals.judge import judge_accuracy, judge_faithfulness
-from evals.metrics import chunk_matches, mean, percentile, recall_at_k, reciprocal_rank
+from evals.metrics import (
+    chunk_matches,
+    mean,
+    percentile,
+    recall_at_k,
+    reciprocal_rank,
+    wilson_interval,
+)
 from mabeyn.db.models import Tenant
 from mabeyn.db.provisioning import create_tenant
 from mabeyn.ingestion.chunk import ChunkConfig
@@ -191,6 +198,9 @@ def summarize(results: list[QuestionResult], retrieval_only: bool = False) -> di
         metrics["accuracy_answerable"] = _rate(answerable, "correct")
         metrics["accuracy_unanswerable"] = _rate(unanswerable, "correct")
         metrics["faithfulness"] = _rate(results, "faithful")
+        for key, attr in (("accuracy", "correct"), ("faithfulness", "faithful")):
+            low, high = wilson_interval(sum(getattr(r, attr) for r in results), len(results))
+            metrics[f"{key}_ci95_low"], metrics[f"{key}_ci95_high"] = low, high
     metrics["latency_p50_s"] = percentile([r.latency_s for r in results], 0.50)
     metrics["latency_p95_s"] = percentile([r.latency_s for r in results], 0.95)
     metrics["cost_per_query_usd"] = mean([r.cost_usd for r in results])

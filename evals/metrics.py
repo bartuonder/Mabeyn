@@ -41,6 +41,17 @@ def percentile(values: Sequence[float], q: float) -> float:
     return ordered[index]
 
 
+def wilson_interval(successes: int, total: int, z: float = 1.96) -> tuple[float, float]:
+    """95% interval for a proportion; stays inside [0, 1] and behaves for small samples."""
+    if total == 0:
+        return math.nan, math.nan
+    p = successes / total
+    denominator = 1 + z * z / total
+    centre = (p + z * z / (2 * total)) / denominator
+    margin = z * math.sqrt(p * (1 - p) / total + z * z / (4 * total * total)) / denominator
+    return max(0.0, centre - margin), min(1.0, centre + margin)
+
+
 def mean(values: Sequence[float]) -> float:
     clean = [v for v in values if not math.isnan(v)]
     return sum(clean) / len(clean) if clean else math.nan

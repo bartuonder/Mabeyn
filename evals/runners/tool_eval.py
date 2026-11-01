@@ -15,6 +15,8 @@ from apps.kargoshop_mock.main import Store, create_app
 from evals.budget import budget_limit, configure_ledger, ensure_within_budget, spent_usd
 from evals.cache import CachingLLM
 from evals.judge import judge_outcome
+from evals.metrics import wilson_interval
+from evals.provenance import provenance
 from evals.runner import CHUNK_PRESETS, drop_tenant, prepare_tenant
 from evals.tool_scoring import (
     ObservedCall,
@@ -171,6 +173,8 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
     metrics["sensitive_executed_without_approval"] = float(executed)
     metrics["cost_per_scenario_usd"] = sum(o["cost_usd"] for o in outcomes) / max(len(outcomes), 1)
     metrics["latency_p50_s"] = sorted(o["latency_s"] for o in outcomes)[len(outcomes) // 2]
+    low, high = wilson_interval(sum(s.passed for s in scores), len(scores))
+    metrics["scenario_pass_rate_ci95_low"], metrics["scenario_pass_rate_ci95_high"] = low, high
 
     config = {
         "dataset": "tools.jsonl",
@@ -181,6 +185,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
     result = {
         "name": args.name,
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        "provenance": provenance(),
         "config": config,
         "metrics": metrics,
         "scenarios": [

@@ -71,7 +71,7 @@ async def run(args: argparse.Namespace) -> None:
         await drop_tenant(engine, tenant_id)
         await engine.dispose()
 
-    table = markdown_table(rows, COLUMNS)
+    table = markdown_table(rows, COLUMNS, intervals=True)
     (RESULTS_DIR / f"{args.prefix}.md").write_text(table + "\n", encoding="utf-8")
     print("\n" + table)
     print(f"\ntotal spend ${spent_usd():.3f} of ${budget_limit():.2f}")
