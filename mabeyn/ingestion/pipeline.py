@@ -16,6 +16,7 @@ from mabeyn.llm.client import LLM, get_llm
 log = structlog.get_logger()
 
 EXPECTED_ERRORS = (ParseError, FetchError)
+FTS_CONFIGS = {"tr": "turkish", "en": "english"}
 
 
 async def add_document(
@@ -117,6 +118,7 @@ async def ingest_document(
                 page=chunk.page,
                 token_count=chunk.token_count,
                 embedding=vector,
+                fts_config=FTS_CONFIGS.get(language, "simple"),
             )
             for chunk, vector in zip(chunks, vectors, strict=True)
         )

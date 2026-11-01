@@ -6,6 +6,7 @@ from typing import Any
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     Boolean,
+    Computed,
     Date,
     DateTime,
     Enum,
@@ -19,7 +20,7 @@ from sqlalchemy import (
     func,
     text,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, REGCONFIG, TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column
 
 from mabeyn.db.base import Base
@@ -167,6 +168,11 @@ class Chunk(TenantModel):
     page: Mapped[int | None] = mapped_column(Integer)
     token_count: Mapped[int] = mapped_column(Integer)
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIMENSIONS))
+    fts_config: Mapped[str] = mapped_column(REGCONFIG, server_default=text("'simple'::regconfig"))
+    search_vector: Mapped[Any] = mapped_column(
+        TSVECTOR,
+        Computed("to_tsvector(fts_config, context_header || ' ' || content)", persisted=True),
+    )
 
 
 class Conversation(TenantModel):
