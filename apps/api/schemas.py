@@ -93,6 +93,15 @@ class ConversationDetail(ConversationOut):
     messages: list[MessageOut]
 
 
+class ToolCreate(StrictRequest):
+    name: str = Field(min_length=3, max_length=64)
+    description: str = Field(min_length=3, max_length=1000)
+    json_schema: dict[str, Any]
+    risk_level: RiskLevel
+    http_method: str = Field(pattern="^(GET|POST|PUT|PATCH|DELETE)$")
+    url_template: str = Field(min_length=8, max_length=2048)
+
+
 class ToolOut(Response):
     id: uuid.UUID
     name: str

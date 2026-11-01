@@ -1,0 +1,77 @@
+[
+  {
+    "name": "get_order_status",
+    "description": "Get the status, items, dates and tracking number of one order that belongs to the current customer.",
+    "risk_level": "read",
+    "http_method": "GET",
+    "path": "/orders/{order_id}",
+    "json_schema": {
+      "type": "object",
+      "properties": {
+        "order_id": {"type": "string", "pattern": "^KS-[0-9]+$", "description": "Order number such as KS-1001"}
+      },
+      "required": ["order_id"]
+    }
+  },
+  {
+    "name": "list_orders",
+    "description": "List the current customer's orders, newest first. Optionally filter by status.",
+    "risk_level": "read",
+    "http_method": "GET",
+    "path": "/orders",
+    "json_schema": {
+      "type": "object",
+      "properties": {
+        "status": {"type": "string", "enum": ["processing", "shipped", "delivered", "cancelled"], "description": "Only return orders with this status"}
+      }
+    }
+  },
+  {
+    "name": "create_ticket",
+    "description": "Open a support ticket for the current customer when a problem needs follow-up by the support team.",
+    "risk_level": "write",
+    "http_method": "POST",
+    "path": "/tickets",
+    "json_schema": {
+      "type": "object",
+      "properties": {
+        "subject": {"type": "string", "minLength": 3, "maxLength": 200, "description": "Short title of the problem"},
+        "description": {"type": "string", "minLength": 3, "maxLength": 2000, "description": "What happened and what the customer needs"}
+      },
+      "required": ["subject", "description"]
+    }
+  },
+  {
+    "name": "request_refund",
+    "description": "Request a refund for a delivered order of the current customer. A human must approve it before it is sent.",
+    "risk_level": "sensitive",
+    "http_method": "POST",
+    "path": "/orders/{order_id}/refund",
+    "json_schema": {
+      "type": "object",
+      "properties": {
+        "order_id": {"type": "string", "pattern": "^KS-[0-9]+$", "description": "Order number such as KS-1001"},
+        "amount": {"type": "number", "exclusiveMinimum": 0, "description": "Refund amount in TRY, not more than the order total"},
+        "reason": {"type": "string", "minLength": 3, "maxLength": 500, "description": "Why the customer wants the refund"}
+      },
+      "required": ["order_id", "amount", "reason"]
+    }
+  },
+  {
+    "name": "change_address",
+    "description": "Change the delivery address of an order that is still being processed.",
+    "risk_level": "write",
+    "http_method": "PUT",
+    "path": "/orders/{order_id}/address",
+    "json_schema": {
+      "type": "object",
+      "properties": {
+        "order_id": {"type": "string", "pattern": "^KS-[0-9]+$", "description": "Order number such as KS-1003"},
+        "line": {"type": "string", "minLength": 3, "maxLength": 200, "description": "Street and number"},
+        "city": {"type": "string", "minLength": 2, "maxLength": 80},
+        "postal_code": {"type": "string", "minLength": 3, "maxLength": 12}
+      },
+      "required": ["order_id", "line", "city", "postal_code"]
+    }
+  }
+]
