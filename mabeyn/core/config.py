@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
 
     llm_model: str = "gpt-4.1-mini"
-    llm_model_small: str = "gpt-4.1-nano"
+    llm_model_small: str = "gpt-4o-mini"
     judge_model: str = "gpt-4.1-mini"
     embedding_model: str = "text-embedding-3-small"
     embedding_dimensions: int = 1536

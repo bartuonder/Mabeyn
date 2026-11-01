@@ -32,7 +32,7 @@ async def test_ranking_from_the_model_is_applied():
     rr, llm = reranker(json.dumps({"ranking": [3, 1]}))
     result = await rr.rerank("q", items, 3)
     assert [c.document_title for c in result] == ["c", "a", "b"]
-    assert llm.chat_calls[0][0] == "gpt-4.1-nano"
+    assert llm.chat_calls[0][0] == "gpt-4o-mini"
     assert llm.chat_calls[0][1][0]["content"] == prompts.RERANK_SYSTEM
 
 

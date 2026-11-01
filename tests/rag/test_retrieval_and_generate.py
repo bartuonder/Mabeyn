@@ -163,7 +163,7 @@ async def test_generate_answer_streams_through_llm_and_uses_sources():
 async def test_fallback_uses_the_small_model():
     llm = FakeLLM(lambda messages, model: "Bilgi bulunamadı.")
     assert await safe_fallback(llm, "Ürün garantisi?") == "Bilgi bulunamadı."
-    assert llm.chat_calls[0][0] == "gpt-4.1-nano"
+    assert llm.chat_calls[0][0] == "gpt-4o-mini"
 
 
 async def test_baseline_without_generation_only_retrieves(fresh_tenant):
