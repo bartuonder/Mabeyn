@@ -74,7 +74,10 @@ class ActionAgent:
         system: ChatMessage = {
             "role": "system",
             "content": prompts.ACTION_SYSTEM.format(
-                company=state["company"], notes=notes, today=state.get("today", "unknown")
+                company=state["company"],
+                notes=notes,
+                today=state.get("today", "unknown"),
+                language_rule=prompts.language_rule(state.get("language")),
             ),
         }
         messages = list(state["action_messages"])
@@ -195,7 +198,10 @@ class ActionAgent:
             [
                 {
                     "role": "system",
-                    "content": prompts.PENDING_SYSTEM.format(summary=pending["summary"]),
+                    "content": prompts.PENDING_SYSTEM.format(
+                        summary=pending["summary"],
+                        language_rule=prompts.language_rule(state.get("language")),
+                    ),
                 },
                 {"role": "user", "content": state["question"]},
             ],

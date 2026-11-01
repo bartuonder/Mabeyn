@@ -264,8 +264,40 @@ async def test_an_abstaining_knowledge_agent_is_not_passed_on(fresh_tenant, chec
     env = await build_env(fresh_tenant, checkpointer, brain, rag)
     _, paused = await env.ask("Refund KS-1001")
 
-    assert "Policy notes" not in env.llm.tool_turns[0][0]["content"]
+    assert "Policy notes from the knowledge team" not in env.llm.tool_turns[0][0]["content"]
     assert paused.answer == "Your request is under review."
     done = await env.service.resume(env.turn(), approved=True, note=None)
     assert done.answer == "Refund submitted."
     assert "approved this action" in env.llm.tool_turns[-1][-1]["content"]
+
+
+async def test_the_detected_language_reaches_every_reply_prompt(fresh_tenant, checkpointer):
+    brain = Brain(route=["action"], tool_turns=[tool_call("request_refund", **REFUND)])
+    original = brain.chat
+
+    def with_language(messages, model):
+        text = original(messages, model)
+        return (
+            text.replace('"reason"', '"language": "English", "reason"') if "route" in text else text
+        )
+
+    brain.chat = with_language  # type: ignore[method-assign]
+    env = await build_env(fresh_tenant, checkpointer, brain)
+    env.llm.handler = brain.chat
+    await env.ask("Refund KS-1001 please")
+
+    action_system = env.llm.tool_turns[0][0]["content"]
+    assert "Write in English." in action_system
+    notice_prompt = next(
+        m[0]["content"] for _, m in env.llm.chat_calls if m[0]["content"].startswith("Write one")
+    )
+    assert "Write in English." in notice_prompt
+
+
+async def test_unknown_language_falls_back_to_mirroring_the_customer(fresh_tenant, checkpointer):
+    env = await build_env(fresh_tenant, checkpointer, Brain(route=["escalate"]))
+    await env.ask("Bir insanla konuşmak istiyorum")
+    prompt = next(
+        m[0]["content"] for _, m in env.llm.chat_calls if m[0]["content"].startswith("Write one")
+    )
+    assert "Write in the language the customer used" in prompt

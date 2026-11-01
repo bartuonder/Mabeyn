@@ -18,6 +18,7 @@ class SupervisorState(TypedDict, total=False):
     conversation_id: str
     company: str
     today: str
+    language: str
 
     question: str
     history: list[ChatMessage]
@@ -57,6 +58,7 @@ def fresh_turn() -> SupervisorState:
         "step": 0,
         "route_reason": "",
         "knowledge_question": "",
+        "language": "",
         "streamed": False,
         "knowledge_answer": "",
         "knowledge_citations": [],

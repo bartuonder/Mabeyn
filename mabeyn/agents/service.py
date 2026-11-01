@@ -96,7 +96,12 @@ class SupervisorService:
             reminder = (
                 await self.llm.chat(
                     [
-                        {"role": "system", "content": prompts.REMINDER_SYSTEM},
+                        {
+                            "role": "system",
+                            "content": prompts.REMINDER_SYSTEM.format(
+                                language_rule=prompts.language_rule(None)
+                            ),
+                        },
                         {"role": "user", "content": question},
                     ],
                     model=get_settings().llm_model_small,

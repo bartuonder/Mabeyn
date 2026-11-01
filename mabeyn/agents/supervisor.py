@@ -68,7 +68,8 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
         decision = check_input(state["question"])
         update: dict[str, Any] = {**fresh_turn(), "question": decision.text}
         if not decision.allowed:
-            reply = await _short_reply(llm, prompts.BLOCKED_SYSTEM, state["question"] or "?")
+            system = prompts.BLOCKED_SYSTEM.format(language_rule=prompts.language_rule(None))
+            reply = await _short_reply(llm, system, state["question"] or "?")
             update.update(blocked=True, answer=reply, status="blocked")
         return update
 
@@ -76,7 +77,7 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
         return "output_guard" if state.get("blocked") else "supervisor"
 
     async def supervisor(state: SupervisorState) -> dict[str, Any]:
-        route, reason, knowledge_question = ["knowledge"], "default", ""
+        route, reason, knowledge_question, language = ["knowledge"], "default", "", ""
         user = state["question"]
         if state.get("history"):
             user = f"Conversation so far:\n{_history_text(state['history'])}\n\nLatest: {user}"
@@ -96,9 +97,15 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
             if data.get("route") in VALID_ROUTES:
                 route, reason = data["route"], str(data.get("reason", ""))
                 knowledge_question = str(data.get("knowledge_question") or "").strip()
+                language = str(data.get("language") or "").strip()
         except (LLMError, AttributeError, TypeError):
             pass
-        return {"plan": route, "route_reason": reason, "knowledge_question": knowledge_question}
+        return {
+            "plan": route,
+            "route_reason": reason,
+            "knowledge_question": knowledge_question,
+            "language": language,
+        }
 
     async def dispatch(state: SupervisorState) -> dict[str, Any]:
         return {}
@@ -142,7 +149,10 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
 
     async def escalate(state: SupervisorState) -> dict[str, Any]:
         reason = state.get("escalation_reason") or state.get("route_reason") or "requested"
-        message = await _short_reply(llm, prompts.ESCALATE_SYSTEM, state["question"])
+        system = prompts.ESCALATE_SYSTEM.format(
+            language_rule=prompts.language_rule(state.get("language"))
+        )
+        message = await _short_reply(llm, system, state["question"])
         async with tenant_session(uuid.UUID(state["tenant_id"])) as session:
             conversation = await session.get(Conversation, uuid.UUID(state["conversation_id"]))
             if conversation is not None:
@@ -161,7 +171,10 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
                 [
                     {
                         "role": "system",
-                        "content": prompts.COMPOSE_SYSTEM.format(company=state["company"]),
+                        "content": prompts.COMPOSE_SYSTEM.format(
+                            company=state["company"],
+                            language_rule=prompts.language_rule(state.get("language")),
+                        ),
                     },
                     {
                         "role": "user",
