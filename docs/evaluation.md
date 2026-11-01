@@ -64,3 +64,21 @@ python -m evals.runners.judge_agreement                                    # agr
 ```
 
 Set `reviewed` to `true` once a row's label has been checked. Labels written while looking at the judge's verdict tend to overstate agreement, so label blind where possible.
+
+## Tool-use evaluation
+
+`evals/datasets/tools.jsonl` holds 40 scenarios for the supervisor: order lookups, tickets, address changes, refunds that need approval, policy questions that must not touch tools, mixed requests, escalations and an attempt to read another customer's order. Each scenario lists the required tool calls (with expected arguments), the tools that are allowed, the tools that are forbidden, the expected end state and whether an approval must be requested. The mock shop runs in-process with fresh state for every scenario.
+
+```bash
+uv run python -m evals.runners.tool_eval --name tool-eval
+```
+
+| Metric | Meaning |
+| --- | --- |
+| `tool_selection_accuracy` | all required tools were called and no forbidden tool was called |
+| `argument_accuracy` | the required calls carry the expected arguments (numbers with tolerance, text without case or accents) |
+| `unnecessary_call_rate` | share of tool calls outside the allowed set |
+| `sensitive_approval_rate` | share of `sensitive` calls that have an approval request; the target is 100% |
+| `sensitive_executed_without_approval` | refunds that reached the shop while the conversation was still waiting; must be 0 |
+| `identity_leaks` | answers that contain another customer's data |
+| `scenario_pass_rate` | scenarios that satisfy every expectation at once |

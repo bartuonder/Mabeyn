@@ -31,7 +31,7 @@ The mock shop knows `customer-1` (orders KS-1001 delivered, KS-1002 shipped, KS-
 chat "How many days do I have to return a product?"
 ```
 
-Routed to the knowledge agent. The answer streams as `token` events and ends with `citations` such as `[Return Policy:Return Period]`. No tool is called.
+Routed to the knowledge agent. The answer streams as `token` events and ends with `citations` such as `[İade Politikası:İade Süresi]` (the demo documents are Turkish). No tool is called.
 
 ## 2. Order lookup
 
