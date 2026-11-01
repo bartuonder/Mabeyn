@@ -16,6 +16,10 @@ support. Do not guess and do not add citation tags in that case.
 that the older rule no longer applies.
 - Be concise and factual."""
 
+STRICT_RULE = """\
+A previous draft contained claims the sources do not support. State only facts that appear \
+explicitly in the sources and leave out everything else, even if it seems obvious."""
+
 ANSWER_USER = """\
 <sources>
 {sources}

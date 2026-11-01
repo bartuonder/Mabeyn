@@ -28,8 +28,11 @@ def build_messages(
     question: str,
     chunks: Sequence[RetrievedChunk],
     history: Sequence[ChatMessage] = (),
+    strict: bool = False,
 ) -> list[ChatMessage]:
     system = prompts.ANSWER_SYSTEM.format(company=company)
+    if strict:
+        system += "\n" + prompts.STRICT_RULE
     user = prompts.ANSWER_USER.format(sources=format_sources(chunks), question=question)
     recent = list(history)[-MAX_HISTORY_MESSAGES:]
     return [
@@ -46,8 +49,9 @@ def stream_answer(
     chunks: Sequence[RetrievedChunk],
     history: Sequence[ChatMessage] = (),
     model: str | None = None,
+    strict: bool = False,
 ) -> AsyncIterator[str]:
-    messages = build_messages(company, question, chunks, history)
+    messages = build_messages(company, question, chunks, history, strict)
     return llm.stream(
         messages, model=model or get_settings().llm_model, max_tokens=MAX_ANSWER_TOKENS
     )
