@@ -1,4 +1,4 @@
-.PHONY: up down test lint typecheck migrate
+.PHONY: up down test lint typecheck migrate seed eval ablation experiments
 
 up:
 	docker compose up -d --build
@@ -18,3 +18,15 @@ typecheck:
 
 migrate:
 	uv run alembic upgrade head
+
+seed:
+	uv run python -m mabeyn.cli seed-kargoshop
+
+eval:
+	uv run python -m evals.runners.rag_eval --name manual --config full
+
+ablation:
+	uv run python -m evals.runners.ablation
+
+experiments:
+	uv run python -m evals.runners.experiments
