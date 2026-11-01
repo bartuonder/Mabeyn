@@ -38,6 +38,7 @@ class RagConfig:
     max_rewrites: int = 2
     max_regenerations: int = 1
     embedding_model: str | None = None
+    generate: bool = True
 
 
 class RagState(TypedDict, total=False):
@@ -141,6 +142,8 @@ def build_rag_graph(llm: LLM, config: RagConfig, reranker: Reranker | None = Non
         return "abstain"
 
     async def generate(state: RagState) -> dict[str, Any]:
+        if not config.generate:
+            return {"answer": "(generation disabled)"}
         writer = get_stream_writer()
         strict = state.get("regenerations", 0) > 0
         pieces: list[str] = []

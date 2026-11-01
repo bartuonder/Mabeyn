@@ -59,7 +59,7 @@ def plan(chunk_presets: list[str], best_chunk: str | None) -> list[Experiment]:
 
 def service_for(item: Experiment, llm: LLM) -> RagService:
     if item.retrieval == "vector" and not item.rerank:
-        return BaselineRag(llm, item.top_k, item.embedding)
+        return BaselineRag(llm, item.top_k, item.embedding, generate=False)
     config = RagConfig(
         name=item.label,
         retrieval="hybrid" if item.retrieval == "hybrid" else "vector",
@@ -68,6 +68,7 @@ def service_for(item: Experiment, llm: LLM) -> RagService:
         faithfulness=False,
         final_k=item.top_k,
         embedding_model=item.embedding,
+        generate=False,
     )
     return GraphRag(llm, config)
 

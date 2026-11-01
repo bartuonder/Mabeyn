@@ -45,8 +45,15 @@ class RagService(Protocol):
 class BaselineRag:
     """Vector search followed by one cited generation call."""
 
-    def __init__(self, llm: LLM, top_k: int = 5, embedding_model: str | None = None) -> None:
+    def __init__(
+        self,
+        llm: LLM,
+        top_k: int = 5,
+        embedding_model: str | None = None,
+        generate: bool = True,
+    ) -> None:
         self.llm = llm
+        self.generate = generate
         self.top_k = top_k
         self.embedding_model = embedding_model
 
@@ -60,6 +67,9 @@ class BaselineRag:
         chunks = await retrieve_vector(
             tenant_id, self.llm, question, self.top_k, self.embedding_model
         )
+        if not self.generate:
+            yield Final(answer="", citations=[], chunks=chunks, ranked=chunks)
+            return
         pieces: list[str] = []
         async for piece in stream_answer(self.llm, company, question, chunks, history):
             pieces.append(piece)

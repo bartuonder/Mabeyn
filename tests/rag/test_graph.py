@@ -149,3 +149,12 @@ async def test_collect_returns_the_final_event(tenant):
     rag = GraphRag(llm, RagConfig(crag=False, faithfulness=False))
     final = await collect(rag.run(tenant, QUESTION, [], "KargoShop"))
     assert final.answer == ANSWER
+
+
+async def test_generation_can_be_disabled_for_retrieval_experiments(tenant):
+    script = Script()
+    config = RagConfig(crag=False, faithfulness=False, generate=False)
+    events, _ = await run(tenant, script, config)
+    assert "answer" not in script.seen
+    assert not any(isinstance(e, Token) for e in events)
+    assert len(final_of(events).ranked) == 6

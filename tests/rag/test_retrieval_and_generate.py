@@ -164,3 +164,15 @@ async def test_fallback_uses_the_small_model():
     llm = FakeLLM(lambda messages, model: "Bilgi bulunamadı.")
     assert await safe_fallback(llm, "Ürün garantisi?") == "Bilgi bulunamadı."
     assert llm.chat_calls[0][0] == "gpt-4.1-nano"
+
+
+async def test_baseline_without_generation_only_retrieves(fresh_tenant):
+    from mabeyn.rag.service import BaselineRag, collect
+
+    llm = FakeLLM()
+    await seed(fresh_tenant, llm)
+    final = await collect(
+        BaselineRag(llm, 2, generate=False).run(fresh_tenant, "return", [], "Shop")
+    )
+    assert final.answer == "" and len(final.ranked) == 2
+    assert llm.chat_calls == []
