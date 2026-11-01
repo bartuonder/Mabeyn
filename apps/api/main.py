@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from apps.api.routers import (
     api_keys,
+    approvals,
     auth,
     chat,
     conversations,
@@ -13,8 +14,10 @@ from apps.api.routers import (
     sessions,
     tools,
 )
+from mabeyn.agents.runtime import runtime
 from mabeyn.core.config import get_settings
 from mabeyn.core.logging import configure_logging
+from mabeyn.core.loop import use_selector_loop_on_windows
 from mabeyn.core.tracking import export_tracking_env
 from mabeyn.db.session import get_engine
 from mabeyn.queue import get_ingestion_queue
@@ -22,12 +25,15 @@ from mabeyn.queue import get_ingestion_queue
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    await runtime.start()
     yield
+    await runtime.stop()
     await get_ingestion_queue().close()
     await get_engine().dispose()
 
 
 def create_app() -> FastAPI:
+    use_selector_loop_on_windows()
     export_tracking_env()
     configure_logging(get_settings().log_level)
     app = FastAPI(title="Mabeyn", version="0.1.0", lifespan=lifespan)
@@ -39,6 +45,7 @@ def create_app() -> FastAPI:
     app.include_router(conversations.router)
     app.include_router(tools.router)
     app.include_router(chat.router)
+    app.include_router(approvals.router)
     return app
 
 
