@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -64,7 +64,15 @@ class DocumentOut(Response):
     status: DocumentStatus
     error: str | None
     size_bytes: int | None
+    language: str
+    effective_date: date | None
     created_at: datetime
+
+
+class UrlDocumentCreate(StrictRequest):
+    url: str = Field(min_length=8, max_length=2048)
+    title: str | None = Field(default=None, max_length=500)
+    effective_date: date | None = None
 
 
 class MessageOut(Response):

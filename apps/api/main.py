@@ -7,11 +7,13 @@ from apps.api.routers import api_keys, auth, conversations, documents, health, s
 from mabeyn.core.config import get_settings
 from mabeyn.core.logging import configure_logging
 from mabeyn.db.session import get_engine
+from mabeyn.queue import get_ingestion_queue
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     yield
+    await get_ingestion_queue().close()
     await get_engine().dispose()
 
 

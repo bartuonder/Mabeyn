@@ -47,3 +47,17 @@ async def fresh_tenant(admin_engine: AsyncEngine) -> AsyncIterator[uuid.UUID]:
     )
     yield tenant_id
     await delete_tenant(admin_engine, tenant_id)
+
+
+@pytest_asyncio.fixture
+async def tenant_x(admin_engine: AsyncEngine) -> AsyncIterator[SeededTenant]:
+    seeded = await seed_tenant(admin_engine, "X")
+    yield seeded
+    await delete_tenant(admin_engine, seeded.id)
+
+
+@pytest_asyncio.fixture
+async def tenant_y(admin_engine: AsyncEngine) -> AsyncIterator[SeededTenant]:
+    seeded = await seed_tenant(admin_engine, "Y")
+    yield seeded
+    await delete_tenant(admin_engine, seeded.id)
