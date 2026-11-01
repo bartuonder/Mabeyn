@@ -25,6 +25,7 @@ class Final:
     answer: str
     citations: list[Citation]
     chunks: list[RetrievedChunk]
+    ranked: list[RetrievedChunk] = field(default_factory=list)
     abstained: bool = False
     trace: dict[str, object] = field(default_factory=dict)
 
@@ -45,9 +46,10 @@ class RagService(Protocol):
 class BaselineRag:
     """Vector search followed by one cited generation call."""
 
-    def __init__(self, llm: LLM, top_k: int = 5) -> None:
+    def __init__(self, llm: LLM, top_k: int = 5, embedding_model: str | None = None) -> None:
         self.llm = llm
         self.top_k = top_k
+        self.embedding_model = embedding_model
 
     async def run(
         self,
@@ -56,7 +58,9 @@ class BaselineRag:
         history: Sequence[ChatMessage],
         company: str,
     ) -> AsyncIterator[RagEvent]:
-        chunks = await retrieve_vector(tenant_id, self.llm, question, self.top_k)
+        chunks = await retrieve_vector(
+            tenant_id, self.llm, question, self.top_k, self.embedding_model
+        )
         pieces: list[str] = []
         async for piece in stream_answer(self.llm, company, question, chunks, history):
             pieces.append(piece)
@@ -64,7 +68,12 @@ class BaselineRag:
         answer = "".join(pieces).strip()
         if not answer:
             answer = await safe_fallback(self.llm, question)
-        yield Final(answer=answer, citations=extract_citations(answer, chunks), chunks=chunks)
+        yield Final(
+            answer=answer,
+            citations=extract_citations(answer, chunks),
+            chunks=chunks,
+            ranked=chunks,
+        )
 
 
 async def collect(events: AsyncIterator[RagEvent]) -> Final:

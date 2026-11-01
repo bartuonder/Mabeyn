@@ -34,6 +34,7 @@ class UsageMeter:
     input_tokens: int = 0
     output_tokens: int = 0
     cost_usd: float = 0.0
+    latency_adjustment_s: float = 0.0
 
     def add(self, model: str, input_tokens: int, output_tokens: int) -> None:
         self.calls += 1
@@ -57,13 +58,25 @@ def measure() -> Iterator[UsageMeter]:
         _current.reset(token)
 
 
-def record(model: str, input_tokens: int, output_tokens: int) -> None:
+def current_meter() -> UsageMeter | None:
+    return _current.get()
+
+
+def adjust_latency(seconds: float) -> None:
+    """Account for time a cached call would have taken (negative if it took longer than replay)."""
+    meter = _current.get()
+    if meter is not None:
+        meter.latency_adjustment_s += seconds
+
+
+def record(model: str, input_tokens: int, output_tokens: int, *, billed: bool = True) -> None:
+    """Add a call to the active meter; `billed=False` replays a cached call without spending."""
     meter = _current.get()
     if meter is not None:
         meter.add(model, input_tokens, output_tokens)
 
     ledger = get_settings().llm_ledger_path
-    if ledger:
+    if billed and ledger:
         entry = {
             "model": model,
             "input_tokens": input_tokens,

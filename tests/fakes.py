@@ -5,6 +5,7 @@ import uuid
 from collections.abc import AsyncIterator, Callable, Sequence
 
 from mabeyn.core.config import get_settings
+from mabeyn.llm import usage
 from mabeyn.llm.client import ChatMessage, ChatResult
 
 ChatHandler = Callable[[Sequence[ChatMessage], str], str]
@@ -40,6 +41,7 @@ class FakeLLM:
     ) -> ChatResult:
         model = model or get_settings().llm_model
         self.chat_calls.append((model, list(messages)))
+        usage.record(model, 10, 5)
         return ChatResult(self.handler(messages, model), 10, 5)
 
     async def stream(
@@ -53,11 +55,13 @@ class FakeLLM:
         model = model or get_settings().llm_model
         self.chat_calls.append((model, list(messages)))
         text = self.handler(messages, model)
+        usage.record(model, 10, 5)
         for piece in re.findall(r"\S+\s*", text):
             yield piece
 
     async def embed(self, texts: Sequence[str], *, model: str | None = None) -> list[list[float]]:
         self.embed_calls.append(list(texts))
+        usage.record(model or get_settings().embedding_model, len(texts), 0)
         return [hash_embed(t) for t in texts]
 
 
