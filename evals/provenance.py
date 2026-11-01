@@ -27,7 +27,8 @@ def _git(*args: str) -> str | None:
 def provenance() -> dict[str, Any]:
     """Which code, prompts and models produced a result."""
     settings = get_settings()
-    status = _git("status", "--porcelain")
+    # Result files written by the run itself do not make the code dirty.
+    status = _git("status", "--porcelain", "--", ".", ":(exclude)evals/results")
     return {
         "commit": _git("rev-parse", "HEAD"),
         "dirty": bool(status) if status is not None else None,
