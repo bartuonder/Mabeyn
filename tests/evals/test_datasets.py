@@ -43,6 +43,20 @@ def test_v0_set_has_fifty_questions_with_ten_unanswerable():
     assert all(q.id == f"tr-{i:03d}" for i, q in enumerate(v0, start=1))
 
 
+def test_full_set_has_eighty_questions_with_sixteen_unanswerable():
+    questions = load_questions("rag.jsonl")
+    assert len(questions) == 80
+    assert sum(not q.answerable for q in questions) == 16
+    assert len(load_questions("rag.jsonl", sets=("v1",))) == 30
+    assert sum(q.category == "conflict" for q in questions) >= 6
+
+
+def test_english_set_has_twenty_questions():
+    questions = load_questions("rag_en.jsonl")
+    assert len(questions) == 20
+    assert sum(not q.answerable for q in questions) == 3
+
+
 def test_conflict_questions_target_the_current_policy():
     for q in load_questions("rag.jsonl"):
         if q.category == "conflict":
