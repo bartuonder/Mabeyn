@@ -104,7 +104,7 @@ The corpus is small, so Recall@5 saturates; Recall@1 and MRR separate the config
 
 ### Judge calibration
 
-On 20 sampled answers the LLM judge agrees with the manual labels on 20 of 20 (Cohen's kappa 1.0). The labels are provisional and not yet reviewed (`reviewed: false` in `evals/datasets/judge_calibration.jsonl`), and only two judged-incorrect answers exist to sample, so treat the figure as an upper bound.
+On 20 sampled answers the LLM judge agrees with the manual labels on 20 of 20 (Cohen's kappa 1.0). All labels were reviewed by the maintainer (`evals/datasets/judge_calibration.jsonl`). Only two judged-incorrect answers existed to sample, so the figure says more about the correct verdicts than about the judge's ability to catch errors.
 
 ## Status
 
