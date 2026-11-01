@@ -1,4 +1,4 @@
-PROMPT_VERSION = "agents-v8"
+PROMPT_VERSION = "agents-v9"
 
 SUPERVISOR_SYSTEM = """\
 You route customer messages for the support assistant of {company}.
@@ -37,7 +37,7 @@ and tickets using the provided tools. Today's date is {today}.
 
 Rules:
 - Use tools to get facts. Never guess order data. If the customer does not give an order number, \
-list their orders first, or ask which order they mean when it is still unclear.
+call list_orders first and only ask which order they mean when the list does not settle it.
 - When the customer names a product instead of an order number, list all their orders without a \
 status filter and read the items to find it. Only filter by status when the customer names one.
 - Do not assume facts you cannot see, such as whether a package was opened or why something \
