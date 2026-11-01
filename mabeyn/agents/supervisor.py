@@ -76,7 +76,7 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
         return "output_guard" if state.get("blocked") else "supervisor"
 
     async def supervisor(state: SupervisorState) -> dict[str, Any]:
-        route, reason = ["knowledge"], "default"
+        route, reason, knowledge_question = ["knowledge"], "default", ""
         user = state["question"]
         if state.get("history"):
             user = f"Conversation so far:\n{_history_text(state['history'])}\n\nLatest: {user}"
@@ -95,9 +95,10 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
             )
             if data.get("route") in VALID_ROUTES:
                 route, reason = data["route"], str(data.get("reason", ""))
+                knowledge_question = str(data.get("knowledge_question") or "").strip()
         except (LLMError, AttributeError, TypeError):
             pass
-        return {"plan": route, "route_reason": reason}
+        return {"plan": route, "route_reason": reason, "knowledge_question": knowledge_question}
 
     async def dispatch(state: SupervisorState) -> dict[str, Any]:
         return {}
@@ -112,10 +113,13 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
         live = state.get("plan") == ["knowledge"]
         writer = get_stream_writer()
         final: Final | None = None
+        mixed = len(state.get("plan", [])) > 1
+        # In a mixed request the document search gets a policy question without order details.
+        question = (state.get("knowledge_question") if mixed else "") or state["question"]
         async for event in deps.rag.run(
             uuid.UUID(state["tenant_id"]),
-            state["question"],
-            state.get("history", []),
+            question,
+            [] if mixed else state.get("history", []),
             state["company"],
         ):
             if isinstance(event, Token) and live:
@@ -126,11 +130,13 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
                 final = event
         if final is None:
             return {"step": state.get("step", 0) + 1}
+        # An abstention is only a stock apology; it must not reach the action agent or customer.
+        usable = not final.abstained
         return {
             "step": state.get("step", 0) + 1,
             "streamed": live,
-            "knowledge_answer": final.answer,
-            "knowledge_citations": _citation_dicts(final),
+            "knowledge_answer": final.answer if usable or live else "",
+            "knowledge_citations": _citation_dicts(final) if usable else [],
             "knowledge_abstained": final.abstained,
         }
 

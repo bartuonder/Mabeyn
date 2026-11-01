@@ -237,7 +237,14 @@ class ActionAgent:
                     pending["arguments"],
                     uuid.UUID(pending["call_id"]),
                 )
-                outcome, status = result, "success" if result.ok else "error"
+                outcome = {
+                    "ok": result.ok,
+                    "status": result.status_code,
+                    "data": result.data,
+                    "error": result.error,
+                    "note": "A human reviewer approved this action and it was carried out.",
+                }
+                status = "success" if result.ok else "error"
             errors = 0 if status == "success" else errors + 1
         else:
             note = str(decision.get("note") or "")

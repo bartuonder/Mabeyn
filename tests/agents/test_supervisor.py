@@ -244,3 +244,28 @@ async def test_each_message_starts_a_clean_turn_in_the_same_thread(fresh_tenant,
 
     assert second.answer == "Anything else?"
     assert second.trace["tool_calls_used"] == 0 and second.trace["tool_trace"] == []
+
+
+async def test_mixed_requests_search_the_documents_with_a_clean_policy_question(
+    fresh_tenant, checkpointer
+):
+    brain = Brain(route=["knowledge", "action"], tool_turns=[say("Order noted.")])
+    env = await build_env(fresh_tenant, checkpointer, brain)
+    await env.ask("I want to return order KS-1001", history=[{"role": "user", "content": "hi"}])
+    assert env.rag.calls == ["What are the return rules?"]
+
+
+async def test_an_abstaining_knowledge_agent_is_not_passed_on(fresh_tenant, checkpointer):
+    brain = Brain(
+        route=["knowledge", "action"],
+        tool_turns=[tool_call("request_refund", **REFUND), say("Refund submitted.")],
+    )
+    rag = StubRag(answer="I could not find reliable information.", abstain=True)
+    env = await build_env(fresh_tenant, checkpointer, brain, rag)
+    _, paused = await env.ask("Refund KS-1001")
+
+    assert "Policy notes" not in env.llm.tool_turns[0][0]["content"]
+    assert paused.answer == "Your request is under review."
+    done = await env.service.resume(env.turn(), approved=True, note=None)
+    assert done.answer == "Refund submitted."
+    assert "approved this action" in env.llm.tool_turns[-1][-1]["content"]

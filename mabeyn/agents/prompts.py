@@ -11,8 +11,12 @@ lists, refunds, address changes, support tickets. It cannot read the company doc
 - escalate: hands the conversation to a human colleague. Use it when the customer asks for a \
 person, is very upset, makes legal threats, or asks for something no agent can do.
 
-Return only JSON: {{"route": [...], "reason": "<short>"}} where route is one of
-["knowledge"], ["action"], ["knowledge", "action"] or ["escalate"].
+Return only JSON: {{"route": [...], "reason": "<short>", "knowledge_question": "<text>"}} where \
+route is one of ["knowledge"], ["action"], ["knowledge", "action"] or ["escalate"].
+When route contains "knowledge" together with "action", knowledge_question must be a standalone \
+policy question for the document search, in the customer's language, without order numbers or \
+personal details, for example "What are the conditions for returning and refunding a product?". \
+Otherwise leave it empty.
 
 Guidance:
 - Choose action whenever the customer wants something done or looked up for a specific order, \

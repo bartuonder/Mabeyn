@@ -24,8 +24,11 @@ SHOP_URL = "http://shop"
 class StubRag:
     """Knowledge agent stand-in: returns a fixed answer without touching documents."""
 
-    def __init__(self, answer: str = "Returns are accepted within 30 days.") -> None:
+    def __init__(
+        self, answer: str = "Returns are accepted within 30 days.", abstain: bool = False
+    ) -> None:
         self.answer = answer
+        self.abstain = abstain
         self.calls: list[str] = []
 
     async def run(
@@ -33,7 +36,7 @@ class StubRag:
     ) -> AsyncIterator[RagEvent]:
         self.calls.append(question)
         yield Token(self.answer)
-        yield Final(answer=self.answer, citations=[], chunks=[])
+        yield Final(answer=self.answer, citations=[], chunks=[], abstained=self.abstain)
 
 
 @dataclass
@@ -72,7 +75,10 @@ class Brain:
         kind = self.kind(messages[0]["content"])
         self.seen.append(kind)
         if kind == "route":
-            return json.dumps({"route": self.route, "reason": "scripted"})
+            question = "What are the return rules?" if len(self.route) > 1 else ""
+            return json.dumps(
+                {"route": self.route, "reason": "scripted", "knowledge_question": question}
+            )
         return self.replies.get(kind, self.DEFAULTS.get(kind, "ok"))
 
     def tools(self, messages: Sequence[ChatMessage], tools: Any, model: str) -> ToolChatResult:

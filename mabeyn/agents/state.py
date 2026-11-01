@@ -25,6 +25,7 @@ class SupervisorState(TypedDict, total=False):
     plan: list[str]
     step: int
     route_reason: str
+    knowledge_question: str
     streamed: bool
 
     knowledge_answer: str
@@ -54,6 +55,7 @@ def fresh_turn() -> SupervisorState:
         "plan": [],
         "step": 0,
         "route_reason": "",
+        "knowledge_question": "",
         "streamed": False,
         "knowledge_answer": "",
         "knowledge_citations": [],
