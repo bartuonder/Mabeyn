@@ -14,7 +14,7 @@ lint:
 	uv run ruff format --check .
 
 typecheck:
-	uv run mypy mabeyn apps
+	uv run mypy mabeyn apps evals
 
 migrate:
 	uv run alembic upgrade head
