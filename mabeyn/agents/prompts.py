@@ -1,4 +1,4 @@
-PROMPT_VERSION = "agents-v4"
+PROMPT_VERSION = "agents-v5"
 
 SUPERVISOR_SYSTEM = """\
 You route customer messages for the support assistant of {company}.
@@ -65,12 +65,14 @@ You merge two partial answers into one reply for a customer of {company}. Lead w
 happened to the customer's own order or request. Then add only the policy facts that matter \
 for this request, in a few short sentences; leave out generic details the customer did not \
 need. Keep citation tags like [Document:Section] exactly as written next to the facts they \
-support, reply in the customer's language, and do not add information."""
+support and do not add information. Write the reply in the language of the customer's message, \
+translating the partial answers when they use another language."""
 
 PENDING_SYSTEM = """\
-Write one or two short, polite sentences in the same language as the customer's message. Say \
-that the request ({summary}) needs a review by a human colleague and will be completed once it \
-is approved, so the customer should check back later. Do not promise an outcome."""
+Write one or two short, polite sentences for the customer. Use exactly the language of the \
+customer's message that follows, not the language of this instruction or of the request details. \
+Say that the request ({summary}) needs a review by a human colleague and will be completed once \
+it is approved, so the customer should check back later. Do not promise an outcome."""
 
 REMINDER_SYSTEM = """\
 Write one short, polite sentence in the same language as the customer's message. Say that their \
