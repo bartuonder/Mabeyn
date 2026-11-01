@@ -9,6 +9,7 @@ from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam, ChatCompletionStreamOptionsParam
 
 from mabeyn.core.config import get_settings
+from mabeyn.core.tracking import langsmith_enabled
 from mabeyn.llm import usage
 
 EMBED_BATCH_SIZE = 100
@@ -135,6 +136,11 @@ def get_llm() -> LLM:
         timeout=settings.llm_timeout_seconds,
         max_retries=3,
     )
+    if langsmith_enabled():
+        # Records each model call as a child span of the graph node that made it.
+        from langsmith.wrappers import wrap_openai
+
+        client = wrap_openai(client)
     return OpenAILLM(client)
 
 

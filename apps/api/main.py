@@ -15,6 +15,7 @@ from apps.api.routers import (
 )
 from mabeyn.core.config import get_settings
 from mabeyn.core.logging import configure_logging
+from mabeyn.core.tracking import export_tracking_env
 from mabeyn.db.session import get_engine
 from mabeyn.queue import get_ingestion_queue
 
@@ -27,6 +28,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 
 def create_app() -> FastAPI:
+    export_tracking_env()
     configure_logging(get_settings().log_level)
     app = FastAPI(title="Mabeyn", version="0.1.0", lifespan=lifespan)
     app.include_router(health.router)
