@@ -61,8 +61,12 @@ def _history_text(history: Sequence[ChatMessage]) -> str:
 
 
 def _passages(chunks: Sequence[RetrievedChunk], limit: int = GRADE_PASSAGE_CHARS) -> str:
+    def heading(i: int, chunk: RetrievedChunk) -> str:
+        date = f" (effective_date: {chunk.effective_date})" if chunk.effective_date else ""
+        return f"[{i}] {chunk.context_header}{date}"
+
     return "\n\n".join(
-        f"[{i}] {c.context_header}\n{c.content[:limit]}" for i, c in enumerate(chunks, start=1)
+        f"{heading(i, c)}\n{c.content[:limit]}" for i, c in enumerate(chunks, start=1)
     )
 
 

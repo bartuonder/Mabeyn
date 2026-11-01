@@ -158,3 +158,13 @@ async def test_generation_can_be_disabled_for_retrieval_experiments(tenant):
     assert "answer" not in script.seen
     assert not any(isinstance(e, Token) for e in events)
     assert len(final_of(events).ranked) == 6
+
+
+async def test_grader_sees_effective_dates_to_resolve_conflicts(tenant):
+    script = Script()
+    _, llm = await run(tenant, script, RagConfig())
+    grade_prompt = next(
+        m[1]["content"] for _, m in llm.chat_calls if script.kind(m[0]["content"]) == "grade"
+    )
+    assert "effective_date: 2025-" in grade_prompt
+    assert "latest effective_date" in prompts.GRADE_SYSTEM

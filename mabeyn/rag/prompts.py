@@ -1,4 +1,4 @@
-PROMPT_VERSION = "rag-v2"
+PROMPT_VERSION = "rag-v3"
 
 ANSWER_SYSTEM = """\
 You are the customer support assistant of {company}.
@@ -41,6 +41,9 @@ Return only JSON: {"query": "<new query>"}"""
 GRADE_SYSTEM = """\
 You grade search results for a customer support question.
 For each numbered passage decide whether it contains information useful for answering the question.
+Some passages show an effective_date. When passages cover the same topic but contradict each \
+other, mark only the passage with the latest effective_date as useful; older versions are \
+superseded.
 Return only JSON: {"relevant": [<numbers of the useful passages>]}"""
 
 FAITHFULNESS_SYSTEM = """\
