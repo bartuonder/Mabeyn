@@ -76,30 +76,33 @@ Each row adds one technique to the row above. Accuracy and faithfulness show a 9
 
 | Configuration | Recall@1 | Recall@5 | MRR | Accuracy | Faithfulness | p95 latency (s) | Cost / query ($) |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Vector only | 0.766 | 0.953 | 0.850 | 0.900 [0.81-0.95] | 0.975 [0.91-0.99] | 1.20 | 0.00081 |
-| + Hybrid (full text + RRF) | 0.812 | 0.969 | 0.883 | 0.912 [0.83-0.96] | 0.963 [0.90-0.99] | 1.36 | 0.00082 |
-| + Reranker (30 to 6) | 0.969 | 1.000 | 0.984 | 0.938 [0.86-0.97] | 0.975 [0.91-0.99] | 3.97 | 0.00200 |
-| + CRAG grading | 0.969 | 1.000 | 0.984 | 0.975 [0.91-0.99] | 0.988 [0.93-1.00] | 7.29 | 0.00195 |
-| + Faithfulness check | 0.969 | 1.000 | 0.984 | 0.975 [0.91-0.99] | 0.988 [0.93-1.00] | 7.30 | 0.00203 |
+| Vector only | 0.766 | 0.953 | 0.850 | 0.912 [0.83-0.96] | 0.975 [0.91-0.99] | 1.25 | 0.00082 |
+| + Hybrid (full text + RRF) | 0.812 | 0.969 | 0.883 | 0.900 [0.81-0.95] | 0.963 [0.90-0.99] | 1.35 | 0.00083 |
+| + Reranker (30 to 6) | 0.969 | 1.000 | 0.984 | 0.975 [0.91-0.99] | 0.988 [0.93-1.00] | 4.45 | 0.00201 |
+| + CRAG grading | 0.969 | 1.000 | 0.984 | 0.975 [0.91-0.99] | 0.975 [0.91-0.99] | 9.16 | 0.00196 |
+| + Faithfulness check | 0.969 | 1.000 | 0.984 | 0.963 [0.90-0.99] | 0.975 [0.91-0.99] | 8.18 | 0.00204 |
+
+Measured with prompt `rag-v5` (every row was rerun after the language fix).
 
 - Ranking quality improves clearly with hybrid search and the reranker (Recall@1 0.77 to 0.97, MRR 0.85 to 0.98).
-- Accuracy rises from 0.90 to 0.975, but neighbouring rows overlap and the set was used for tuning; the CRAG step in particular is a hint, not a proof (see the held-out set below).
-- The faithfulness check shows no measurable effect; it costs about $0.00008 per query.
-- Latency is the RAG subgraph only. Measured end to end on the knowledge path the first streamed token arrives after about 4.1 s (median), the whole answer after about 5.6 s, because routing, query handling, reranking and grading run first.
-- The same vector-only answers judged by `gpt-4.1` instead of `gpt-4.1-mini` score 0.925 instead of 0.900 (two verdicts differ), so the judge model moves the numbers by a couple of points.
+- Accuracy rises from about 0.91 to 0.975 with the reranker; the intervals of neighbouring rows overlap and the set was used for tuning. CRAG grading and the faithfulness check show no measurable effect on this set (an earlier run with prompt `rag-v4` had CRAG at 0.975 versus 0.938 for the reranker alone; the same configurations now differ by noise). Their value shows on unanswerable questions in the held-out set below.
+- Latency is the RAG subgraph only and varies between runs. Measured end to end on the knowledge path the first streamed token arrives after about 4.1 s (median), the whole answer after about 5.6 s, because routing, query handling, reranking and grading run first.
+- On an earlier run, the same vector-only answers judged by `gpt-4.1` instead of `gpt-4.1-mini` scored 0.925 instead of 0.900 (two verdicts differ), so the judge model moves the numbers by a couple of points.
 - English set (20 questions, 17 answerable), measured earlier with the full pipeline: Recall@5 1.00, accuracy 0.95.
 
-### Held-out set (30 questions, judge `gpt-4.1`)
+### Held-out set (30 fresh questions, judge `gpt-4.1`)
 
-Written before the final measurement and never used for tuning (`evals/results/heldout.md`).
+Written after the first held-out set had been consumed by a fix, with gold sections no other set uses, and measured once (`evals/results/heldout2.md`). 25 questions are answerable (21 Turkish, 3 English over English documents, 1 English over a Turkish document) and 5 are not.
 
-| Configuration | Recall@1 | MRR | Accuracy | Faithfulness | p95 latency (s) | Cost / query ($) |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Vector only | 0.917 | 0.948 | 1.000 [0.89-1.00] | 0.967 [0.83-0.99] | 1.77 | 0.00085 |
-| Hybrid + reranker | 1.000 | 1.000 | 1.000 [0.89-1.00] | 0.967 [0.83-0.99] | 3.47 | 0.00205 |
-| Full pipeline | 1.000 | 1.000 | 1.000 [0.89-1.00] | 0.967 [0.83-0.99] | 8.78 | 0.00204 |
+| Configuration | Recall@1 | MRR | Accuracy | Answerable | Unanswerable (5) | Faithfulness | p95 latency (s) | Cost / query ($) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Vector only | 0.720 | 0.830 | 0.933 [0.79-0.98] | 0.960 | 0.800 | 1.000 [0.89-1.00] | 2.45 | 0.00077 |
+| Hybrid + reranker | 0.960 | 0.980 | 0.933 [0.79-0.98] | 1.000 | 0.600 | 0.933 [0.79-0.98] | 3.44 | 0.00199 |
+| Full pipeline | 0.960 | 0.980 | 0.967 [0.83-0.99] | 1.000 | 0.800 | 1.000 [0.89-1.00] | 9.63 | 0.00200 |
 
-This set is easier than the development set: even vector-only answers all 30 questions correctly (including 2 questions asked in English over Turkish documents and 6 unanswerable ones). It confirms the ranking gain of the reranker but cannot confirm or refute the accuracy gain of CRAG, so that claim rests on the development set only.
+- The reranker again lifts ranking (Recall@1 0.72 to 0.96) and answers every answerable question; the full pipeline gives the best overall accuracy, but 28, 28 and 29 correct answers out of 30 cannot be told apart statistically.
+- The one visible difference is on unanswerable questions: with only five of them, hybrid plus reranker invents an answer for two, the full pipeline for one. Treat this as a hint that grading and the faithfulness check guard against invented answers, not as proof.
+- The first held-out set (30 questions, all configurations 1.000) is consumed and kept only as a regression test; it was too easy to separate the configurations.
 
 ### Experiments (retrieval only, 80 questions)
 
@@ -131,24 +134,26 @@ On 20 sampled answers the LLM judge agrees with the manual labels on 20 of 20 (C
 
 ### Tool use and approvals
 
-Scenarios on the supervisor with the mock shop ([how they are scored](docs/evaluation.md#tool-use-evaluation)). The development set (40) was used for tuning; the held-out set (15, judge `gpt-4.1`) was not.
+Scenarios on the supervisor with the mock shop ([how they are scored](docs/evaluation.md#tool-use-evaluation)). The development set (40) was used for tuning. The first held-out set (15) is consumed: its language failure led to a fix, so its column predates that fix and is kept for reference. The fresh held-out set (15, judge `gpt-4.1`) was written afterwards and measured once.
 
-| Metric | Development (40) | Held-out (15) |
-| --- | ---: | ---: |
-| Scenarios passed | 0.975 [0.87-1.00] | 0.867 [0.62-0.96] |
-| Correct tool selection | 1.000 | 1.000 |
-| Correct arguments | 1.000 | 1.000 |
-| Unnecessary tool calls | 0.000 | 0.000 |
-| Sensitive calls that reached approval | 1.000 | 1.000 |
-| Sensitive actions executed without approval | 0 | 0 |
-| Routing accuracy | 1.000 | 1.000 |
-| Reply judged correct | 0.975 | 0.933 |
-| Reply in the customer's language | 1.000 | 0.933 |
-| Other customer's data in a reply | 0 | 0 |
-| Cost per scenario | $0.002 | $0.002 |
+| Metric | Development (40) | Held-out, consumed (15) | Held-out, fresh (15) |
+| --- | ---: | ---: | ---: |
+| Scenarios passed | 0.975 [0.87-1.00] | 0.867 [0.62-0.96] | 0.867 [0.62-0.96] |
+| Correct tool selection | 1.000 | 1.000 | 0.933 |
+| Correct arguments | 1.000 | 1.000 | 0.833 |
+| Unnecessary tool calls | 0.000 | 0.000 | 0.000 |
+| Sensitive calls that reached approval | 1.000 | 1.000 | 1.000 |
+| Sensitive actions executed without approval | 0 | 0 | 0 |
+| Routing accuracy | 1.000 | 1.000 | 1.000 |
+| Reply judged correct | 0.975 | 0.933 | 0.933 |
+| Reply in the customer's language | 1.000 | 0.933 | 1.000 |
+| Other customer's data in a reply | 0 | 0 | 0 |
+| Cost per scenario | $0.002 | $0.002 | $0.002 |
 
-- Tool choice, arguments and the approval gate hold on unseen scenarios, including two multi-turn ones. The approval rate is 100% by construction (the graph routes every `sensitive` call to approval); the real risk is the model not calling a tool, which tool selection measures.
-- Open defects found by the held-out set: an English question answered over Turkish documents is answered in Turkish when it takes the knowledge-only path (the supervisor knows the language but the RAG answer prompt is not told), and one scenario failed because the judge insisted on the word "delivered". The development set has one known failure: an English question that finds nothing in Turkish documents.
+- The approval gate, routing and tenant/customer isolation held on every set. The approval rate is 100% by construction (the graph routes every `sensitive` call to approval); the real risk is the model not calling a tool, which tool selection measures.
+- The language fix works: both English knowledge questions in the development and fresh sets are answered in English (language accuracy 1.000).
+- The two failures in the fresh set are scoring artefacts rather than wrong replies, and the set was not changed afterwards. In one the assistant listed the customer's orders instead of calling the status tool for an order number given in the message, and answered correctly (the scenario required the status tool). In the other the judge marked a correct delivery reply wrong because it did not repeat the order number.
+- The development set has one known failure: an English question that finds nothing in Turkish documents (cross-lingual retrieval is weak).
 
 ## Status
 
