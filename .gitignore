@@ -26,3 +26,8 @@ build/
 
 # Eval outputs are committed selectively
 evals/results/*.tmp.json
+
+# Evaluation caches and spend ledger
+evals/.cache/
+evals/.ledger.jsonl
+wandb/
