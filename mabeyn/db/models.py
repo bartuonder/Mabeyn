@@ -68,6 +68,12 @@ class ApprovalStatus(enum.StrEnum):
     REJECTED = "rejected"
 
 
+class ConversationStatus(enum.StrEnum):
+    OPEN = "open"
+    ESCALATED = "escalated"
+    CLOSED = "closed"
+
+
 class SecurityAction(enum.StrEnum):
     BLOCKED = "blocked"
     FLAGGED = "flagged"
@@ -179,6 +185,10 @@ class Conversation(TenantModel):
     __tablename__ = "conversations"
 
     customer_id: Mapped[str] = mapped_column(String(128), index=True)
+    status: Mapped[ConversationStatus] = mapped_column(
+        _enum(ConversationStatus), server_default=ConversationStatus.OPEN.value
+    )
+    escalation_reason: Mapped[str | None] = mapped_column(Text)
 
 
 class Message(TenantModel):
