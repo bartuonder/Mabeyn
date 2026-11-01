@@ -8,8 +8,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
 from mabeyn.core.config import get_settings
+from mabeyn.core.loop import use_selector_loop_on_windows
 from mabeyn.db.provisioning import create_tenant
 from tests.factories import SeededTenant, delete_tenant, seed_tenant
+
+use_selector_loop_on_windows()
 
 
 @pytest_asyncio.fixture(scope="session")
@@ -61,3 +64,12 @@ async def tenant_y(admin_engine: AsyncEngine) -> AsyncIterator[SeededTenant]:
     seeded = await seed_tenant(admin_engine, "Y")
     yield seeded
     await delete_tenant(admin_engine, seeded.id)
+
+
+@pytest_asyncio.fixture(scope="session")
+async def checkpointer(admin_engine: AsyncEngine):
+    from mabeyn.agents.checkpoint import open_checkpointer, setup_checkpoint_tables
+
+    await setup_checkpoint_tables()
+    async with open_checkpointer() as saver:
+        yield saver
