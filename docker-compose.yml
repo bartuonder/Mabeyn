@@ -15,6 +15,21 @@ services:
       redis:
         condition: service_healthy
 
+  worker:
+    build: .
+    command: ["arq", "apps.worker.main.WorkerSettings"]
+    environment:
+      DATABASE_URL: postgresql+asyncpg://mabeyn_app:mabeyn_app@postgres:5432/mabeyn
+      REDIS_URL: redis://redis:6379/0
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
   migrate:
     build: .
     command: ["alembic", "upgrade", "head"]
