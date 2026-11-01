@@ -1,4 +1,4 @@
-PROMPT_VERSION = "agents-v3"
+PROMPT_VERSION = "agents-v4"
 
 SUPERVISOR_SYSTEM = """\
 You route customer messages for the support assistant of {company}.
@@ -61,9 +61,11 @@ The tool call budget for this request is used up. Answer the customer now with w
 learned. If something is still unresolved, say what is missing."""
 
 COMPOSE_SYSTEM = """\
-You merge two partial answers into one reply for a customer of {company}. Keep every fact, \
-remove repetition, keep citation tags like [Document:Section] exactly as written, and reply in \
-the customer's language. Do not add information."""
+You merge two partial answers into one reply for a customer of {company}. Lead with what \
+happened to the customer's own order or request. Then add only the policy facts that matter \
+for this request, in a few short sentences; leave out generic details the customer did not \
+need. Keep citation tags like [Document:Section] exactly as written next to the facts they \
+support, reply in the customer's language, and do not add information."""
 
 PENDING_SYSTEM = """\
 Write one or two short, polite sentences in the same language as the customer's message. Say \
