@@ -144,3 +144,28 @@ def test_dataset_is_consistent_with_the_seed_tools_and_orders():
         if "order_id" in c.arguments and s.category != "identity"
     ]
     assert all(owner[order] == s.customer_id for s, order in own_orders)
+
+
+def test_outcome_and_language_verdicts_feed_the_score():
+    from evals.tool_scoring import OutcomeVerdict
+
+    good = OutcomeVerdict(True, True, "ok")
+    assert score_scenario(scenario(), [call()], ["action"], "answered", "", verdict=good).passed
+    wrong = OutcomeVerdict(False, True, "claimed a refund")
+    scored = score_scenario(scenario(), [call()], ["action"], "answered", "", verdict=wrong)
+    assert scored.outcome_ok is False and not scored.passed
+    foreign = OutcomeVerdict(True, False, "wrong language")
+    assert not score_scenario(
+        scenario(), [call()], ["action"], "answered", "", verdict=foreign
+    ).passed
+    metrics = summarize_scores(
+        [
+            score_scenario(scenario(), [call()], ["action"], "answered", "", verdict=v)
+            for v in (good, wrong)
+        ]
+    )
+    assert metrics["outcome_accuracy"] == 0.5 and metrics["language_accuracy"] == 1.0
+
+
+def test_every_scenario_states_its_expected_outcome():
+    assert all(s.outcome.strip() for s in load_scenarios())

@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from apps.kargoshop_mock.main import Store, create_app
 from evals.budget import budget_limit, configure_ledger, ensure_within_budget, spent_usd
 from evals.cache import CachingLLM
+from evals.judge import judge_outcome
 from evals.runner import CHUNK_PRESETS, drop_tenant, prepare_tenant
 from evals.tool_scoring import (
     ObservedCall,
@@ -95,6 +96,7 @@ async def run_scenario(
         for t in trace  # type: ignore[attr-defined]
     ]
     sensitive, with_approval = await _approval_counts(tenant_id, conversation_id)
+    verdict = await judge_outcome(llm, scenario.message, scenario.outcome, final.answer)
     score = score_scenario(
         scenario,
         calls,
@@ -103,6 +105,7 @@ async def run_scenario(
         final.answer,
         sensitive,
         with_approval,
+        verdict,
     )
     await saver.adelete_thread(turn.thread_id)
     return {
@@ -209,7 +212,9 @@ def main() -> None:
     parser.add_argument("--name", default="tool-eval")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--categories", nargs="*")
-    asyncio.run(run(parser.parse_args()))
+    args = parser.parse_args()
+    use_selector_loop_on_windows()
+    asyncio.run(run(args))
 
 
 if __name__ == "__main__":

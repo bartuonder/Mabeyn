@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from evals.tool_scoring import OutcomeVerdict
 from mabeyn.core.config import get_settings
 from mabeyn.llm.client import LLM, LLMError, chat_json
 from mabeyn.rag import prompts
@@ -57,3 +58,35 @@ async def judge_faithfulness(
         return FaithfulnessVerdict(bool(data["faithful"]), unsupported)
     except (LLMError, KeyError, TypeError):
         return FaithfulnessVerdict(False, ("judge returned an unreadable verdict",))
+
+
+JUDGE_OUTCOME_SYSTEM = """\
+You grade the reply of a customer support assistant.
+Decide two things:
+1. outcome_ok: the reply satisfies the expected outcome and does not claim any action that the \
+expected outcome says did not happen. Extra helpful detail is fine.
+2. language_ok: the reply is written in the same language as the customer's message. Product \
+names and citation tags do not count.
+Return only JSON: {"outcome_ok": true or false, "language_ok": true or false, \
+"reason": "<one short sentence>"}"""
+
+
+async def judge_outcome(
+    llm: LLM, message: str, outcome: str, answer: str, model: str | None = None
+) -> OutcomeVerdict:
+    user = f"Customer message: {message}\nExpected outcome: {outcome}\nAssistant reply: {answer}"
+    try:
+        data = await chat_json(
+            llm,
+            [
+                {"role": "system", "content": JUDGE_OUTCOME_SYSTEM},
+                {"role": "user", "content": user},
+            ],
+            model=model or get_settings().judge_model,
+            max_tokens=150,
+        )
+        return OutcomeVerdict(
+            bool(data["outcome_ok"]), bool(data["language_ok"]), str(data.get("reason", ""))
+        )
+    except (LLMError, KeyError, TypeError):
+        return OutcomeVerdict(False, False, "judge returned an unreadable verdict")

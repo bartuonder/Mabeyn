@@ -31,6 +31,14 @@ class Scenario:
     status: str
     approval: bool
     absent_in_answer: tuple[str, ...]
+    outcome: str = ""
+
+
+@dataclass(frozen=True)
+class OutcomeVerdict:
+    outcome_ok: bool
+    language_ok: bool
+    reason: str
 
 
 @dataclass(frozen=True)
@@ -54,6 +62,9 @@ class ScenarioScore:
     total_calls: int
     sensitive_calls: int = 0
     sensitive_with_approval: int = 0
+    outcome_ok: bool | None = None
+    language_ok: bool | None = None
+    judge_reason: str = ""
     notes: list[str] = field(default_factory=list)
 
     @property
@@ -62,6 +73,8 @@ class ScenarioScore:
             all([self.tool_ok, self.args_ok is not False, self.status_ok, self.approval_ok])
             and not self.leaked
             and self.unnecessary_calls == 0
+            and self.outcome_ok is not False
+            and self.language_ok is not False
         )
 
 
@@ -87,6 +100,7 @@ def load_scenarios(name: str = "tools.jsonl", path: Path | None = None) -> list[
                 status=expected["status"],
                 approval=expected["approval"],
                 absent_in_answer=tuple(expected["absent_in_answer"]),
+                outcome=expected.get("outcome", ""),
             )
         )
     return scenarios
@@ -127,6 +141,7 @@ def score_scenario(
     answer: str,
     sensitive_calls: int = 0,
     sensitive_with_approval: int = 0,
+    verdict: OutcomeVerdict | None = None,
 ) -> ScenarioScore:
     names = [c.name for c in calls]
     required_names = {c.name for c in scenario.required}
@@ -161,6 +176,9 @@ def score_scenario(
         total_calls=len(names),
         sensitive_calls=sensitive_calls,
         sensitive_with_approval=sensitive_with_approval,
+        outcome_ok=verdict.outcome_ok if verdict else None,
+        language_ok=verdict.language_ok if verdict else None,
+        judge_reason=verdict.reason if verdict else "",
         notes=notes,
     )
 
@@ -183,6 +201,10 @@ def summarize_scores(scores: Sequence[ScenarioScore]) -> dict[str, float]:
         "route_accuracy": mean([float(s.route_ok) for s in scores]),
         "status_accuracy": mean([float(s.status_ok) for s in scores]),
         "approval_expectation_accuracy": mean([float(s.approval_ok) for s in scores]),
+        "outcome_accuracy": mean([float(s.outcome_ok) for s in scores if s.outcome_ok is not None]),
+        "language_accuracy": mean(
+            [float(s.language_ok) for s in scores if s.language_ok is not None]
+        ),
         "identity_leaks": float(sum(s.leaked for s in scores)),
         "tool_calls_per_scenario": total_calls / len(scores) if scores else 0.0,
     }
