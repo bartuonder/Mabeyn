@@ -82,3 +82,22 @@ uv run python -m evals.runners.tool_eval --name tool-eval
 | `sensitive_executed_without_approval` | refunds that reached the shop while the conversation was still waiting; must be 0 |
 | `identity_leaks` | answers that contain another customer's data |
 | `scenario_pass_rate` | scenarios that satisfy every expectation at once |
+
+## Held-out sets and how to read the numbers
+
+The development sets (`rag.jsonl`, `tools.jsonl`) were used while building and tuning the pipeline: prompts and rules were changed after looking at the questions that failed. Their scores are therefore optimistic.
+
+`rag_heldout.jsonl` (30 questions) and `tools_heldout.jsonl` (15 scenarios) were written before the final measurement and are **not** used for tuning. They are run once per report, with a stronger judge model that is not the answer model (`JUDGE_MODEL=gpt-4.1`). If a held-out failure leads to a fix, the set is partly consumed: say so in the report and write a new held-out set before the next one.
+
+```bash
+JUDGE_MODEL=gpt-4.1 uv run python -m evals.runners.ablation --prefix heldout \
+  --dataset rag_heldout.jsonl --configs vector hybrid-rerank full
+JUDGE_MODEL=gpt-4.1 uv run python -m evals.runners.tool_eval --name tool-eval-heldout \
+  --dataset tools_heldout.jsonl
+```
+
+Reading the tables:
+
+- Accuracy and faithfulness show a 95% Wilson interval. With 80 questions a difference of six answers is about 7 points and the intervals of neighbouring rows overlap, so a single row is a hint, not proof.
+- Every result file records the git commit, whether the code was dirty, the prompt versions and the models. `tests/test_prompt_registry.py` fails when a prompt changes without a new `PROMPT_VERSION`; after bumping it, run `uv run python -m mabeyn.prompt_registry`.
+- Cached calls replay their original latency, so latency columns reflect the time of the first real call and vary between full reruns.

@@ -4,6 +4,26 @@ Eight phases. Each ends with a working build and a measured result.
 Tenant isolation, evals and red-teaming are never cut.
 Do not start a phase before the previous one meets its definition of done.
 
+## Status
+
+| Phase | State | Notes |
+| --- | --- | --- |
+| 1 Foundation and tenant isolation | done | ADR-0001 |
+| 2 Ingestion and RAG v1 | done | |
+| 3 RAG v2 and evals | done | Ablation, experiments and a held-out set; see [evaluation.md](evaluation.md) |
+| 4 Agentic layer | done | ADR-0002, [architecture.md](architecture.md) |
+| 5 Memory | planned | |
+| 6 LLM firewall and red-team | planned | ADR-0003 reserved; also closes the open items in [ADR-0005](adr/0005-customer-session-trust.md) |
+| 7 LLMOps, cache, performance | planned | |
+| 8 Productization | planned | Widget and session keys follow ADR-0005 |
+
+Deliberate differences from the plan below:
+- Embeddings come from the OpenAI API instead of a local bge-m3, and the reranker is an LLM listwise reranker instead of a cross-encoder.
+- Gold references in the evaluation sets point to a document and a section heading instead of chunk ids, so chunk size experiments reuse the same questions ([ADR-0004](adr/0004-evaluation-driven-rag.md)).
+- The demo documents and the golden set are Turkish, with a small English set.
+- The plan's phases 0 and 1 are one phase here, and weeks are not tracked.
+- Evaluation results are reported with 95% confidence intervals, and a held-out set that is never used for tuning backs the development numbers.
+
 ## Phase 1 — Foundation and tenant isolation
 
 Goal: a one-command stack with green CI, and a proof (by test) that tenant A can never see tenant B's data. The guarantee lives in the database, not in application code.
