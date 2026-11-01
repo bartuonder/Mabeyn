@@ -1,6 +1,20 @@
 {
   "name": "tool-eval",
-  "created_at": "2026-11-01T15:28:55",
+  "created_at": "2026-11-01T16:10:33",
+  "provenance": {
+    "commit": "10621fd2c809f66726ab0c1a95bb417805cafcb1",
+    "dirty": true,
+    "prompt_versions": {
+      "rag": "rag-v4",
+      "agents": "agents-v9"
+    },
+    "models": {
+      "generation": "gpt-4.1-mini",
+      "small": "gpt-4o-mini",
+      "judge": "gpt-4.1-mini",
+      "embedding": "text-embedding-3-small"
+    }
+  },
   "config": {
     "dataset": "tools.jsonl",
     "llm_model": "gpt-4.1-mini",
@@ -22,8 +36,10 @@
     "identity_leaks": 0.0,
     "tool_calls_per_scenario": 0.85,
     "sensitive_executed_without_approval": 0.0,
-    "cost_per_scenario_usd": 0.00170039825,
-    "latency_p50_s": 3.507043400000839
+    "cost_per_scenario_usd": 0.00170024325,
+    "latency_p50_s": 4.2536104999981035,
+    "scenario_pass_rate_ci95_low": 0.8711834051199223,
+    "scenario_pass_rate_ci95_high": 0.9955732825922052
   },
   "scenarios": [
     {
@@ -42,7 +58,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 3.830023499998788,
+      "latency_s": 4.477981100000761,
       "cost_usd": 0.0009571,
       "id": "tool-001",
       "message": "Where is order KS-1002?",
@@ -79,7 +95,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 3.0941630999986955,
+      "latency_s": 3.7267592000007426,
       "cost_usd": 0.0009761500000000001,
       "id": "tool-002",
       "message": "What is the status of order KS-1003?",
@@ -116,7 +132,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.7679496000000654,
+      "latency_s": 3.340515099998811,
       "cost_usd": 0.0009563,
       "id": "tool-003",
       "message": "KS-2002 siparişim ne zaman gelecek?",
@@ -153,7 +169,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.9399479999992764,
+      "latency_s": 3.521060300001409,
       "cost_usd": 0.00094045,
       "id": "tool-004",
       "message": "Was my order KS-3001 cancelled?",
@@ -188,7 +204,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 3.6584476999996696,
+      "latency_s": 4.2536104999981035,
       "cost_usd": 0.0012172,
       "id": "tool-005",
       "message": "Show me all my orders.",
@@ -225,7 +241,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.62120540000069,
+      "latency_s": 3.2487118000008195,
       "cost_usd": 0.0009424500000000001,
       "id": "tool-006",
       "message": "Which of my orders are still being processed?",
@@ -262,7 +278,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.9905441000009887,
+      "latency_s": 3.5568003000025783,
       "cost_usd": 0.0009571,
       "id": "tool-007",
       "message": "Siparişlerimden kargoda olan var mı?",
@@ -299,7 +315,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.926059700001133,
+      "latency_s": 3.3391419000017777,
       "cost_usd": 0.00092495,
       "id": "tool-008",
       "message": "What is the tracking number of KS-3002?",
@@ -336,7 +352,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.7045447999989847,
+      "latency_s": 3.2843616000009206,
       "cost_usd": 0.0009572000000000001,
       "id": "tool-009",
       "message": "Where is my air fryer?",
@@ -371,7 +387,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.6492596000007325,
+      "latency_s": 3.2293572000016866,
       "cost_usd": 0.00104595,
       "id": "tool-010",
       "message": "Has my robot vacuum been delivered?",
@@ -406,7 +422,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.9562319000015123,
+      "latency_s": 3.5290308999992703,
       "cost_usd": 0.0010926000000000002,
       "id": "tool-011",
       "message": "Where is my latest order?",
@@ -428,7 +444,7 @@
       "passed": true
     },
     {
-      "answer": "I have opened a support ticket regarding the crackling issue with your earbuds from order KS-1001. The support team will assist you further. Is there anything else I can help you with?",
+      "answer": "I have opened a support ticket about the crackling issue with your earbuds from order KS-1001. The support team will assist you further. Is there anything else I can help you with?",
       "status": "answered",
       "route": [
         "action"
@@ -444,7 +460,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.691853500002253,
+      "latency_s": 3.3006848999993963,
       "cost_usd": 0.0009827500000000001,
       "id": "tool-012",
       "message": "My earbuds from order KS-1001 crackle. Please open a support ticket about it.",
@@ -482,8 +498,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.8319783000006282,
-      "cost_usd": 0.00102005,
+      "latency_s": 2.8946838000010757,
+      "cost_usd": 0.00101965,
       "id": "tool-013",
       "message": "Bir destek talebi açın: KS-2002 siparişimdeki robot süpürge çalışmıyor.",
       "category": "ticket",
@@ -520,8 +536,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.734111399999165,
-      "cost_usd": 0.00098585,
+      "latency_s": 3.0202809999991587,
+      "cost_usd": 0.0009846500000000001,
       "id": "tool-014",
       "message": "Open a ticket for me: I was charged twice for order KS-3002.",
       "category": "ticket",
@@ -542,7 +558,7 @@
       "passed": true
     },
     {
-      "answer": "I have created a support ticket to follow up on the late delivery of your parcel KS-1002. The support team will look into it and get back to you. Is there anything else I can help you with?",
+      "answer": "I have created a support ticket for the late delivery of your parcel KS-1002. The support team will follow up and provide you with an update. Is there anything else I can assist you with?",
       "status": "answered",
       "route": [
         "action"
@@ -558,8 +574,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.832457600001362,
-      "cost_usd": 0.0010146999999999999,
+      "latency_s": 2.82484740000109,
+      "cost_usd": 0.0010107,
       "id": "tool-015",
       "message": "My parcel KS-1002 is late and I need someone to follow up. Create a ticket.",
       "category": "ticket",
@@ -575,7 +591,7 @@
       "sensitive_with_approval": 0,
       "outcome_ok": true,
       "language_ok": true,
-      "judge_reason": "The assistant confirms that a support ticket was created for the late parcel KS-1002 as requested.",
+      "judge_reason": "The assistant confirms that a support ticket for the late parcel KS-1002 was created as requested.",
       "notes": [],
       "passed": true
     },
@@ -598,7 +614,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.7794932999986486,
+      "latency_s": 3.433125100000325,
       "cost_usd": 0.0010140000000000001,
       "id": "tool-016",
       "message": "Change the delivery address of KS-1003 to Bahçe Sk. 7, Izmir, postal code 35000.",
@@ -645,7 +661,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 3.507043400000839,
+      "latency_s": 4.293477000001076,
       "cost_usd": 0.00154885,
       "id": "tool-017",
       "message": "KS-2003 siparişimin adresini Mimar Sk. 3, Ankara, posta kodu 06500 olarak değiştirin.",
@@ -685,7 +701,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.6560187000013684,
+      "latency_s": 3.3643004999994446,
       "cost_usd": 0.00095465,
       "id": "tool-018",
       "message": "Update the address of KS-1002 to Yeni Cad. 5, Bursa, 16000.",
@@ -722,7 +738,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.600383700002567,
+      "latency_s": 3.232197500001348,
       "cost_usd": 0.0009513,
       "id": "tool-019",
       "message": "I want to change the address of KS-3001.",
@@ -769,7 +785,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 9.00092880000011,
+      "latency_s": 9.41106089999812,
       "cost_usd": 0.0032535399999999996,
       "id": "tool-020",
       "message": "Refund order KS-1001 in full, the earbuds are unopened.",
@@ -816,7 +832,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 9.294954699997106,
+      "latency_s": 9.763325799995073,
       "cost_usd": 0.0035664500000000005,
       "id": "tool-021",
       "message": "KS-2002 siparişim için tam iade istiyorum, ürün kapalı ambalajında.",
@@ -863,7 +879,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 9.521233600000414,
+      "latency_s": 9.9678111000012,
       "cost_usd": 0.0033657900000000004,
       "id": "tool-022",
       "message": "I want my money back for KS-3002, the power bank is defective.",
@@ -910,7 +926,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 8.822945599999002,
+      "latency_s": 9.272438100000727,
       "cost_usd": 0.0032519899999999997,
       "id": "tool-023",
       "message": "Refund 100 TL of order KS-1001, the cable is missing.",
@@ -948,7 +964,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 9.698819000001095,
+      "latency_s": 10.31110609999996,
       "cost_usd": 0.00365169,
       "id": "tool-024",
       "message": "Please refund order KS-2001.",
@@ -986,7 +1002,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 9.622564299997975,
+      "latency_s": 10.20691910000096,
       "cost_usd": 0.00357329,
       "id": "tool-025",
       "message": "Refund order KS-1002 please.",
@@ -1015,8 +1031,8 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 6.403512100003354,
-      "cost_usd": 0.00226787,
+      "latency_s": 6.07353310000326,
+      "cost_usd": 0.0022690699999999998,
       "id": "tool-026",
       "message": "What is your return policy?",
       "category": "knowledge",
@@ -1044,7 +1060,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 5.794048399999156,
+      "latency_s": 5.811073899998519,
       "cost_usd": 0.00200751,
       "id": "tool-027",
       "message": "Kargo ücreti ne kadar?",
@@ -1073,7 +1089,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 5.586808000003657,
+      "latency_s": 5.596616800001357,
       "cost_usd": 0.0016629099999999999,
       "id": "tool-028",
       "message": "How long is the warranty on electronics?",
@@ -1102,7 +1118,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 10.209711799998331,
+      "latency_s": 10.22287569999935,
       "cost_usd": 0.0037040099999999993,
       "id": "tool-029",
       "message": "Do you ship to Germany?",
@@ -1131,7 +1147,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 5.82180530000096,
+      "latency_s": 5.824128800001745,
       "cost_usd": 0.00193279,
       "id": "tool-030",
       "message": "Hava fritözü F6 sepetini bulaşık makinesinde yıkayabilir miyim?",
@@ -1160,7 +1176,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 5.923874900001465,
+      "latency_s": 5.930013200002577,
       "cost_usd": 0.0017315899999999999,
       "id": "tool-031",
       "message": "Hello!",
@@ -1189,7 +1205,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 5.689082800001415,
+      "latency_s": 5.718075700000554,
       "cost_usd": 0.00191448,
       "id": "tool-032",
       "message": "How do I put the B300 earbuds into pairing mode?",
@@ -1218,7 +1234,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 5.257971600001838,
+      "latency_s": 5.288804200001323,
       "cost_usd": 0.0016500599999999996,
       "id": "tool-033",
       "message": "Can I pay with cash on delivery?",
@@ -1256,7 +1272,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 10.414580099999512,
+      "latency_s": 11.018298900000445,
       "cost_usd": 0.00419227,
       "id": "tool-034",
       "message": "What is the return policy, and can I still return order KS-1001?",
@@ -1294,8 +1310,8 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 8.300407499998983,
-      "cost_usd": 0.0028312400000000005,
+      "latency_s": 9.125156199997946,
+      "cost_usd": 0.0028294400000000003,
       "id": "tool-035",
       "message": "How long does standard shipping take, and where is order KS-3002?",
       "category": "mixed",
@@ -1332,7 +1348,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 7.916885200000252,
+      "latency_s": 8.33781170000293,
       "cost_usd": 0.0028044999999999997,
       "id": "tool-036",
       "message": "How long is the warranty on the R5, and what is the status of KS-2002?",
@@ -1361,7 +1377,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 1.9515439000006154,
+      "latency_s": 1.9553360999998404,
       "cost_usd": 0.00010125000000000001,
       "id": "tool-037",
       "message": "I want to talk to a human agent.",
@@ -1390,7 +1406,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 2.0517135999998573,
+      "latency_s": 2.0499610000024404,
       "cost_usd": 0.00010905,
       "id": "tool-038",
       "message": "This is unacceptable. I will sue you, connect me to a manager right now.",
@@ -1419,7 +1435,7 @@
       ],
       "calls": [],
       "refunds_executed": 0,
-      "latency_s": 2.271271400000842,
+      "latency_s": 2.2719194000019343,
       "cost_usd": 0.00010875,
       "id": "tool-039",
       "message": "Beni lütfen bir müşteri temsilcisine bağlayın.",
@@ -1456,7 +1472,7 @@
         }
       ],
       "refunds_executed": 0,
-      "latency_s": 2.624992899998688,
+      "latency_s": 3.260200899996562,
       "cost_usd": 0.0008953000000000001,
       "id": "tool-040",
       "message": "Show me order KS-2001.",

@@ -1,8 +1,22 @@
 {
-  "name": "ablation-full",
-  "created_at": "2026-11-01T13:19:54",
+  "name": "ablation-hybrid-rerank",
+  "created_at": "2026-11-01T16:01:39",
+  "provenance": {
+    "commit": "10621fd2c809f66726ab0c1a95bb417805cafcb1",
+    "dirty": true,
+    "prompt_versions": {
+      "rag": "rag-v4",
+      "agents": "agents-v9"
+    },
+    "models": {
+      "generation": "gpt-4.1-mini",
+      "small": "gpt-4o-mini",
+      "judge": "gpt-4.1-mini",
+      "embedding": "text-embedding-3-small"
+    }
+  },
   "config": {
-    "config": "full",
+    "config": "hybrid-rerank",
     "dataset": "rag.jsonl",
     "chunk_preset": "default",
     "embedding_model": "text-embedding-3-small",
@@ -18,22 +32,26 @@
     "recall@3": 1.0,
     "recall@5": 1.0,
     "recall@8": 1.0,
-    "accuracy": 0.975,
-    "accuracy_answerable": 1.0,
-    "accuracy_unanswerable": 0.875,
+    "accuracy": 0.9375,
+    "accuracy_answerable": 0.96875,
+    "accuracy_unanswerable": 0.8125,
     "faithfulness": 0.975,
-    "latency_p50_s": 3.5777736000013647,
-    "latency_p95_s": 7.084310299999743,
-    "cost_per_query_usd": 0.0020279275,
-    "llm_calls_per_query": 5.9625
+    "accuracy_ci95_low": 0.8618967084664824,
+    "accuracy_ci95_high": 0.9730110223020145,
+    "faithfulness_ci95_low": 0.9133539994467789,
+    "faithfulness_ci95_high": 0.9931172511018748,
+    "latency_p50_s": 2.296076000001449,
+    "latency_p95_s": 3.9689386999998533,
+    "cost_per_query_usd": 0.001996518,
+    "llm_calls_per_query": 3.0
   },
   "accuracy_by_category": {
-    "conflict": 1.0,
-    "factual": 1.0,
+    "conflict": 0.8333333333333334,
+    "factual": 0.9761904761904762,
     "multi": 1.0,
     "numeric": 1.0,
     "procedure": 1.0,
-    "unanswerable": 0.875
+    "unanswerable": 0.8125
   },
   "questions": [
     {
@@ -41,7 +59,7 @@
       "category": "conflict",
       "answerable": true,
       "question": "Ürünü kaç gün içinde iade edebilirim?",
-      "answer": "Ürünü teslimat tarihinden itibaren 30 gün içinde iade talebi oluşturabilirsiniz[İade Politikası:İade Süresi].",
+      "answer": "Ürünü teslimat tarihinden itibaren 30 gün içinde iade talebi oluşturabilirsiniz. 30 günün ardından iade talepleri kabul edilmez, ürün garanti kapsamında değerlendirilir. [İade Politikası:İade Süresi]",
       "abstained": false,
       "ranked": [
         {
@@ -84,19 +102,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly states the 30-day return period from delivery as in the reference.",
+      "judge_reason": "The assistant correctly states the 30-day return period matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 2.9825454000001628,
-      "cost_usd": 0.00160757,
-      "llm_calls": 5
+      "latency_s": 2.0152579000000514,
+      "cost_usd": 0.0019203700000000002,
+      "llm_calls": 3
     },
     {
       "id": "tr-002",
       "category": "conflict",
       "answerable": true,
       "question": "İade kargo ücretini kim öder?",
-      "answer": "İade kargo ücretini, anlaşmalı kargo firması Anadolu Kargo ile yapılan iadelerde KargoShop karşılar ve kargo ücretsizdir. Ancak ürünü kendi kargonuzla gönderirseniz kargo ücreti iade edilmez. İade kodunu şubede göstermeniz yeterlidir [İade Politikası:İade Kargo Ücreti].",
+      "answer": "İade kargo ücreti, Anadolu Kargo ile yapılan iadelerde KargoShop tarafından karşılanır ve kargo ücretsizdir. İade kodunu şubede göstermeniz yeterlidir. Ancak ürünü kendi kargonuzla gönderirseniz kargo ücreti iade edilmez. Bu politika 15 Ocak 2025 tarihinden itibaren geçerlidir [İade Politikası:İade Kargo Ücreti] [İade Politikası:Yürürlük Tarihi].",
       "abstained": false,
       "ranked": [
         {
@@ -125,9 +143,9 @@
           "title": "Değişim Politikası"
         },
         {
-          "doc": "hasarli-ve-eksik-urun.md",
-          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
-          "title": "Hasarlı veya Eksik Ürün"
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Yürürlük Tarihi",
+          "title": "İade Politikası"
         }
       ],
       "gold_hit": true,
@@ -139,21 +157,21 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer correctly states that the return shipping cost is free with the contracted carrier Anadolu Kargo and that if you use your own shipping, the cost is not refunded, matching the reference.",
+      "judge_reason": "The assistant's answer correctly states that returns via Anadolu Kargo are free and that using own cargo does not refund the fee, matching the reference.",
       "faithful": false,
       "unsupported": [
-        "İade kargo ücretini, anlaşmalı kargo firması Anadolu Kargo ile yapılan iadelerde KargoShop karşılar"
+        "İade kargo ücreti, Anadolu Kargo ile yapılan iadelerde KargoShop tarafından karşılanır"
       ],
-      "latency_s": 3.4909428999994816,
-      "cost_usd": 0.0017428200000000002,
-      "llm_calls": 5
+      "latency_s": 2.462113300000965,
+      "cost_usd": 0.00195342,
+      "llm_calls": 3
     },
     {
       "id": "tr-003",
       "category": "conflict",
       "answerable": true,
       "question": "İade ettiğim ürünün parası kaç iş gününde hesabıma yatar?",
-      "answer": "İade ettiğiniz ürün depoya ulaşıp kontrolden geçtikten sonra 5 iş günü içinde ödemeniz aynı yöntemle hesabınıza iade edilir [İade Politikası:Geri Ödeme Süresi].",
+      "answer": "İade ettiğiniz ürün depoya ulaşıp kontrolden geçtikten sonra 5 iş günü içinde ödemeniz aynı yönteme iade edilir. Kapıda ödeme yapılan siparişlerde ise iade, hesap sahibinin IBAN numarasına yapılır. [İade Politikası: Geri Ödeme Süresi]",
       "abstained": false,
       "ranked": [
         {
@@ -196,30 +214,30 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference by stating the refund is processed within 5 business days after the product is received and checked.",
+      "judge_reason": "The assistant's answer matches the reference by stating the refund is processed within 5 business days after the product is received and checked, with additional correct details about the refund method.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.484540100000231,
-      "cost_usd": 0.0016827799999999996,
-      "llm_calls": 5
+      "latency_s": 2.750441900001533,
+      "cost_usd": 0.00200468,
+      "llm_calls": 3
     },
     {
       "id": "tr-004",
       "category": "unanswerable",
       "answerable": false,
       "question": "KargoShop hangi yıl kuruldu?",
-      "answer": "Üzgünüm, ancak bu konuda belgelerimizde güvenilir bir bilgi bulamadım; lütfen destek ekibimizle iletişime geçin.",
-      "abstained": true,
+      "answer": "KargoShop'un hangi yıl kurulduğu hakkında kaynaklarda bilgi bulunmamaktadır. Daha detaylı bilgi için destek ekibimizle iletişime geçmenizi öneririm.",
+      "abstained": false,
       "ranked": [
-        {
-          "doc": "kargo-takip.md",
-          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
-          "title": "Kargo Takibi"
-        },
         {
           "doc": "kvkk-ve-gizlilik.md",
           "section": "KVKK ve Gizlilik > Toplanan Veriler | KVKK ve Gizlilik > Saklama Süreleri | KVKK ve Gizlilik > Veri Silme Talebi | KVKK ve Gizlilik > Çerezler",
           "title": "KVKK ve Gizlilik"
+        },
+        {
+          "doc": "kargo-takip.md",
+          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
+          "title": "Kargo Takibi"
         },
         {
           "doc": "garanti-basvuru.md",
@@ -251,19 +269,19 @@
       },
       "mrr": null,
       "correct": true,
-      "judge_reason": "The assistant correctly declines to provide the founding year as the reference states the information is not available.",
+      "judge_reason": "Assistant correctly states that the founding year information is not available, matching the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 6.412032599998838,
-      "cost_usd": 0.0036982900000000003,
-      "llm_calls": 12
+      "latency_s": 1.5451284999999189,
+      "cost_usd": 0.00179547,
+      "llm_calls": 3
     },
     {
       "id": "tr-005",
       "category": "conflict",
       "answerable": true,
       "question": "İade için fatura şart mı?",
-      "answer": "İade için fatura şart değildir, sadece sipariş numarası yeterlidir. [İade Politikası:Genel Koşullar]",
+      "answer": "İade için fatura şart değildir, sadece sipariş numarası yeterlidir. Ürünü denemek serbesttir ancak kullanım izi bulunan ürünler kabul edilmez. Bu bilgi 15 Ocak 2025 tarihinden itibaren geçerli olan iade politikasına göre geçerlidir [İade Politikası:Genel Koşullar].",
       "abstained": false,
       "ranked": [
         {
@@ -292,9 +310,9 @@
           "title": "İade Politikası"
         },
         {
-          "doc": "siparis-iptali.md",
-          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
-          "title": "Sipariş İptali"
+          "doc": "degisim-politikasi.md",
+          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
+          "title": "Değişim Politikası"
         }
       ],
       "gold_hit": true,
@@ -306,19 +324,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference by stating that an invoice is not required and the order number is sufficient.",
+      "judge_reason": "The assistant correctly states that an invoice is not required for returns and only the order number is sufficient, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.7425301000002946,
-      "cost_usd": 0.0016336999999999999,
-      "llm_calls": 5
+      "latency_s": 2.887953200000993,
+      "cost_usd": 0.0019169,
+      "llm_calls": 3
     },
     {
       "id": "tr-006",
       "category": "factual",
       "answerable": true,
       "question": "Ambalajı açılmış kablosuz kulaklığı iade edebilir miyim?",
-      "answer": "Ambalajı açılmış kulak içi kulaklıklar iade edilemez. Bu nedenle ambalajı açılmış kablosuz kulaklığı iade edemezsiniz [İade Politikası:İade Edilemeyen Ürünler].",
+      "answer": "Ambalajı açılmış kablosuz kulaklıklar iade edilemez. Bu kural 15 Ocak 2025 tarihinden itibaren geçerli olan iade politikasında belirtilmiştir ve önceki politika bu kuralı değiştirmemektedir [İade Politikası:İade Edilemeyen Ürünler] [İade Politikası:Yürürlük Tarihi].",
       "abstained": false,
       "ranked": [
         {
@@ -342,14 +360,14 @@
           "title": "Kablosuz Kulaklık B300 Kullanım Kılavuzu"
         },
         {
-          "doc": "iade-politikasi.md",
-          "section": "İade Politikası > Yürürlük Tarihi",
-          "title": "İade Politikası"
-        },
-        {
           "doc": "degisim-politikasi.md",
           "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
           "title": "Değişim Politikası"
+        },
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Yürürlük Tarihi",
+          "title": "İade Politikası"
         }
       ],
       "gold_hit": true,
@@ -361,21 +379,19 @@
       },
       "mrr": 0.5,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference by stating that opened in-ear headphones cannot be returned.",
-      "faithful": false,
-      "unsupported": [
-        "Bu nedenle ambalajı açılmış kablosuz kulaklığı iade edemezsiniz"
-      ],
-      "latency_s": 2.871480199999951,
-      "cost_usd": 0.0018838000000000001,
-      "llm_calls": 5
+      "judge_reason": "The assistant correctly states that opened wireless earphones cannot be returned, consistent with the reference answer.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 1.6726863000017147,
+      "cost_usd": 0.0019806,
+      "llm_calls": 3
     },
     {
       "id": "tr-007",
       "category": "factual",
       "answerable": true,
       "question": "İade kodum kaç gün geçerli?",
-      "answer": "İade kodunuz 7 gün geçerlidir. Bu süre içinde ürün kargoya verilmezse talep kendiliğinden kapanır [İade Süreci Adım Adım:İade Kodu].",
+      "answer": "İade kodunuz, talep onaylandıktan sonra e-posta ile gönderilir ve 7 gün geçerlidir. Bu süre içinde ürün kargoya verilmezse iade talebi kendiliğinden kapanır. [İade Süreci Adım Adım:İade Kodu]",
       "abstained": false,
       "ranked": [
         {
@@ -404,9 +420,9 @@
           "title": "Hediye Çekleri"
         },
         {
-          "doc": "sadakat-programi.md",
-          "section": "KargoPuan Sadakat Programı > Puan Kazanma | KargoPuan Sadakat Programı > Puan Kullanma | KargoPuan Sadakat Programı > Puan Geçerlilik Süresi | KargoPuan Sadakat Programı > Üyelik Seviyeleri",
-          "title": "KargoPuan Sadakat Programı"
+          "doc": "degisim-politikasi.md",
+          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
+          "title": "Değişim Politikası"
         }
       ],
       "gold_hit": true,
@@ -418,20 +434,20 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly states the return code is valid for 7 days, matching the reference answer, and adds relevant extra detail.",
+      "judge_reason": "The assistant correctly states that the return code is valid for 7 days, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.447449699999197,
-      "cost_usd": 0.0016381699999999998,
-      "llm_calls": 5
+      "latency_s": 2.1244176999989577,
+      "cost_usd": 0.00187367,
+      "llm_calls": 3
     },
     {
       "id": "tr-008",
       "category": "unanswerable",
       "answerable": false,
       "question": "Robot süpürge R5 hangi renklerde satılıyor?",
-      "answer": "Üzgünüm, ancak bu konuda belgelerimizde güvenilir bir bilgi bulamadım; lütfen destek ekibiyle iletişime geçin.",
-      "abstained": true,
+      "answer": "Üzgünüm, Robot Süpürge R5'in hangi renklerde satıldığına dair bilgi kaynaklarımızda bulunmamaktadır. Daha detaylı bilgi için lütfen KargoShop müşteri hizmetleri ile iletişime geçiniz.",
+      "abstained": false,
       "ranked": [
         {
           "doc": "urun-kilavuzu-robot-supurge-r5.md",
@@ -444,24 +460,24 @@
           "title": "Değişim Politikası"
         },
         {
-          "doc": "yurt-disi-ve-kktc-gonderim.md",
-          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
-          "title": "Yurt Dışı ve KKTC Gönderimi"
-        },
-        {
           "doc": "hasarli-ve-eksik-urun.md",
           "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
           "title": "Hasarlı veya Eksik Ürün"
         },
         {
-          "doc": "urun-kilavuzu-akilli-saat-x2.md",
-          "section": "Akıllı Saat X2 Kullanım Kılavuzu > Teknik Özellikler | Akıllı Saat X2 Kullanım Kılavuzu > Şarj Etme | Akıllı Saat X2 Kullanım Kılavuzu > Telefonla Eşleştirme | Akıllı Saat X2 Kullanım Kılavuzu > Fabrika Ayarlarına Dönme | Akıllı Saat X2 Kullanım Kılavuzu > Sorun Giderme",
-          "title": "Akıllı Saat X2 Kullanım Kılavuzu"
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
         },
         {
-          "doc": "urun-kilavuzu-kablosuz-kulaklik-b300.md",
-          "section": "Kablosuz Kulaklık B300 Kullanım Kılavuzu > Teknik Özellikler | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Eşleştirme Modu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Gürültü Engelleme | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Şarj Kutusu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Sıfırlama",
-          "title": "Kablosuz Kulaklık B300 Kullanım Kılavuzu"
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Yürürlük Tarihi",
+          "title": "İade Politikası"
+        },
+        {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
         }
       ],
       "gold_hit": false,
@@ -473,19 +489,19 @@
       },
       "mrr": null,
       "correct": true,
-      "judge_reason": "The assistant correctly declines to provide information as the reference states the information is not available.",
+      "judge_reason": "The assistant correctly states that the information is not available and does not invent facts.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 7.5441233999999895,
-      "cost_usd": 0.004021970000000001,
-      "llm_calls": 12
+      "latency_s": 1.667487800001254,
+      "cost_usd": 0.00190694,
+      "llm_calls": 3
     },
     {
       "id": "tr-009",
       "category": "procedure",
       "answerable": true,
       "question": "İade talebi oluşturdum ama ürünü henüz kargoya vermedim, vazgeçebilir miyim?",
-      "answer": "Evet, ürünü henüz kargoya vermediyseniz Siparişlerim sayfasından iade talebinizi iptal edebilirsiniz[İade Süreci Adım Adım:İade Talebini İptal Etme].",
+      "answer": "Evet, ürünü henüz kargoya vermediyseniz Siparişlerim sayfasından iade talebinizi iptal edebilirsiniz. Kargoya verilen ürünler için iptal mümkün değildir, depo kontrolü tamamlanır. [İade Süreci Adım Adım:İade Talebini İptal Etme]",
       "abstained": false,
       "ranked": [
         {
@@ -528,19 +544,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer correctly states that the return request can be canceled if the product has not been shipped, matching the reference answer.",
+      "judge_reason": "The assistant answer correctly states that the return request can be canceled if the product has not been shipped, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 2.973799899999449,
-      "cost_usd": 0.00166513,
-      "llm_calls": 5
+      "latency_s": 1.596294800000578,
+      "cost_usd": 0.0019770300000000003,
+      "llm_calls": 3
     },
     {
       "id": "tr-010",
       "category": "procedure",
       "answerable": true,
       "question": "İade kodunu nasıl alıyorum?",
-      "answer": "İade kodunu almak için Hesabım sayfasında Siparişlerim bölümüne girip iade etmek istediğiniz ürünü seçerek İade Talebi Oluştur düğmesine basmanız gerekir. Talep onaylandığında size e-posta ile 8 haneli bir iade kodu gönderilir. Bu kod 7 gün geçerlidir ve bu süre içinde ürün kargoya verilmelidir, aksi takdirde talep kapanır [İade Süreci Adım Adım:İade Talebi Oluşturma] [İade Süreci Adım Adım:İade Kodu].",
+      "answer": "İade kodunu almak için Hesabım sayfasında Siparişlerim bölümüne girip iade etmek istediğiniz ürünü seçerek İade Talebi Oluştur düğmesine basmanız gerekir. Talep onaylandığında size e-posta ile 8 haneli bir iade kodu gönderilir. Bu kod 7 gün geçerlidir ve bu süre içinde ürün kargoya verilmelidir, aksi takdirde talep kapanır [İade Süreci Adım Adım:İade Kodu].",
       "abstained": false,
       "ranked": [
         {
@@ -569,9 +585,9 @@
           "title": "İade Politikası"
         },
         {
-          "doc": "hasarli-ve-eksik-urun.md",
-          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
-          "title": "Hasarlı veya Eksik Ürün"
+          "doc": "degisim-politikasi.md",
+          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
+          "title": "Değişim Politikası"
         }
       ],
       "gold_hit": true,
@@ -583,12 +599,12 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly states that the refund code is sent by email when the refund request is approved, matching the reference answer.",
+      "judge_reason": "The assistant's answer correctly states that the refund code is sent by email when the refund request is approved, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.869298500000241,
-      "cost_usd": 0.00200547,
-      "llm_calls": 5
+      "latency_s": 2.5549984999979642,
+      "cost_usd": 0.00197652,
+      "llm_calls": 3
     },
     {
       "id": "tr-011",
@@ -604,14 +620,14 @@
           "title": "Değişim Politikası"
         },
         {
-          "doc": "iade-politikasi-2023.md",
-          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
-          "title": "İade Politikası (2023)"
-        },
-        {
           "doc": "iade-politikasi.md",
           "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
           "title": "İade Politikası"
+        },
+        {
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
         },
         {
           "doc": "iade-sureci.md",
@@ -619,14 +635,14 @@
           "title": "İade Süreci Adım Adım"
         },
         {
-          "doc": "garanti-basvuru.md",
-          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
-          "title": "Garanti Başvuru Süreci"
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
         },
         {
-          "doc": "kargo-sss.md",
-          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
-          "title": "Kargo Sıkça Sorulan Sorular"
+          "doc": "teslimat-adres-degisikligi.md",
+          "section": "Teslimat Adresi Değişikliği > Adres Değiştirme Koşulları | Teslimat Adresi Değişikliği > Adres Değişikliği Nasıl Yapılır | Teslimat Adresi Değişikliği > Farklı Şehre Gönderim",
+          "title": "Teslimat Adresi Değişikliği"
         }
       ],
       "gold_hit": true,
@@ -641,16 +657,16 @@
       "judge_reason": "The assistant correctly states the 30-day period for exchange requests as in the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.295004199999312,
-      "cost_usd": 0.00162102,
-      "llm_calls": 5
+      "latency_s": 1.9709420999988652,
+      "cost_usd": 0.00195502,
+      "llm_calls": 3
     },
     {
       "id": "tr-012",
       "category": "unanswerable",
       "answerable": false,
       "question": "Akıllı Saat X2 uyku takibi yapabiliyor mu?",
-      "answer": "Akıllı Saat X2'nin uyku takibi yapıp yapmadığına dair bilgi kaynaklarda bulunmamaktadır. Daha detaylı bilgi için lütfen destek ekibimizle iletişime geçiniz.",
+      "answer": "Üzgünüm, Akıllı Saat X2'nin uyku takibi yapıp yapmadığına dair elimde bilgi bulunmamaktadır. Daha detaylı bilgi için lütfen KargoShop müşteri hizmetleri ile iletişime geçiniz.",
       "abstained": false,
       "ranked": [
         {
@@ -693,19 +709,19 @@
       },
       "mrr": null,
       "correct": true,
-      "judge_reason": "The assistant correctly states that the information is not available in the sources, matching the reference answer.",
+      "judge_reason": "The assistant correctly states that the information is not available and does not invent facts.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 2.9717815999997583,
-      "cost_usd": 0.0017467099999999996,
-      "llm_calls": 5
+      "latency_s": 1.6121012999983577,
+      "cost_usd": 0.0021033099999999997,
+      "llm_calls": 3
     },
     {
       "id": "tr-013",
       "category": "factual",
       "answerable": true,
       "question": "Ürün değişiminde kargo ücreti ödüyor muyum?",
-      "answer": "İlk değişim için gidiş ve dönüş kargo ücretsizdir. Ancak aynı sipariş için ikinci ve sonraki değişimlerde kargo ücreti 49,90 TL'dir [Değişim Politikası:Değişim Kargo Ücreti].",
+      "answer": "İlk değişim için gidiş ve dönüş kargo ücretsizdir. Aynı sipariş için ikinci ve sonraki değişimlerde kargo ücreti 49,90 TL'dir. [Değişim Politikası:Değişim Kargo Ücreti]",
       "abstained": false,
       "ranked": [
         {
@@ -724,11 +740,6 @@
           "title": "İade Politikası (2023)"
         },
         {
-          "doc": "iade-sureci.md",
-          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
-          "title": "İade Süreci Adım Adım"
-        },
-        {
           "doc": "hasarli-ve-eksik-urun.md",
           "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
           "title": "Hasarlı veya Eksik Ürün"
@@ -737,6 +748,11 @@
           "doc": "kargo-sss.md",
           "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
           "title": "Kargo Sıkça Sorulan Sorular"
+        },
+        {
+          "doc": "teslimat-adres-degisikligi.md",
+          "section": "Teslimat Adresi Değişikliği > Adres Değiştirme Koşulları | Teslimat Adresi Değişikliği > Adres Değişikliği Nasıl Yapılır | Teslimat Adresi Değişikliği > Farklı Şehre Gönderim",
+          "title": "Teslimat Adresi Değişikliği"
         }
       ],
       "gold_hit": true,
@@ -748,19 +764,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference answer regarding shipping fees for product exchanges.",
+      "judge_reason": "The assistant's answer matches the reference answer's key facts about shipping fees for product exchanges.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.5524003000009543,
-      "cost_usd": 0.0016523,
-      "llm_calls": 5
+      "latency_s": 2.2257162000005337,
+      "cost_usd": 0.0019637500000000002,
+      "llm_calls": 3
     },
     {
       "id": "tr-014",
       "category": "numeric",
       "answerable": true,
       "question": "Daha ucuz bir ürünle değiştirirsem aradaki fark ne olur?",
-      "answer": "Daha ucuz bir ürünle değiştirirseniz, aradaki fark aynı ödeme yöntemine 5 iş günü içinde iade edilir. [Değişim Politikası:Fiyat Farkı]",
+      "answer": "Daha ucuz bir ürünle değişim yaparsanız, aradaki fiyat farkı aynı ödeme yöntemine 5 iş günü içinde iade edilir. [Değişim Politikası:Fiyat Farkı]",
       "abstained": false,
       "ranked": [
         {
@@ -803,12 +819,12 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer correctly states that the price difference will be refunded within 5 business days to the same payment method, matching the reference.",
+      "judge_reason": "The assistant's answer matches the reference by stating the price difference is refunded within 5 business days to the same payment method.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.41206609999972,
-      "cost_usd": 0.00168161,
-      "llm_calls": 5
+      "latency_s": 2.465315100001135,
+      "cost_usd": 0.00202546,
+      "llm_calls": 3
     },
     {
       "id": "tr-015",
@@ -861,17 +877,17 @@
       "judge_reason": "The assistant's answer matches the reference answer exactly and provides the same key information.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.2697714999994787,
-      "cost_usd": 0.0016327599999999998,
-      "llm_calls": 5
+      "latency_s": 2.1788639000005787,
+      "cost_usd": 0.00187006,
+      "llm_calls": 3
     },
     {
       "id": "tr-016",
       "category": "unanswerable",
       "answerable": false,
       "question": "Siparişim için kargo sigortası yaptırabilir miyim?",
-      "answer": "Bu konuda belgelerimizde güvenilir bir bilgi bulamadım, lütfen destek ekibiyle iletişime geçin.",
-      "abstained": true,
+      "answer": "Üzgünüm, kargo sigortası hakkında bilgi kaynaklarımızda yer almamaktadır. Daha detaylı bilgi için müşteri hizmetlerimizle iletişime geçmenizi öneririm.",
+      "abstained": false,
       "ranked": [
         {
           "doc": "kargo-sss.md",
@@ -894,9 +910,9 @@
           "title": "Kargo Takibi"
         },
         {
-          "doc": "hasarli-ve-eksik-urun.md",
-          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
-          "title": "Hasarlı veya Eksik Ürün"
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
         },
         {
           "doc": "iade-politikasi.md",
@@ -913,19 +929,19 @@
       },
       "mrr": null,
       "correct": true,
-      "judge_reason": "Assistant correctly declines to answer due to lack of information in the documents.",
+      "judge_reason": "The assistant correctly states that the information is not available and does not invent facts.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 6.858002900000429,
-      "cost_usd": 0.0038696599999999996,
-      "llm_calls": 12
+      "latency_s": 1.5358221999995294,
+      "cost_usd": 0.00194293,
+      "llm_calls": 3
     },
     {
       "id": "tr-017",
       "category": "numeric",
       "answerable": true,
       "question": "Sepetim 620 TL, kargo ücretsiz mi?",
-      "answer": "Evet, sepet tutarınız 500 TL ve üzerinde olduğu için standart kargo ücretsizdir. Ancak ekspres kargo her zaman ücretlidir ve ücretsiz kargo limiti geçerli değildir [Kargo Sıkça Sorulan Sorular:Ücretsiz Kargo Limiti].",
+      "answer": "Evet, sepet tutarınız 500 TL ve üzerinde olduğu için standart kargo ücretsizdir. Ancak ekspres kargo her zaman ücretlidir ve ücretsiz kargo limiti ekspres kargo için geçerli değildir [Kargo Sıkça Sorulan Sorular:Ücretsiz Kargo Limiti].",
       "abstained": false,
       "ranked": [
         {
@@ -944,14 +960,14 @@
           "title": "Yurt Dışı ve KKTC Gönderimi"
         },
         {
-          "doc": "sadakat-programi.md",
-          "section": "KargoPuan Sadakat Programı > Puan Kazanma | KargoPuan Sadakat Programı > Puan Kullanma | KargoPuan Sadakat Programı > Puan Geçerlilik Süresi | KargoPuan Sadakat Programı > Üyelik Seviyeleri",
-          "title": "KargoPuan Sadakat Programı"
-        },
-        {
           "doc": "degisim-politikasi.md",
           "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
           "title": "Değişim Politikası"
+        },
+        {
+          "doc": "sadakat-programi.md",
+          "section": "KargoPuan Sadakat Programı > Puan Kazanma | KargoPuan Sadakat Programı > Puan Kullanma | KargoPuan Sadakat Programı > Puan Geçerlilik Süresi | KargoPuan Sadakat Programı > Üyelik Seviyeleri",
+          "title": "KargoPuan Sadakat Programı"
         },
         {
           "doc": "iade-politikasi.md",
@@ -968,19 +984,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly confirms free standard shipping for orders over 500 TL and adds accurate information about express shipping fees.",
+      "judge_reason": "The assistant correctly confirms free standard shipping for orders over 500 TL and adds accurate extra information about express shipping fees.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.887516799999048,
-      "cost_usd": 0.00174523,
-      "llm_calls": 5
+      "latency_s": 2.302913699999408,
+      "cost_usd": 0.00203083,
+      "llm_calls": 3
     },
     {
       "id": "tr-018",
       "category": "numeric",
       "answerable": true,
       "question": "450 TL'lik bir siparişte kargo ne kadar tutar?",
-      "answer": "450 TL'lik bir siparişte standart kargo ücreti 49,90 TL'dir çünkü ücretsiz kargo limiti 500 TL ve üzeri siparişler için geçerlidir. Ekspres kargo ise her zaman ücretlidir ve 89,90 TL tutarındadır [Kargo Sıkça Sorulan Sorular:Kargo Ücreti] [Kargo Sıkça Sorulan Sorular:Ücretsiz Kargo Limiti].",
+      "answer": "450 TL'lik bir siparişte standart kargo ücreti 49,90 TL'dir çünkü ücretsiz kargo limiti 500 TL ve üzeri siparişler için geçerlidir. Ekspres kargo ise her zaman ücretlidir ve 89,90 TL tutarındadır. Dolayısıyla 450 TL'lik siparişte standart kargo ücreti 49,90 TL olacaktır. [Kargo Sıkça Sorulan Sorular:Kargo Ücreti] [Kargo Sıkça Sorulan Sorular:Ücretsiz Kargo Limiti]",
       "abstained": false,
       "ranked": [
         {
@@ -1023,19 +1039,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly states the standard shipping fee for orders under 500 TL as 49.90 TL, matching the reference answer.",
+      "judge_reason": "The assistant correctly states the standard shipping fee for orders under 500 TL as 49.90 TL, matching the reference answer, and does not contradict it.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.815580799999225,
-      "cost_usd": 0.00178842,
-      "llm_calls": 5
+      "latency_s": 2.598053799999434,
+      "cost_usd": 0.0020932700000000004,
+      "llm_calls": 3
     },
     {
       "id": "tr-019",
       "category": "factual",
       "answerable": true,
       "question": "Ekspres teslimat hangi şehirlerde var?",
-      "answer": "Ekspres teslimat yalnızca İstanbul, Ankara ve İzmir şehirlerinde geçerlidir [Kargo Sıkça Sorulan Sorular:Teslimat Süreleri].",
+      "answer": "Ekspres teslimat yalnızca İstanbul, Ankara ve İzmir şehirlerinde geçerlidir ve ertesi iş günü teslim edilir [Kargo Sıkça Sorulan Sorular:Teslimat Süreleri].",
       "abstained": false,
       "ranked": [
         {
@@ -1054,6 +1070,11 @@
           "title": "Yurt Dışı ve KKTC Gönderimi"
         },
         {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
           "doc": "hasarli-ve-eksik-urun.md",
           "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
           "title": "Hasarlı veya Eksik Ürün"
@@ -1062,11 +1083,6 @@
           "doc": "stok-ve-on-siparis.md",
           "section": "Stok ve Ön Sipariş > Stok Bildirimi | Stok ve Ön Sipariş > Ön Sipariş | Stok ve Ön Sipariş > Ön Sipariş İptali | Stok ve Ön Sipariş > Stok Yetersizliği",
           "title": "Stok ve Ön Sipariş"
-        },
-        {
-          "doc": "kargo-takip.md",
-          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
-          "title": "Kargo Takibi"
         }
       ],
       "gold_hit": true,
@@ -1078,40 +1094,40 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly lists the same cities as the reference answer and does not contradict it.",
+      "judge_reason": "The assistant correctly lists the same cities as the reference and adds accurate extra detail about delivery time.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.318466800000351,
-      "cost_usd": 0.0016079499999999995,
-      "llm_calls": 5
+      "latency_s": 2.080184800000552,
+      "cost_usd": 0.0018054500000000001,
+      "llm_calls": 3
     },
     {
       "id": "tr-020",
       "category": "unanswerable",
       "answerable": false,
       "question": "Black Friday indirimleri ne zaman başlıyor?",
-      "answer": "Bu konuda şirket belgelerinde güvenilir bir bilgi bulamadım, lütfen destek ekibiyle iletişime geçin.",
-      "abstained": true,
+      "answer": "Üzgünüm, Black Friday indirimlerinin ne zaman başlayacağına dair bilgi kaynaklarımızda bulunmamaktadır. Daha detaylı bilgi için lütfen KargoShop müşteri hizmetleri ile iletişime geçiniz.",
+      "abstained": false,
       "ranked": [
-        {
-          "doc": "english-support.md",
-          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
-          "title": "English Language Support"
-        },
-        {
-          "doc": "musteri-hizmetleri.md",
-          "section": "Müşteri Hizmetleri > Çalışma Saatleri | Müşteri Hizmetleri > İletişim Kanalları | Müşteri Hizmetleri > Yanıt Süreleri | Müşteri Hizmetleri > Şikâyet ve Öneri",
-          "title": "Müşteri Hizmetleri"
-        },
-        {
-          "doc": "kargo-sss.md",
-          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
-          "title": "Kargo Sıkça Sorulan Sorular"
-        },
         {
           "doc": "taksit-ve-kampanyalar.md",
           "section": "Taksit ve Kampanyalar > Taksit Seçenekleri | Taksit ve Kampanyalar > Taksit İçin Alt Limit | Taksit ve Kampanyalar > İndirim Kuponları | Taksit ve Kampanyalar > Fiyat Farkı İadesi",
           "title": "Taksit ve Kampanyalar"
+        },
+        {
+          "doc": "odeme-yontemleri.md",
+          "section": "Ödeme Yöntemleri > Kabul Edilen Yöntemler | Ödeme Yöntemleri > Havale ve EFT İndirimi | Ödeme Yöntemleri > Kapıda Ödeme | Ödeme Yöntemleri > Güvenli Ödeme",
+          "title": "Ödeme Yöntemleri"
+        },
+        {
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
+        },
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
         },
         {
           "doc": "iade-politikasi.md",
@@ -1133,19 +1149,19 @@
       },
       "mrr": null,
       "correct": true,
-      "judge_reason": "Both answers state that the information is not available in the documents and decline to provide a specific date.",
+      "judge_reason": "Assistant correctly states that the information is not available and does not invent facts.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 6.324836100000084,
-      "cost_usd": 0.0037116100000000006,
-      "llm_calls": 12
+      "latency_s": 1.6165914000002886,
+      "cost_usd": 0.0017243199999999999,
+      "llm_calls": 3
     },
     {
       "id": "tr-021",
       "category": "factual",
       "answerable": true,
       "question": "Pazar günü teslimat yapıyor musunuz?",
-      "answer": "Hayır, Pazar günü teslimat yapılmamaktadır. Teslimatlar hafta içi 09:00 ile 19:00 arasında, cumartesi 09:00 ile 15:00 arasında yapılır [Kargo Sıkça Sorulan Sorular:Teslimat Saatleri].",
+      "answer": "Hayır, Pazar günü teslimat yapılmamaktadır. Kurye teslimatları hafta içi 09:00 ile 19:00 arasında, cumartesi 09:00 ile 15:00 arasında yapılır ancak Pazar günü teslimat yapılmaz. [Kargo Sıkça Sorulan Sorular:Teslimat Saatleri]",
       "abstained": false,
       "ranked": [
         {
@@ -1188,19 +1204,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly states that there is no delivery on Sunday and provides additional accurate delivery time details.",
+      "judge_reason": "The assistant correctly states that there is no delivery on Sunday, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.6857668000002377,
-      "cost_usd": 0.00168826,
-      "llm_calls": 5
+      "latency_s": 2.277257499999905,
+      "cost_usd": 0.0019496600000000002,
+      "llm_calls": 3
     },
     {
       "id": "tr-022",
       "category": "factual",
       "answerable": true,
       "question": "Kurye beni evde bulamazsa ne olur?",
-      "answer": "Kurye teslimatı için 3 deneme yapar. Eğer teslim edilemezse paket en yakın şubede 5 gün bekletilir. Bu sürenin sonunda paket KargoShop deposuna geri döner ve ödemeniz iade edilir [Kargo Takibi:Teslim Edilemeyen Kargo].",
+      "answer": "Kurye teslimatı için 3 deneme yapar. Eğer teslim edilemezse paket en yakın şubede 5 gün bekletilir. Bu sürenin sonunda paket KargoShop deposuna geri döner ve ödeme iade edilir. [Kargo Takibi:Teslim Edilemeyen Kargo]",
       "abstained": false,
       "ranked": [
         {
@@ -1243,19 +1259,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference in key facts about delivery attempts, holding period, return to depot, and refund.",
+      "judge_reason": "The assistant's answer matches the reference answer's key facts about delivery attempts, holding period, and return with refund.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.1033932999998797,
-      "cost_usd": 0.0016470499999999997,
-      "llm_calls": 5
+      "latency_s": 1.8866441999989547,
+      "cost_usd": 0.00189695,
+      "llm_calls": 3
     },
     {
       "id": "tr-023",
       "category": "factual",
       "answerable": true,
       "question": "Kargom yola çıktı, teslimat adresini değiştirebilir miyim?",
-      "answer": "Teslimat adresi yalnızca sipariş durumu \"Hazırlanıyor\" iken değiştirilebilir. Kargonuz yola çıktıysa, yani kargoya verildiyse adres değişikliği yapılamaz. Bu durumda paket teslim edildikten sonra iade veya yeniden gönderim seçebilirsiniz [Teslimat Adresi Değişikliği:Adres Değiştirme Koşulları].",
+      "answer": "Teslimat adresi yalnızca sipariş durumu \"Hazırlanıyor\" iken değiştirilebilir. Sipariş kargoya verildikten sonra adres değişikliği yapılamaz. Kargonuz yola çıktıysa adres değişikliği mümkün değildir; bu durumda paket teslim edildikten sonra iade veya yeniden gönderim seçebilirsiniz [Teslimat Adresi Değişikliği:Adres Değiştirme Koşulları].",
       "abstained": false,
       "ranked": [
         {
@@ -1284,9 +1300,9 @@
           "title": "Yurt Dışı ve KKTC Gönderimi"
         },
         {
-          "doc": "hasarli-ve-eksik-urun.md",
-          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
-          "title": "Hasarlı veya Eksik Ürün"
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
         }
       ],
       "gold_hit": true,
@@ -1298,19 +1314,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly states that the delivery address cannot be changed once the order has been shipped, matching the reference answer.",
+      "judge_reason": "The assistant correctly states that the delivery address cannot be changed after the order has been shipped, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.5112645000008342,
-      "cost_usd": 0.00166715,
-      "llm_calls": 5
+      "latency_s": 2.7147988000015175,
+      "cost_usd": 0.00200815,
+      "llm_calls": 3
     },
     {
       "id": "tr-024",
       "category": "unanswerable",
       "answerable": false,
       "question": "Hava fritözü F6 kaç kilogram?",
-      "answer": "Hava fritözü F6'nın kilogram cinsinden ağırlığı kullanım kılavuzunda belirtilmemiştir. Daha fazla bilgi için destek ekibimizle iletişime geçmenizi öneririm.",
+      "answer": "Hava Fritözü F6'nın kilogram cinsinden ağırlığı kullanım kılavuzunda belirtilmemiştir. Bu konuda net bilgi almak için lütfen müşteri hizmetlerimizle iletişime geçiniz.",
       "abstained": false,
       "ranked": [
         {
@@ -1356,16 +1372,16 @@
       "judge_reason": "The assistant correctly states that the weight information is not provided and does not invent facts.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 5.782422800000404,
-      "cost_usd": 0.0017990299999999999,
-      "llm_calls": 5
+      "latency_s": 4.343784399999095,
+      "cost_usd": 0.00210313,
+      "llm_calls": 3
     },
     {
       "id": "tr-025",
       "category": "factual",
       "answerable": true,
       "question": "KKTC'ye teslimat kaç günde yapılıyor?",
-      "answer": "KKTC adreslerine teslimat 5 ile 7 iş günü sürmektedir[ Yurt Dışı ve KKTC Gönderimi:KKTC Teslimat Süresi].",
+      "answer": "KKTC adreslerine teslimat 5 ile 7 iş günü sürer. Ekspres teslimat KKTC için geçerli değildir. [Yurt Dışı ve KKTC Gönderimi:KKTC Teslimat Süresi]",
       "abstained": false,
       "ranked": [
         {
@@ -1408,19 +1424,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference by stating the delivery time as 5 to 7 business days.",
+      "judge_reason": "The assistant's answer matches the reference delivery time and adds relevant extra information without contradiction.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.335016400000768,
-      "cost_usd": 0.0016173499999999998,
-      "llm_calls": 5
+      "latency_s": 2.2356424999998126,
+      "cost_usd": 0.0019453499999999998,
+      "llm_calls": 3
     },
     {
       "id": "tr-026",
       "category": "factual",
       "answerable": true,
       "question": "Almanya'ya sipariş gönderebilir miyim?",
-      "answer": "KargoShop yalnızca Türkiye ve Kuzey Kıbrıs Türk Cumhuriyeti adreslerine teslimat yapmaktadır. Almanya'ya gönderim şu anda mevcut değildir. Destek için bizimle iletişime geçebilirsiniz. [Yurt Dışı ve KKTC Gönderimi:Teslimat Bölgeleri]",
+      "answer": "Hayır, KargoShop yalnızca Türkiye ve Kuzey Kıbrıs Türk Cumhuriyeti adreslerine teslimat yapmaktadır. Almanya'ya gönderim şu anda mevcut değildir. Daha fazla bilgi için destek ile iletişime geçebilirsiniz [Yurt Dışı ve KKTC Gönderimi:Teslimat Bölgeleri].",
       "abstained": false,
       "ranked": [
         {
@@ -1463,19 +1479,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly states that shipping is only available to Turkey and Northern Cyprus, and not to Germany, matching the reference answer.",
+      "judge_reason": "The assistant correctly states that shipping is only to Turkey and KKTC, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.690394599999763,
-      "cost_usd": 0.00160689,
-      "llm_calls": 5
+      "latency_s": 2.2465221000002202,
+      "cost_usd": 0.0018774399999999998,
+      "llm_calls": 3
     },
     {
       "id": "tr-027",
       "category": "factual",
       "answerable": true,
       "question": "Elektronik ürünlerde garanti süresi kaç yıl?",
-      "answer": "Elektronik ürünlerde garanti süresi 2 yıldır ve bu süre ürünün teslim tarihinden başlar [Garanti Koşulları:Garanti Süresi].",
+      "answer": "Elektronik ürünlerde garanti süresi 2 yıldır ve bu süre ürünün teslim tarihinden başlar. [Garanti Koşulları:Garanti Süresi]",
       "abstained": false,
       "ranked": [
         {
@@ -1521,27 +1537,27 @@
       "judge_reason": "The assistant correctly states the warranty period as 2 years, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.686390900000788,
-      "cost_usd": 0.0016546299999999998,
-      "llm_calls": 5
+      "latency_s": 2.0415896000013163,
+      "cost_usd": 0.0019159299999999997,
+      "llm_calls": 3
     },
     {
       "id": "tr-028",
       "category": "unanswerable",
       "answerable": false,
       "question": "Mobil uygulamanız Huawei AppGallery'de var mı?",
-      "answer": "Üzgünüm, ancak bu konuda belgelerimizde güvenilir bir bilgi bulamadım; lütfen destek ekibimizle iletişime geçin.",
-      "abstained": true,
+      "answer": "Elimizdeki kaynaklarda mobil uygulamanın Huawei AppGallery'de olup olmadığına dair bilgi bulunmamaktadır. Daha detaylı bilgi için lütfen müşteri hizmetlerimizle iletişime geçiniz.",
+      "abstained": false,
       "ranked": [
-        {
-          "doc": "urun-kilavuzu-akilli-saat-x2.md",
-          "section": "Akıllı Saat X2 Kullanım Kılavuzu > Teknik Özellikler | Akıllı Saat X2 Kullanım Kılavuzu > Şarj Etme | Akıllı Saat X2 Kullanım Kılavuzu > Telefonla Eşleştirme | Akıllı Saat X2 Kullanım Kılavuzu > Fabrika Ayarlarına Dönme | Akıllı Saat X2 Kullanım Kılavuzu > Sorun Giderme",
-          "title": "Akıllı Saat X2 Kullanım Kılavuzu"
-        },
         {
           "doc": "urun-kilavuzu-powerbank-p20.md",
           "section": "Powerbank P20 Kullanım Kılavuzu > Teknik Özellikler | Powerbank P20 Kullanım Kılavuzu > Şarj Göstergeleri | Powerbank P20 Kullanım Kılavuzu > Uçakta Taşıma | Powerbank P20 Kullanım Kılavuzu > Kendi Kendini Şarj Etme | Powerbank P20 Kullanım Kılavuzu > Sorun Giderme",
           "title": "Powerbank P20 Kullanım Kılavuzu"
+        },
+        {
+          "doc": "urun-kilavuzu-akilli-saat-x2.md",
+          "section": "Akıllı Saat X2 Kullanım Kılavuzu > Teknik Özellikler | Akıllı Saat X2 Kullanım Kılavuzu > Şarj Etme | Akıllı Saat X2 Kullanım Kılavuzu > Telefonla Eşleştirme | Akıllı Saat X2 Kullanım Kılavuzu > Fabrika Ayarlarına Dönme | Akıllı Saat X2 Kullanım Kılavuzu > Sorun Giderme",
+          "title": "Akıllı Saat X2 Kullanım Kılavuzu"
         },
         {
           "doc": "urun-kilavuzu-robot-supurge-r5.md",
@@ -1554,14 +1570,14 @@
           "title": "Garanti Başvuru Süreci"
         },
         {
-          "doc": "kargo-takip.md",
-          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
-          "title": "Kargo Takibi"
-        },
-        {
           "doc": "fatura-ve-belgeler.md",
           "section": "Fatura ve Belgeler > E-Fatura ve E-Arşiv | Fatura ve Belgeler > Kurumsal Fatura | Fatura ve Belgeler > Fatura Bilgisi Değişikliği | Fatura ve Belgeler > Garanti ve Fatura",
           "title": "Fatura ve Belgeler"
+        },
+        {
+          "doc": "kargo-takip.md",
+          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
+          "title": "Kargo Takibi"
         }
       ],
       "gold_hit": false,
@@ -1573,19 +1589,19 @@
       },
       "mrr": null,
       "correct": true,
-      "judge_reason": "The assistant correctly states that the information is not available in the documents, matching the reference answer.",
+      "judge_reason": "The assistant correctly states that the information is not available in the sources, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 6.599843899999087,
-      "cost_usd": 0.003977179999999999,
-      "llm_calls": 12
+      "latency_s": 1.5410888999990675,
+      "cost_usd": 0.0020324699999999998,
+      "llm_calls": 3
     },
     {
       "id": "tr-029",
       "category": "factual",
       "answerable": true,
       "question": "Telefonum suya düştü, garanti karşılar mı?",
-      "answer": "Telefonunuzun suya düşmesi nedeniyle oluşan arızalar garanti kapsamı dışındadır. Garanti, darbe ve sıvı teması gibi durumları kapsamaz. Bu nedenle suya düşme sonucu oluşan hasarlar garanti kapsamında değildir [Garanti Koşulları:Garanti Kapsamı Dışındaki Durumlar].",
+      "answer": "Telefonunuzun suya düşmesi nedeniyle oluşan arızalar garanti kapsamı dışındadır. Garanti, darbe, sıvı teması ve kullanıcı hatasından kaynaklanan arızaları kapsamaz [Garanti Koşulları:Garanti Kapsamı Dışındaki Durumlar].",
       "abstained": false,
       "ranked": [
         {
@@ -1631,16 +1647,16 @@
       "judge_reason": "The assistant correctly states that water damage is not covered by the warranty, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.061461499999041,
-      "cost_usd": 0.0016891399999999998,
-      "llm_calls": 5
+      "latency_s": 1.7335295999992013,
+      "cost_usd": 0.0019457899999999998,
+      "llm_calls": 3
     },
     {
       "id": "tr-030",
       "category": "factual",
       "answerable": true,
       "question": "Garantideki ürünün onarımı en fazla kaç iş günü sürer?",
-      "answer": "Garantideki ürünün onarımı en fazla 20 iş günü sürer. Bu süre, ürünün serviste teslim alındığı günden itibaren hesaplanır [Garanti Başvuru Süreci:Onarım Süresi].",
+      "answer": "Garantideki ürünün onarımı en fazla 20 iş günü sürer. Bu süre ürünün serviste teslim alındığı günden itibaren hesaplanır [Garanti Başvuru Süreci:Onarım Süresi].",
       "abstained": false,
       "ranked": [
         {
@@ -1683,12 +1699,12 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference answer and provides additional relevant detail without contradiction.",
+      "judge_reason": "The assistant's answer matches the reference by stating the repair takes up to 20 business days and adds relevant context without contradiction.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.739475500000026,
-      "cost_usd": 0.0016889799999999999,
-      "llm_calls": 5
+      "latency_s": 2.3181518000001233,
+      "cost_usd": 0.00200998,
+      "llm_calls": 3
     },
     {
       "id": "tr-031",
@@ -1709,24 +1725,24 @@
           "title": "Müşteri Hizmetleri"
         },
         {
-          "doc": "iade-politikasi.md",
-          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
-          "title": "İade Politikası"
+          "doc": "kargo-takip.md",
+          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
+          "title": "Kargo Takibi"
         },
         {
-          "doc": "iade-sureci.md",
-          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
-          "title": "İade Süreci Adım Adım"
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
         },
         {
-          "doc": "iade-politikasi-2023.md",
-          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
-          "title": "İade Politikası (2023)"
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
         },
         {
-          "doc": "siparis-iptali.md",
-          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
-          "title": "Sipariş İptali"
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
         }
       ],
       "gold_hit": true,
@@ -1741,22 +1757,27 @@
       "judge_reason": "The assistant's answer correctly states the key options of replacement or refund and adds relevant additional information without contradiction.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.5777736000013647,
-      "cost_usd": 0.0017335600000000003,
-      "llm_calls": 5
+      "latency_s": 2.303010699999504,
+      "cost_usd": 0.00186446,
+      "llm_calls": 3
     },
     {
       "id": "tr-032",
       "category": "unanswerable",
       "answerable": false,
       "question": "KargoShop'ta ikinci el ürün alım programı var mı?",
-      "answer": "Bu konuda şirket belgelerinde güvenilir bir bilgi bulamadım, lütfen destek ekibiyle iletişime geçin.",
-      "abstained": true,
+      "answer": "KargoShop'ta ikinci el ürün alım programı hakkında bilgi kaynaklarımızda yer almamaktadır. Daha detaylı bilgi için müşteri hizmetlerimizle iletişime geçmenizi öneririm.",
+      "abstained": false,
       "ranked": [
         {
-          "doc": "odeme-yontemleri.md",
-          "section": "Ödeme Yöntemleri > Kabul Edilen Yöntemler | Ödeme Yöntemleri > Havale ve EFT İndirimi | Ödeme Yöntemleri > Kapıda Ödeme | Ödeme Yöntemleri > Güvenli Ödeme",
-          "title": "Ödeme Yöntemleri"
+          "doc": "sadakat-programi.md",
+          "section": "KargoPuan Sadakat Programı > Puan Kazanma | KargoPuan Sadakat Programı > Puan Kullanma | KargoPuan Sadakat Programı > Puan Geçerlilik Süresi | KargoPuan Sadakat Programı > Üyelik Seviyeleri",
+          "title": "KargoPuan Sadakat Programı"
+        },
+        {
+          "doc": "degisim-politikasi.md",
+          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
+          "title": "Değişim Politikası"
         },
         {
           "doc": "kargo-takip.md",
@@ -1769,19 +1790,14 @@
           "title": "Garanti Başvuru Süreci"
         },
         {
-          "doc": "kargo-sss.md",
-          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
-          "title": "Kargo Sıkça Sorulan Sorular"
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
         },
         {
-          "doc": "kvkk-ve-gizlilik.md",
-          "section": "KVKK ve Gizlilik > Toplanan Veriler | KVKK ve Gizlilik > Saklama Süreleri | KVKK ve Gizlilik > Veri Silme Talebi | KVKK ve Gizlilik > Çerezler",
-          "title": "KVKK ve Gizlilik"
-        },
-        {
-          "doc": "degisim-politikasi.md",
-          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
-          "title": "Değişim Politikası"
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
         }
       ],
       "gold_hit": false,
@@ -1793,12 +1809,12 @@
       },
       "mrr": null,
       "correct": true,
-      "judge_reason": "The assistant correctly declines to answer due to lack of information in the documents.",
+      "judge_reason": "The assistant correctly states that the information is not available, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 6.318510799999331,
-      "cost_usd": 0.00378557,
-      "llm_calls": 12
+      "latency_s": 1.5828629999996338,
+      "cost_usd": 0.00188093,
+      "llm_calls": 3
     },
     {
       "id": "tr-033",
@@ -1829,9 +1845,9 @@
           "title": "Kablosuz Kulaklık B300 Kullanım Kılavuzu"
         },
         {
-          "doc": "hasarli-ve-eksik-urun.md",
-          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
-          "title": "Hasarlı veya Eksik Ürün"
+          "doc": "garanti-kosullari.md",
+          "section": "Garanti Koşulları > Garanti Süresi | Garanti Koşulları > Garanti Kapsamı | Garanti Koşulları > Garanti Kapsamı Dışındaki Durumlar | Garanti Koşulları > Garanti Belgesi",
+          "title": "Garanti Koşulları"
         },
         {
           "doc": "urun-kilavuzu-powerbank-p20.md",
@@ -1851,16 +1867,16 @@
       "judge_reason": "The assistant's answer matches the reference by stating the battery lasts approximately 7 days.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.4389774999995097,
-      "cost_usd": 0.0017788799999999996,
-      "llm_calls": 5
+      "latency_s": 2.237510000000384,
+      "cost_usd": 0.00212723,
+      "llm_calls": 3
     },
     {
       "id": "tr-034",
       "category": "procedure",
       "answerable": true,
       "question": "Akıllı saati telefonuma nasıl bağlarım?",
-      "answer": "Akıllı Saat X2'yi telefonunuza bağlamak için, telefonda KargoWear uygulamasını açın, \"Cihaz Ekle\" seçeneğine dokunun ve saatin ekranındaki QR kodu okutun. Eşleştirme sırasında telefonunuzun Bluetooth özelliğinin açık olması gerekmektedir [Akıllı Saat X2 Kullanım Kılavuzu:Telefonla Eşleştirme].",
+      "answer": "Akıllı Saat X2'yi telefonunuza bağlamak için öncelikle telefonda KargoWear uygulamasını açın, ardından \"Cihaz Ekle\" seçeneğine dokunun ve saatin ekranındaki QR kodu okutun. Eşleştirme sırasında telefonunuzun Bluetooth özelliğinin açık olması gerekmektedir [Akıllı Saat X2 Kullanım Kılavuzu:Telefonla Eşleştirme].",
       "abstained": false,
       "ranked": [
         {
@@ -1874,14 +1890,14 @@
           "title": "Müşteri Hizmetleri"
         },
         {
-          "doc": "urun-kilavuzu-kablosuz-kulaklik-b300.md",
-          "section": "Kablosuz Kulaklık B300 Kullanım Kılavuzu > Teknik Özellikler | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Eşleştirme Modu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Gürültü Engelleme | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Şarj Kutusu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Sıfırlama",
-          "title": "Kablosuz Kulaklık B300 Kullanım Kılavuzu"
-        },
-        {
           "doc": "urun-kilavuzu-powerbank-p20.md",
           "section": "Powerbank P20 Kullanım Kılavuzu > Teknik Özellikler | Powerbank P20 Kullanım Kılavuzu > Şarj Göstergeleri | Powerbank P20 Kullanım Kılavuzu > Uçakta Taşıma | Powerbank P20 Kullanım Kılavuzu > Kendi Kendini Şarj Etme | Powerbank P20 Kullanım Kılavuzu > Sorun Giderme",
           "title": "Powerbank P20 Kullanım Kılavuzu"
+        },
+        {
+          "doc": "urun-kilavuzu-kablosuz-kulaklik-b300.md",
+          "section": "Kablosuz Kulaklık B300 Kullanım Kılavuzu > Teknik Özellikler | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Eşleştirme Modu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Gürültü Engelleme | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Şarj Kutusu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Sıfırlama",
+          "title": "Kablosuz Kulaklık B300 Kullanım Kılavuzu"
         },
         {
           "doc": "urun-kilavuzu-robot-supurge-r5.md",
@@ -1903,19 +1919,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer correctly explains the process of connecting the smartwatch to the phone using the KargoWear app and scanning the QR code, matching the reference answer.",
+      "judge_reason": "The assistant's answer matches the reference by explaining the use of the KargoWear app, selecting 'Cihaz Ekle', scanning the QR code on the watch, and ensuring Bluetooth is on.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.6524091000005683,
-      "cost_usd": 0.00186725,
-      "llm_calls": 5
+      "latency_s": 2.544129099998827,
+      "cost_usd": 0.0022551999999999997,
+      "llm_calls": 3
     },
     {
       "id": "tr-035",
       "category": "procedure",
       "answerable": true,
       "question": "Akıllı saatim yanıt vermiyor, ne yapmalıyım?",
-      "answer": "Akıllı saatiniz yanıt vermiyorsa, yan düğmeye 12 saniye basılı tutarak cihazı yeniden başlatabilirsiniz. Bu işlem genellikle yanıt vermeyen saatlerde çözüm sağlar [Akıllı Saat X2 Kullanım Kılavuzu:Fabrika Ayarlarına Dönme].",
+      "answer": "Akıllı saatiniz yanıt vermiyorsa, yan düğmeye 12 saniye basılı tutarak cihazı yeniden başlatmayı deneyebilirsiniz. Bu işlem genellikle yanıt vermeyen saatlerde işe yarar [Akıllı Saat X2 Kullanım Kılavuzu:Sorun Giderme].",
       "abstained": false,
       "ranked": [
         {
@@ -1934,14 +1950,14 @@
           "title": "Garanti Başvuru Süreci"
         },
         {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        },
+        {
           "doc": "garanti-kosullari.md",
           "section": "Garanti Koşulları > Garanti Süresi | Garanti Koşulları > Garanti Kapsamı | Garanti Koşulları > Garanti Kapsamı Dışındaki Durumlar | Garanti Koşulları > Garanti Belgesi",
           "title": "Garanti Koşulları"
-        },
-        {
-          "doc": "hasarli-ve-eksik-urun.md",
-          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
-          "title": "Hasarlı veya Eksik Ürün"
         },
         {
           "doc": "kargo-sss.md",
@@ -1961,9 +1977,9 @@
       "judge_reason": "The assistant's answer matches the reference by advising to press the side button for 12 seconds to restart the watch.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.729378700000325,
-      "cost_usd": 0.0017766999999999998,
-      "llm_calls": 5
+      "latency_s": 1.7633737999994992,
+      "cost_usd": 0.0019481,
+      "llm_calls": 3
     },
     {
       "id": "tr-036",
@@ -2016,16 +2032,16 @@
       "judge_reason": "The reference states the information is not available, but the assistant provides a phone number.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.3643884000007347,
-      "cost_usd": 0.0016328899999999997,
-      "llm_calls": 5
+      "latency_s": 2.4937666000005265,
+      "cost_usd": 0.00196979,
+      "llm_calls": 3
     },
     {
       "id": "tr-037",
       "category": "procedure",
       "answerable": true,
       "question": "B300 kulaklığı eşleştirme moduna nasıl alırım?",
-      "answer": "B300 kulaklığı eşleştirme moduna almak için kulaklıkları kutudan çıkarın. Daha sonra dokunmatik yüzeye 3 saniye basılı tutun; LED ışığı dönüşümlü olarak yanıp sönecektir. Ardından telefonunuzun Bluetooth listesinden B300 seçebilirsiniz [Kablosuz Kulaklık B300 Kullanım Kılavuzu:Eşleştirme Modu].",
+      "answer": "B300 kulaklığı eşleştirme moduna almak için kulaklıkları kutudan çıkarın ve dokunmatik yüzeye 3 saniye basılı tutun; LED ışığı dönüşümlü olarak yanıp söner. Ardından telefonunuzun Bluetooth listesinden B300 seçebilirsiniz. [Kablosuz Kulaklık B300 Kullanım Kılavuzu:Eşleştirme Modu]",
       "abstained": false,
       "ranked": [
         {
@@ -2068,19 +2084,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference by stating to take the headphones out of the box and press the touch surface for 3 seconds to enter pairing mode.",
+      "judge_reason": "The assistant's answer correctly explains how to enter pairing mode and adds relevant details without contradicting the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.178996599999209,
-      "cost_usd": 0.0018608299999999997,
-      "llm_calls": 5
+      "latency_s": 1.9305881999994199,
+      "cost_usd": 0.00213713,
+      "llm_calls": 3
     },
     {
       "id": "tr-038",
       "category": "procedure",
       "answerable": true,
       "question": "B300'de gürültü engellemeyi nasıl açarım?",
-      "answer": "B300 kulaklıkta aktif gürültü engelleme (ANC) özelliğini açmak için sol kulaklığa iki kez dokunmanız yeterlidir. Böylece ANC aktif hale gelir. Şeffaf modu açmak isterseniz sol kulaklığa üç kez dokunabilirsiniz [Kablosuz Kulaklık B300 Kullanım Kılavuzu:Gürültü Engelleme].",
+      "answer": "B300 kulaklıkta aktif gürültü engelleme (ANC) özelliğini açmak için sol kulaklığa iki kez dokunmanız yeterlidir. Gürültü engelleme bu şekilde açılıp kapatılabilir. Ayrıca şeffaf mod için sol kulaklığa üç kez dokunabilirsiniz [Kablosuz Kulaklık B300 Kullanım Kılavuzu:Gürültü Engelleme].",
       "abstained": false,
       "ranked": [
         {
@@ -2123,19 +2139,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly states that double-tapping the left earbud activates noise cancellation, matching the reference answer.",
+      "judge_reason": "The assistant's answer correctly states that double-tapping the left earbud activates noise cancellation, matching the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.98642049999944,
-      "cost_usd": 0.0019048299999999997,
-      "llm_calls": 5
+      "latency_s": 2.830681499999173,
+      "cost_usd": 0.00226668,
+      "llm_calls": 3
     },
     {
       "id": "tr-039",
       "category": "factual",
       "answerable": true,
       "question": "Robot süpürgemde E3 hatası çıkıyor, ne demek?",
-      "answer": "E3 hata kodu, robot süpürgenizin tekerleğinin sıkıştığını gösterir. Tekerleği temizleyip cihazı yeniden başlatmanız gerekmektedir [Robot Süpürge R5 Kullanım Kılavuzu:Hata Kodları].",
+      "answer": "Robot süpürgenizde E3 hata kodu tekerleğin sıkıştığını gösterir; tekerleği temizleyip cihazı yeniden başlatmanız gerekir. [Robot Süpürge R5 Kullanım Kılavuzu:Hata Kodları]",
       "abstained": false,
       "ranked": [
         {
@@ -2181,17 +2197,17 @@
       "judge_reason": "The assistant's answer matches the reference by explaining that E3 indicates a stuck wheel and advises cleaning the wheel and restarting the device.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.5221765999995114,
-      "cost_usd": 0.0018448000000000002,
-      "llm_calls": 5
+      "latency_s": 2.188020399999914,
+      "cost_usd": 0.00214065,
+      "llm_calls": 3
     },
     {
       "id": "tr-040",
       "category": "unanswerable",
       "answerable": false,
       "question": "Hediye çeki ile kargo ücretini ödeyebilir miyim?",
-      "answer": "Bu konuda şirket belgelerinde güvenilir bir bilgi bulamadım, lütfen destek ekibiyle iletişime geçin.",
-      "abstained": true,
+      "answer": "Hediye çekleri ürün satın alımlarında kullanılabilir, ancak kargo ücretleri için geçerli olduğuna dair bir bilgi bulunmamaktadır. Bu nedenle hediye çeki ile kargo ücretini ödeyemezsiniz. Daha detaylı bilgi için müşteri hizmetlerimizle iletişime geçebilirsiniz. [Hediye Çekleri:Geçerlilik ve Kullanım]",
+      "abstained": false,
       "ranked": [
         {
           "doc": "hediye-cekleri.md",
@@ -2204,6 +2220,16 @@
           "title": "Kargo Sıkça Sorulan Sorular"
         },
         {
+          "doc": "degisim-politikasi.md",
+          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
+          "title": "Değişim Politikası"
+        },
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        },
+        {
           "doc": "odeme-yontemleri.md",
           "section": "Ödeme Yöntemleri > Kabul Edilen Yöntemler | Ödeme Yöntemleri > Havale ve EFT İndirimi | Ödeme Yöntemleri > Kapıda Ödeme | Ödeme Yöntemleri > Güvenli Ödeme",
           "title": "Ödeme Yöntemleri"
@@ -2212,16 +2238,6 @@
           "doc": "kargo-takip.md",
           "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
           "title": "Kargo Takibi"
-        },
-        {
-          "doc": "yurt-disi-ve-kktc-gonderim.md",
-          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
-          "title": "Yurt Dışı ve KKTC Gönderimi"
-        },
-        {
-          "doc": "degisim-politikasi.md",
-          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
-          "title": "Değişim Politikası"
         }
       ],
       "gold_hit": false,
@@ -2232,13 +2248,13 @@
         "recall@8": null
       },
       "mrr": null,
-      "correct": true,
-      "judge_reason": "Both answers state that the information is not available in the documents and decline to provide an answer.",
+      "correct": false,
+      "judge_reason": "The reference states the information is not available, but the assistant incorrectly asserts that gift vouchers cannot be used for shipping fees.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 7.679380500000207,
-      "cost_usd": 0.00391013,
-      "llm_calls": 12
+      "latency_s": 4.7983006000004025,
+      "cost_usd": 0.0019960200000000003,
+      "llm_calls": 3
     },
     {
       "id": "tr-041",
@@ -2291,16 +2307,16 @@
       "judge_reason": "The assistant confirms the basket can be washed in the dishwasher and adds correct additional care instructions without contradiction.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.4118380000004436,
-      "cost_usd": 0.00185358,
-      "llm_calls": 5
+      "latency_s": 2.223904899999525,
+      "cost_usd": 0.00210988,
+      "llm_calls": 3
     },
     {
       "id": "tr-042",
       "category": "factual",
       "answerable": true,
       "question": "Powerbank P20'yi uçakta el bagajında taşıyabilir miyim?",
-      "answer": "Evet, Powerbank P20 100 Wh sınırının altında olduğu için havayolu kurallarına göre el bagajında taşınabilir. Ancak kontrol bagajına konulmamalıdır [Powerbank P20 Kullanım Kılavuzu:Uçakta Taşıma].",
+      "answer": "Evet, Powerbank P20'nin kapasitesi 100 Wh sınırının altında olduğu için havayolu kurallarına göre el bagajında taşınabilir. Ancak kontrol bagajına konulmamalıdır. [Powerbank P20 Kullanım Kılavuzu:Uçakta Taşıma]",
       "abstained": false,
       "ranked": [
         {
@@ -2346,16 +2362,16 @@
       "judge_reason": "The assistant's answer correctly states that the Powerbank P20 can be carried in hand luggage because it is under the 100 Wh limit and should not be placed in checked baggage, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.688555499998529,
-      "cost_usd": 0.00183589,
-      "llm_calls": 5
+      "latency_s": 2.4776922999999442,
+      "cost_usd": 0.00223164,
+      "llm_calls": 3
     },
     {
       "id": "tr-043",
       "category": "factual",
       "answerable": true,
       "question": "Kapıda ödemede ek ücret var mı?",
-      "answer": "Evet, kapıda ödeme seçeneğinde 19,90 TL hizmet bedeli alınır. Ayrıca kapıda ödeme için sepet tutarı en fazla 3000 TL olabilir. Kurye nakit veya kartla tahsilat yapar [Ödeme Yöntemleri:Kapıda Ödeme].",
+      "answer": "Evet, kapıda ödeme seçeneğinde 19,90 TL hizmet bedeli alınır. Ayrıca kapıda ödeme için sepet tutarı en fazla 3000 TL olabilir. Kapıda ödemede kurye nakit veya kartla tahsilat yapar. [Ödeme Yöntemleri:Kapıda Ödeme]",
       "abstained": false,
       "ranked": [
         {
@@ -2364,19 +2380,14 @@
           "title": "Ödeme Yöntemleri"
         },
         {
-          "doc": "taksit-ve-kampanyalar.md",
-          "section": "Taksit ve Kampanyalar > Taksit Seçenekleri | Taksit ve Kampanyalar > Taksit İçin Alt Limit | Taksit ve Kampanyalar > İndirim Kuponları | Taksit ve Kampanyalar > Fiyat Farkı İadesi",
-          "title": "Taksit ve Kampanyalar"
-        },
-        {
           "doc": "iade-politikasi.md",
           "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
           "title": "İade Politikası"
         },
         {
-          "doc": "iade-politikasi-2023.md",
-          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
-          "title": "İade Politikası (2023)"
+          "doc": "taksit-ve-kampanyalar.md",
+          "section": "Taksit ve Kampanyalar > Taksit Seçenekleri | Taksit ve Kampanyalar > Taksit İçin Alt Limit | Taksit ve Kampanyalar > İndirim Kuponları | Taksit ve Kampanyalar > Fiyat Farkı İadesi",
+          "title": "Taksit ve Kampanyalar"
         },
         {
           "doc": "degisim-politikasi.md",
@@ -2384,9 +2395,14 @@
           "title": "Değişim Politikası"
         },
         {
-          "doc": "kargo-sss.md",
-          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
-          "title": "Kargo Sıkça Sorulan Sorular"
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
+        },
+        {
+          "doc": "stok-ve-on-siparis.md",
+          "section": "Stok ve Ön Sipariş > Stok Bildirimi | Stok ve Ön Sipariş > Ön Sipariş | Stok ve Ön Sipariş > Ön Sipariş İptali | Stok ve Ön Sipariş > Stok Yetersizliği",
+          "title": "Stok ve Ön Sipariş"
         }
       ],
       "gold_hit": true,
@@ -2398,19 +2414,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference by stating the 19.90 TL fee and the 3000 TL maximum basket amount, with no contradictions.",
+      "judge_reason": "The assistant's answer matches the reference by stating the 19.90 TL fee and the 3000 TL maximum basket amount, with additional correct details.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.5525804000012613,
-      "cost_usd": 0.0016543800000000002,
-      "llm_calls": 5
+      "latency_s": 2.50393350000013,
+      "cost_usd": 0.00195448,
+      "llm_calls": 3
     },
     {
       "id": "tr-044",
       "category": "factual",
       "answerable": true,
       "question": "Kaç taksite kadar ödeme yapabilirim?",
-      "answer": "Anlaşmalı bankaların kredi kartlarıyla 2 ile 9 taksit arasında ödeme yapabilirsiniz. 3 taksite kadar işlemler komisyonsuzdur, 6 ve 9 taksitte ise vade farkı uygulanır [Taksit ve Kampanyalar:Taksit Seçenekleri].",
+      "answer": "Anlaşmalı bankaların kredi kartlarıyla 2 ile 9 taksit arasında ödeme yapabilirsiniz. 3 taksite kadar işlemler komisyonsuzdur, 6 ve 9 taksitte ise vade farkı uygulanır [Taksit ve Kampanyalar:Taksit Seçenekleri]. Yabancı kartlarda ise taksit seçeneği yoktur, tek seferde ödeme yapılır [Paying with Foreign Cards:Installments].",
       "abstained": false,
       "ranked": [
         {
@@ -2453,19 +2469,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference's key facts about installment limits and commission-free options.",
+      "judge_reason": "The assistant's answer matches the reference's key facts about installment payments and adds accurate extra details.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.1481948000000557,
-      "cost_usd": 0.00167449,
-      "llm_calls": 5
+      "latency_s": 2.120274299999892,
+      "cost_usd": 0.00198964,
+      "llm_calls": 3
     },
     {
       "id": "tr-045",
       "category": "numeric",
       "answerable": true,
       "question": "250 TL'lik alışverişi taksitle ödeyebilir miyim?",
-      "answer": "Hayır, taksitli ödeme için sepet tutarının en az 300 TL olması gerekmektedir. 250 TL'lik alışveriş taksitli ödeme için uygun değildir [Taksit ve Kampanyalar:Taksit İçin Alt Limit].",
+      "answer": "Hayır, taksitli ödeme için sepet tutarının en az 300 TL olması gerekmektedir. 250 TL'lik alışveriş taksitli ödemeye uygun değildir. Ayrıca banka kartları ve kapıda ödeme ile taksit yapılamaz [Taksit ve Kampanyalar:Taksit İçin Alt Limit].",
       "abstained": false,
       "ranked": [
         {
@@ -2484,11 +2500,6 @@
           "title": "Paying with Foreign Cards"
         },
         {
-          "doc": "kargo-sss.md",
-          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
-          "title": "Kargo Sıkça Sorulan Sorular"
-        },
-        {
           "doc": "sadakat-programi.md",
           "section": "KargoPuan Sadakat Programı > Puan Kazanma | KargoPuan Sadakat Programı > Puan Kullanma | KargoPuan Sadakat Programı > Puan Geçerlilik Süresi | KargoPuan Sadakat Programı > Üyelik Seviyeleri",
           "title": "KargoPuan Sadakat Programı"
@@ -2497,6 +2508,11 @@
           "doc": "hediye-cekleri.md",
           "section": "Hediye Çekleri > Hediye Çeki Tutarları | Hediye Çekleri > Geçerlilik ve Kullanım | Hediye Çekleri > İade ve Nakde Çevirme | Hediye Çekleri > Kayıp Kod",
           "title": "Hediye Çekleri"
+        },
+        {
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
         }
       ],
       "gold_hit": true,
@@ -2508,19 +2524,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly states that the minimum amount for installment payment is 300 TL, matching the reference answer.",
+      "judge_reason": "The assistant correctly states that installment payments require a minimum of 300 TL and that 250 TL purchases cannot be paid in installments, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.2641997999990053,
-      "cost_usd": 0.0016336900000000001,
-      "llm_calls": 5
+      "latency_s": 4.383518699999513,
+      "cost_usd": 0.0019734899999999996,
+      "llm_calls": 3
     },
     {
       "id": "tr-046",
       "category": "procedure",
       "answerable": true,
       "question": "Verdiğim siparişi nasıl iptal ederim?",
-      "answer": "Siparişinizi iptal etmek için Hesabım sayfasında Siparişlerim bölümünden ilgili siparişi seçip \"Siparişi İptal Et\" düğmesine basmanız yeterlidir. İptal işlemi anında tamamlanır ve size e-posta ile onay gönderilir [Sipariş İptali:İptal Nasıl Yapılır].",
+      "answer": "Siparişinizi iptal etmek için Hesabım sayfasında Siparişlerim bölümüne girip iptal etmek istediğiniz siparişi seçin ve \"Siparişi İptal Et\" düğmesine basın. İptal işlemi anında tamamlanır ve size e-posta ile onay gönderilir. Ancak siparişiniz yalnızca \"Hazırlanıyor\" durumundayken iptal edilebilir; kargoya verildikten sonra iptal mümkün değildir, bu durumda iade süreci başlatmanız gerekir [Sipariş İptali:İptal Koşulları] [Sipariş İptali:İptal Nasıl Yapılır].",
       "abstained": false,
       "ranked": [
         {
@@ -2539,19 +2555,19 @@
           "title": "Stok ve Ön Sipariş"
         },
         {
-          "doc": "iade-politikasi.md",
-          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
-          "title": "İade Politikası"
-        },
-        {
-          "doc": "iade-politikasi-2023.md",
-          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
-          "title": "İade Politikası (2023)"
-        },
-        {
           "doc": "fatura-ve-belgeler.md",
           "section": "Fatura ve Belgeler > E-Fatura ve E-Arşiv | Fatura ve Belgeler > Kurumsal Fatura | Fatura ve Belgeler > Fatura Bilgisi Değişikliği | Fatura ve Belgeler > Garanti ve Fatura",
           "title": "Fatura ve Belgeler"
+        },
+        {
+          "doc": "odeme-yontemleri.md",
+          "section": "Ödeme Yöntemleri > Kabul Edilen Yöntemler | Ödeme Yöntemleri > Havale ve EFT İndirimi | Ödeme Yöntemleri > Kapıda Ödeme | Ödeme Yöntemleri > Güvenli Ödeme",
+          "title": "Ödeme Yöntemleri"
+        },
+        {
+          "doc": "kvkk-ve-gizlilik.md",
+          "section": "KVKK ve Gizlilik > Toplanan Veriler | KVKK ve Gizlilik > Saklama Süreleri | KVKK ve Gizlilik > Veri Silme Talebi | KVKK ve Gizlilik > Çerezler",
+          "title": "KVKK ve Gizlilik"
         }
       ],
       "gold_hit": true,
@@ -2563,19 +2579,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer correctly explains how to cancel the order via the account page and the 'Siparişi İptal Et' button, matching the reference instructions.",
+      "judge_reason": "The assistant's answer correctly explains the cancellation process during the 'Hazırlanıyor' status and adds relevant details without contradicting the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.1379544999986138,
-      "cost_usd": 0.0016399,
-      "llm_calls": 5
+      "latency_s": 3.9689386999998533,
+      "cost_usd": 0.0020534000000000004,
+      "llm_calls": 3
     },
     {
       "id": "tr-047",
       "category": "factual",
       "answerable": true,
       "question": "Siparişimi iptal edersem para ne zaman iade edilir?",
-      "answer": "Siparişinizi iptal ettiğinizde, ödemeniz 1 ile 3 iş günü içinde ödeme yapılan karta yansıtılır. Ancak bankanıza bağlı olarak bu işlem hesap ekstresine yansıması 7 güne kadar sürebilir [Sipariş İptali:İptal Sonrası Ödeme İadesi].",
+      "answer": "Siparişinizi iptal ettiğinizde, ödemeniz 1 ile 3 iş günü içinde ödeme yapılan karta yansıtılır. Bankanıza bağlı olarak bu işlem hesap ekstresine yansıması 7 güne kadar sürebilir [Sipariş İptali:İptal Sonrası Ödeme İadesi].",
       "abstained": false,
       "ranked": [
         {
@@ -2618,19 +2634,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference answer in key details about the refund timing and bank processing time.",
+      "judge_reason": "The assistant's answer matches the reference in timing and process of refund after order cancellation.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 2.9355761999995593,
-      "cost_usd": 0.00163058,
-      "llm_calls": 5
+      "latency_s": 1.8020215999995344,
+      "cost_usd": 0.00188258,
+      "llm_calls": 3
     },
     {
       "id": "tr-048",
       "category": "factual",
       "answerable": true,
       "question": "Hasarlı ürün bildirimini kaç saat içinde yapmalıyım?",
-      "answer": "Hasarlı ürün bildirimi teslimattan itibaren 48 saat içinde yapılmalıdır. Bildirim için sipariş numarası ve ürünün fotoğrafı gerekmektedir [Hasarlı veya Eksik Ürün:Bildirim Süresi].",
+      "answer": "Hasarlı ürün bildirimi teslimattan itibaren 48 saat içinde yapılmalıdır. Bildirim için sipariş numarası ve ürünün fotoğrafı gereklidir. [Hasarlı veya Eksik Ürün:Bildirim Süresi]",
       "abstained": false,
       "ranked": [
         {
@@ -2654,14 +2670,14 @@
           "title": "İade Süreci Adım Adım"
         },
         {
-          "doc": "siparis-iptali.md",
-          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
-          "title": "Sipariş İptali"
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
         },
         {
-          "doc": "degisim-politikasi.md",
-          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
-          "title": "Değişim Politikası"
+          "doc": "stok-ve-on-siparis.md",
+          "section": "Stok ve Ön Sipariş > Stok Bildirimi | Stok ve Ön Sipariş > Ön Sipariş | Stok ve Ön Sipariş > Ön Sipariş İptali | Stok ve Ön Sipariş > Stok Yetersizliği",
+          "title": "Stok ve Ön Sipariş"
         }
       ],
       "gold_hit": true,
@@ -2676,16 +2692,16 @@
       "judge_reason": "The assistant correctly states the 48-hour notification period and adds relevant details without contradiction.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.4910646000003,
-      "cost_usd": 0.0016821499999999999,
-      "llm_calls": 5
+      "latency_s": 2.1842135000006238,
+      "cost_usd": 0.0020142,
+      "llm_calls": 3
     },
     {
       "id": "tr-049",
       "category": "numeric",
       "answerable": true,
       "question": "1000 KargoPuanım var, ne kadar indirim sağlar?",
-      "answer": "1000 KargoPuan 100 TL indirim sağlar çünkü 1 KargoPuan 0,10 TL değerindedir. Ancak puanlar en az 200 puan birikince kullanılabilir ve bir siparişte sepet tutarının en fazla yüzde 50'si puanla ödenebilir [KargoPuan Sadakat Programı:Puan Kullanma].",
+      "answer": "1000 KargoPuan 100 TL değerindedir çünkü 1 KargoPuan 0,10 TL değerindedir. Ancak puanlar en az 200 puan birikince kullanılabilir ve bir siparişte sepet tutarının en fazla yüzde 50'si puanla ödenebilir [KargoPuan Sadakat Programı:Puan Kullanma].",
       "abstained": false,
       "ranked": [
         {
@@ -2699,9 +2715,9 @@
           "title": "Taksit ve Kampanyalar"
         },
         {
-          "doc": "kargo-sss.md",
-          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
-          "title": "Kargo Sıkça Sorulan Sorular"
+          "doc": "odeme-yontemleri.md",
+          "section": "Ödeme Yöntemleri > Kabul Edilen Yöntemler | Ödeme Yöntemleri > Havale ve EFT İndirimi | Ödeme Yöntemleri > Kapıda Ödeme | Ödeme Yöntemleri > Güvenli Ödeme",
+          "title": "Ödeme Yöntemleri"
         },
         {
           "doc": "siparis-iptali.md",
@@ -2709,14 +2725,14 @@
           "title": "Sipariş İptali"
         },
         {
-          "doc": "urun-kilavuzu-powerbank-p20.md",
-          "section": "Powerbank P20 Kullanım Kılavuzu > Teknik Özellikler | Powerbank P20 Kullanım Kılavuzu > Şarj Göstergeleri | Powerbank P20 Kullanım Kılavuzu > Uçakta Taşıma | Powerbank P20 Kullanım Kılavuzu > Kendi Kendini Şarj Etme | Powerbank P20 Kullanım Kılavuzu > Sorun Giderme",
-          "title": "Powerbank P20 Kullanım Kılavuzu"
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
         },
         {
-          "doc": "urun-kilavuzu-kablosuz-kulaklik-b300.md",
-          "section": "Kablosuz Kulaklık B300 Kullanım Kılavuzu > Teknik Özellikler | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Eşleştirme Modu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Gürültü Engelleme | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Şarj Kutusu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Sıfırlama",
-          "title": "Kablosuz Kulaklık B300 Kullanım Kılavuzu"
+          "doc": "kargo-takip.md",
+          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
+          "title": "Kargo Takibi"
         }
       ],
       "gold_hit": true,
@@ -2728,19 +2744,21 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference in key facts about the value of KargoPuan, minimum points required, and maximum discount percentage.",
-      "faithful": true,
-      "unsupported": [],
-      "latency_s": 3.6365299999988565,
-      "cost_usd": 0.00178587,
-      "llm_calls": 5
+      "judge_reason": "The assistant correctly states the value of 1000 KargoPuan as 100 TL and includes the conditions for usage matching the reference.",
+      "faithful": false,
+      "unsupported": [
+        "1000 KargoPuan 100 TL değerindedir"
+      ],
+      "latency_s": 2.28498799999943,
+      "cost_usd": 0.00203872,
+      "llm_calls": 3
     },
     {
       "id": "tr-050",
       "category": "factual",
       "answerable": true,
       "question": "Her 100 TL harcamada kaç KargoPuan kazanırım?",
-      "answer": "Her 100 TL harcama için 5 KargoPuan kazanırsınız. Puanlar siparişin teslim edilmesinden 14 gün sonra hesabınıza yüklenir [KargoPuan Sadakat Programı:Puan Kazanma].",
+      "answer": "Her 100 TL harcama için 5 KargoPuan kazanırsınız. Puanlar siparişin teslim edilmesinden 14 gün sonra hesabınıza yüklenir. İade edilen ürünlerin puanları geri alınır. [KargoPuan Sadakat Programı:Puan Kazanma]",
       "abstained": false,
       "ranked": [
         {
@@ -2764,14 +2782,14 @@
           "title": "Ödeme Yöntemleri"
         },
         {
-          "doc": "taksit-ve-kampanyalar.md",
-          "section": "Taksit ve Kampanyalar > Taksit Seçenekleri | Taksit ve Kampanyalar > Taksit İçin Alt Limit | Taksit ve Kampanyalar > İndirim Kuponları | Taksit ve Kampanyalar > Fiyat Farkı İadesi",
-          "title": "Taksit ve Kampanyalar"
-        },
-        {
           "doc": "yurt-disi-ve-kktc-gonderim.md",
           "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
           "title": "Yurt Dışı ve KKTC Gönderimi"
+        },
+        {
+          "doc": "taksit-ve-kampanyalar.md",
+          "section": "Taksit ve Kampanyalar > Taksit Seçenekleri | Taksit ve Kampanyalar > Taksit İçin Alt Limit | Taksit ve Kampanyalar > İndirim Kuponları | Taksit ve Kampanyalar > Fiyat Farkı İadesi",
+          "title": "Taksit ve Kampanyalar"
         }
       ],
       "gold_hit": true,
@@ -2786,9 +2804,9 @@
       "judge_reason": "The assistant correctly states that 5 KargoPuan are earned per 100 TL spent, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.710193500000969,
-      "cost_usd": 0.0016793600000000002,
-      "llm_calls": 5
+      "latency_s": 2.9774194000001444,
+      "cost_usd": 0.00197881,
+      "llm_calls": 3
     },
     {
       "id": "tr-051",
@@ -2819,14 +2837,14 @@
           "title": "Hasarlı veya Eksik Ürün"
         },
         {
-          "doc": "siparis-iptali.md",
-          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
-          "title": "Sipariş İptali"
-        },
-        {
           "doc": "degisim-politikasi.md",
           "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
           "title": "Değişim Politikası"
+        },
+        {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
         }
       ],
       "gold_hit": true,
@@ -2841,16 +2859,16 @@
       "judge_reason": "The assistant's answer matches the reference's key fact about the 2 business day inspection period and adds relevant detail without contradiction.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.4316889000010633,
-      "cost_usd": 0.0017176999999999997,
-      "llm_calls": 5
+      "latency_s": 2.296076000001449,
+      "cost_usd": 0.0019831000000000002,
+      "llm_calls": 3
     },
     {
       "id": "tr-052",
       "category": "factual",
       "answerable": true,
       "question": "Saat kaça kadar verdiğim sipariş aynı gün kargoya verilir?",
-      "answer": "Saat 14:00'e kadar verdiğiniz siparişler aynı gün kargoya teslim edilir [Kargo Sıkça Sorulan Sorular:Sipariş Hazırlama].",
+      "answer": "Saat 14:00'e kadar verdiğiniz siparişler aynı gün kargoya teslim edilir. [Kargo Sıkça Sorulan Sorular:Sipariş Hazırlama]",
       "abstained": false,
       "ranked": [
         {
@@ -2874,14 +2892,14 @@
           "title": "Sipariş İptali"
         },
         {
+          "doc": "musteri-hizmetleri.md",
+          "section": "Müşteri Hizmetleri > Çalışma Saatleri | Müşteri Hizmetleri > İletişim Kanalları | Müşteri Hizmetleri > Yanıt Süreleri | Müşteri Hizmetleri > Şikâyet ve Öneri",
+          "title": "Müşteri Hizmetleri"
+        },
+        {
           "doc": "iade-politikasi.md",
           "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
           "title": "İade Politikası"
-        },
-        {
-          "doc": "degisim-politikasi.md",
-          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
-          "title": "Değişim Politikası"
         }
       ],
       "gold_hit": true,
@@ -2893,19 +2911,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference answer's key fact about the 14:00 cutoff time for same-day shipping.",
+      "judge_reason": "The assistant's answer matches the reference answer's key information about the cutoff time for same-day shipping.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.6715362000013556,
-      "cost_usd": 0.00169511,
-      "llm_calls": 5
+      "latency_s": 3.187749000000622,
+      "cost_usd": 0.00198906,
+      "llm_calls": 3
     },
     {
       "id": "tr-053",
       "category": "factual",
       "answerable": true,
       "question": "Kargo takip numarası ne zaman aktif olur?",
-      "answer": "Takip numarası genellikle kargoya verildikten sonraki 24 saat içinde aktif olur [Kargo Takibi:Takip Numarası].",
+      "answer": "Kargo takip numarası, siparişiniz kargoya verildikten sonraki 24 saat içinde aktif olur ve size SMS ile e-posta yoluyla iletilir. [Kargo Takibi:Takip Numarası]",
       "abstained": false,
       "ranked": [
         {
@@ -2924,19 +2942,19 @@
           "title": "Hasarlı veya Eksik Ürün"
         },
         {
-          "doc": "yurt-disi-ve-kktc-gonderim.md",
-          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
-          "title": "Yurt Dışı ve KKTC Gönderimi"
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
         },
         {
-          "doc": "kvkk-ve-gizlilik.md",
-          "section": "KVKK ve Gizlilik > Toplanan Veriler | KVKK ve Gizlilik > Saklama Süreleri | KVKK ve Gizlilik > Veri Silme Talebi | KVKK ve Gizlilik > Çerezler",
-          "title": "KVKK ve Gizlilik"
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
         },
         {
-          "doc": "degisim-politikasi.md",
-          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
-          "title": "Değişim Politikası"
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
         }
       ],
       "gold_hit": true,
@@ -2948,20 +2966,20 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference by stating the tracking number is active within 24 hours after shipment.",
+      "judge_reason": "The assistant's answer matches the reference by stating the tracking number becomes active within 24 hours after shipment.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.2448953999996775,
-      "cost_usd": 0.0016329299999999997,
-      "llm_calls": 5
+      "latency_s": 2.582674899998892,
+      "cost_usd": 0.0020272800000000002,
+      "llm_calls": 3
     },
     {
       "id": "tr-054",
       "category": "unanswerable",
       "answerable": false,
       "question": "Siparişimi hediye paketi yaptırabilir miyim?",
-      "answer": "Bu konuda belgelerimizde güvenilir bir bilgi bulamadım, lütfen destek ekibiyle iletişime geçin.",
-      "abstained": true,
+      "answer": "Üzgünüm, siparişin hediye paketi yapılması hakkında elimde bilgi bulunmamaktadır. Daha detaylı bilgi için müşteri hizmetlerimizle iletişime geçmenizi öneririm.",
+      "abstained": false,
       "ranked": [
         {
           "doc": "siparis-iptali.md",
@@ -2974,6 +2992,11 @@
           "title": "Hediye Çekleri"
         },
         {
+          "doc": "stok-ve-on-siparis.md",
+          "section": "Stok ve Ön Sipariş > Stok Bildirimi | Stok ve Ön Sipariş > Ön Sipariş | Stok ve Ön Sipariş > Ön Sipariş İptali | Stok ve Ön Sipariş > Stok Yetersizliği",
+          "title": "Stok ve Ön Sipariş"
+        },
+        {
           "doc": "teslimat-adres-degisikligi.md",
           "section": "Teslimat Adresi Değişikliği > Adres Değiştirme Koşulları | Teslimat Adresi Değişikliği > Adres Değişikliği Nasıl Yapılır | Teslimat Adresi Değişikliği > Farklı Şehre Gönderim",
           "title": "Teslimat Adresi Değişikliği"
@@ -2984,14 +3007,9 @@
           "title": "İade Süreci Adım Adım"
         },
         {
-          "doc": "stok-ve-on-siparis.md",
-          "section": "Stok ve Ön Sipariş > Stok Bildirimi | Stok ve Ön Sipariş > Ön Sipariş | Stok ve Ön Sipariş > Ön Sipariş İptali | Stok ve Ön Sipariş > Stok Yetersizliği",
-          "title": "Stok ve Ön Sipariş"
-        },
-        {
-          "doc": "sadakat-programi.md",
-          "section": "KargoPuan Sadakat Programı > Puan Kazanma | KargoPuan Sadakat Programı > Puan Kullanma | KargoPuan Sadakat Programı > Puan Geçerlilik Süresi | KargoPuan Sadakat Programı > Üyelik Seviyeleri",
-          "title": "KargoPuan Sadakat Programı"
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
         }
       ],
       "gold_hit": false,
@@ -3003,19 +3021,19 @@
       },
       "mrr": null,
       "correct": true,
-      "judge_reason": "The assistant correctly declines to answer due to lack of information in the documents.",
+      "judge_reason": "The assistant correctly states that the information is not available and does not invent facts.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 6.289319000001797,
-      "cost_usd": 0.0038801200000000004,
-      "llm_calls": 12
+      "latency_s": 1.7142025000011927,
+      "cost_usd": 0.00191651,
+      "llm_calls": 3
     },
     {
       "id": "tr-055",
       "category": "factual",
       "answerable": true,
       "question": "Aksesuarların garanti süresi ne kadar?",
-      "answer": "Aksesuarların garanti süresi 6 aydır ve bu süre ürünün teslim tarihinden başlar [Garanti Koşulları:Garanti Süresi].",
+      "answer": "Aksesuarların garanti süresi 6 aydır ve bu süre ürünün teslim tarihinden başlar. [Garanti Koşulları:Garanti Süresi]",
       "abstained": false,
       "ranked": [
         {
@@ -3034,19 +3052,19 @@
           "title": "İade Politikası"
         },
         {
-          "doc": "kargo-sss.md",
-          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
-          "title": "Kargo Sıkça Sorulan Sorular"
-        },
-        {
           "doc": "iade-politikasi-2023.md",
           "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
           "title": "İade Politikası (2023)"
         },
         {
-          "doc": "hasarli-ve-eksik-urun.md",
-          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
-          "title": "Hasarlı veya Eksik Ürün"
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
+        },
+        {
+          "doc": "degisim-politikasi.md",
+          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
+          "title": "Değişim Politikası"
         }
       ],
       "gold_hit": true,
@@ -3058,19 +3076,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer correctly states the 6-month warranty period for accessories as given in the reference.",
+      "judge_reason": "The assistant correctly states the warranty period as 6 months, matching the reference answer, with additional relevant detail.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.2490955999996913,
-      "cost_usd": 0.00167994,
-      "llm_calls": 5
+      "latency_s": 2.941599399998722,
+      "cost_usd": 0.0019997900000000004,
+      "llm_calls": 3
     },
     {
       "id": "tr-056",
       "category": "factual",
       "answerable": true,
       "question": "Garanti belgem yok, ne yapmalıyım?",
-      "answer": "Garanti belgesi yerine fatura geçerlidir. Faturanızı saklamanız önerilir; eğer faturanız kaybolursa hesabınızdan yeniden indirebilirsiniz. Böylece garanti haklarınızı kullanabilirsiniz. [Garanti Koşulları:Garanti Belgesi] [Fatura ve Belgeler:Garanti ve Fatura]",
+      "answer": "Garanti belgesi yerine fatura geçerlidir. Faturanızı saklamanız önerilir; eğer faturanız kaybolduysa hesabınızdan yeniden indirebilirsiniz. Böylece garanti haklarınızı kullanabilirsiniz. [Garanti Koşulları:Garanti Belgesi] [Fatura ve Belgeler:Garanti ve Fatura]",
       "abstained": false,
       "ranked": [
         {
@@ -3094,14 +3112,14 @@
           "title": "İade Politikası"
         },
         {
-          "doc": "hasarli-ve-eksik-urun.md",
-          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
-          "title": "Hasarlı veya Eksik Ürün"
-        },
-        {
           "doc": "stok-ve-on-siparis.md",
           "section": "Stok ve Ön Sipariş > Stok Bildirimi | Stok ve Ön Sipariş > Ön Sipariş | Stok ve Ön Sipariş > Ön Sipariş İptali | Stok ve Ön Sipariş > Stok Yetersizliği",
           "title": "Stok ve Ön Sipariş"
+        },
+        {
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
         }
       ],
       "gold_hit": true,
@@ -3116,16 +3134,16 @@
       "judge_reason": "The assistant correctly states that the invoice is valid instead of the warranty certificate and that it can be re-downloaded from the account, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 2.9450105999994776,
-      "cost_usd": 0.0019816100000000004,
-      "llm_calls": 5
+      "latency_s": 1.7161807000002227,
+      "cost_usd": 0.0019454600000000002,
+      "llm_calls": 3
     },
     {
       "id": "tr-057",
       "category": "factual",
       "answerable": true,
       "question": "B300 kulaklık şarj kutusuyla birlikte toplam kaç saat kullanım sağlar?",
-      "answer": "B300 kulaklık, şarj kutusuyla birlikte toplam 30 saat kullanım sağlar [Kablosuz Kulaklık B300 Kullanım Kılavuzu:Teknik Özellikler].",
+      "answer": "B300 kulaklık şarj kutusuyla birlikte toplam 30 saat kullanım sağlar [Kablosuz Kulaklık B300 Kullanım Kılavuzu:Teknik Özellikler].",
       "abstained": false,
       "ranked": [
         {
@@ -3168,20 +3186,20 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference by stating the total usage time as 30 hours with the charging case.",
+      "judge_reason": "The assistant's answer matches the reference answer by stating the total usage time as 30 hours.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.5706208999995397,
-      "cost_usd": 0.0018146500000000001,
-      "llm_calls": 5
+      "latency_s": 2.4836723000003076,
+      "cost_usd": 0.0021888000000000003,
+      "llm_calls": 3
     },
     {
       "id": "tr-058",
       "category": "unanswerable",
       "answerable": false,
       "question": "Ürünler için 3 yıllık uzatılmış garanti satın alabilir miyim?",
-      "answer": "Bu konuda şirket belgelerinde güvenilir bir bilgi bulamadım, lütfen destek ekibiyle iletişime geçin.",
-      "abstained": true,
+      "answer": "Ürünler için 3 yıllık uzatılmış garanti satın alma seçeneği hakkında bilgi kaynaklarımızda yer almamaktadır. Bu konuda kesin bilgi almak için KargoShop müşteri hizmetleri ile iletişime geçmenizi öneririm.",
+      "abstained": false,
       "ranked": [
         {
           "doc": "garanti-kosullari.md",
@@ -3194,24 +3212,24 @@
           "title": "Warranty for International Buyers"
         },
         {
-          "doc": "garanti-basvuru.md",
-          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
-          "title": "Garanti Başvuru Süreci"
-        },
-        {
-          "doc": "hasarli-ve-eksik-urun.md",
-          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
-          "title": "Hasarlı veya Eksik Ürün"
-        },
-        {
           "doc": "iade-politikasi.md",
           "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
           "title": "İade Politikası"
         },
         {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
+        },
+        {
           "doc": "iade-sureci.md",
           "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
           "title": "İade Süreci Adım Adım"
+        },
+        {
+          "doc": "degisim-politikasi.md",
+          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
+          "title": "Değişim Politikası"
         }
       ],
       "gold_hit": false,
@@ -3223,12 +3241,12 @@
       },
       "mrr": null,
       "correct": true,
-      "judge_reason": "Both answers indicate that the information is not available in the documents and do not provide invented facts.",
+      "judge_reason": "The assistant correctly states that the information is not available and does not invent facts.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 7.084310299999743,
-      "cost_usd": 0.0038450000000000003,
-      "llm_calls": 12
+      "latency_s": 2.822474200000215,
+      "cost_usd": 0.00194187,
+      "llm_calls": 3
     },
     {
       "id": "tr-059",
@@ -3244,14 +3262,14 @@
           "title": "Robot Süpürge R5 Kullanım Kılavuzu"
         },
         {
-          "doc": "urun-kilavuzu-kablosuz-kulaklik-b300.md",
-          "section": "Kablosuz Kulaklık B300 Kullanım Kılavuzu > Teknik Özellikler | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Eşleştirme Modu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Gürültü Engelleme | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Şarj Kutusu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Sıfırlama",
-          "title": "Kablosuz Kulaklık B300 Kullanım Kılavuzu"
-        },
-        {
           "doc": "urun-kilavuzu-powerbank-p20.md",
           "section": "Powerbank P20 Kullanım Kılavuzu > Teknik Özellikler | Powerbank P20 Kullanım Kılavuzu > Şarj Göstergeleri | Powerbank P20 Kullanım Kılavuzu > Uçakta Taşıma | Powerbank P20 Kullanım Kılavuzu > Kendi Kendini Şarj Etme | Powerbank P20 Kullanım Kılavuzu > Sorun Giderme",
           "title": "Powerbank P20 Kullanım Kılavuzu"
+        },
+        {
+          "doc": "urun-kilavuzu-kablosuz-kulaklik-b300.md",
+          "section": "Kablosuz Kulaklık B300 Kullanım Kılavuzu > Teknik Özellikler | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Eşleştirme Modu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Gürültü Engelleme | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Şarj Kutusu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Sıfırlama",
+          "title": "Kablosuz Kulaklık B300 Kullanım Kılavuzu"
         },
         {
           "doc": "kargo-sss.md",
@@ -3281,16 +3299,16 @@
       "judge_reason": "The assistant's answer matches the reference by stating the robot vacuum runs approximately 120 minutes on a single charge.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.406488800000261,
-      "cost_usd": 0.0018217399999999999,
-      "llm_calls": 5
+      "latency_s": 2.089170400000512,
+      "cost_usd": 0.00215894,
+      "llm_calls": 3
     },
     {
       "id": "tr-060",
       "category": "factual",
       "answerable": true,
       "question": "R5 robot süpürgenin filtresini ne sıklıkla değiştirmeliyim?",
-      "answer": "R5 robot süpürgenin HEPA filtresi her 3 ayda bir değiştirilmelidir [Robot Süpürge R5 Kullanım Kılavuzu:Bakım ve Filtre Değişimi].",
+      "answer": "R5 robot süpürgenin HEPA filtresi her 3 ayda bir değiştirilmelidir. [Robot Süpürge R5 Kullanım Kılavuzu:Bakım ve Filtre Değişimi]",
       "abstained": false,
       "ranked": [
         {
@@ -3333,19 +3351,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly states that the HEPA filter should be changed every 3 months, matching the reference answer.",
+      "judge_reason": "The assistant correctly states that the HEPA filter should be replaced every 3 months, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.779751099999885,
-      "cost_usd": 0.00182325,
-      "llm_calls": 5
+      "latency_s": 2.1541265000009844,
+      "cost_usd": 0.00213435,
+      "llm_calls": 3
     },
     {
       "id": "tr-061",
       "category": "factual",
       "answerable": true,
       "question": "Hava fritözü F6 hangi sıcaklıklar arasında çalışır?",
-      "answer": "Hava fritözü F6, 80 ile 200 derece arasında çalışır. [Hava Fritözü F6 Kullanım Kılavuzu:Teknik Özellikler]",
+      "answer": "Hava fritözü F6, 80 ile 200 derece arasında sıcaklık ayarı yapabilir. [Hava Fritözü F6 Kullanım Kılavuzu:Teknik Özellikler]",
       "abstained": false,
       "ranked": [
         {
@@ -3388,35 +3406,40 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference answer with the same temperature range.",
+      "judge_reason": "The assistant's answer matches the reference temperature range of 80 to 200 degrees.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.739074999999957,
-      "cost_usd": 0.00177546,
-      "llm_calls": 5
+      "latency_s": 2.304056400000718,
+      "cost_usd": 0.0020991100000000004,
+      "llm_calls": 3
     },
     {
       "id": "tr-062",
       "category": "unanswerable",
       "answerable": false,
       "question": "KargoShop'un Instagram hesabı nedir?",
-      "answer": "Üzgünüm, ancak bu konuda belgelerimizde güvenilir bir bilgi bulamadım; lütfen destek ekibiyle iletişime geçin.",
-      "abstained": true,
+      "answer": "KargoShop'un Instagram hesabı hakkında bilgi kaynaklarımızda bulunmamaktadır. Daha fazla bilgi için müşteri hizmetlerimizle iletişime geçmenizi öneririm.",
+      "abstained": false,
       "ranked": [
+        {
+          "doc": "kvkk-ve-gizlilik.md",
+          "section": "KVKK ve Gizlilik > Toplanan Veriler | KVKK ve Gizlilik > Saklama Süreleri | KVKK ve Gizlilik > Veri Silme Talebi | KVKK ve Gizlilik > Çerezler",
+          "title": "KVKK ve Gizlilik"
+        },
+        {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
+        },
         {
           "doc": "kargo-takip.md",
           "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
           "title": "Kargo Takibi"
         },
         {
-          "doc": "musteri-hizmetleri.md",
-          "section": "Müşteri Hizmetleri > Çalışma Saatleri | Müşteri Hizmetleri > İletişim Kanalları | Müşteri Hizmetleri > Yanıt Süreleri | Müşteri Hizmetleri > Şikâyet ve Öneri",
-          "title": "Müşteri Hizmetleri"
-        },
-        {
-          "doc": "kargo-sss.md",
-          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
-          "title": "Kargo Sıkça Sorulan Sorular"
+          "doc": "uyelik-ve-hesap.md",
+          "section": "Üyelik ve Hesap Yönetimi > Şifre Sıfırlama | Üyelik ve Hesap Yönetimi > İki Adımlı Doğrulama | Üyelik ve Hesap Yönetimi > Üyeliği Silme | Üyelik ve Hesap Yönetimi > E-posta Adresi Değiştirme",
+          "title": "Üyelik ve Hesap Yönetimi"
         },
         {
           "doc": "yurt-disi-ve-kktc-gonderim.md",
@@ -3424,14 +3447,9 @@
           "title": "Yurt Dışı ve KKTC Gönderimi"
         },
         {
-          "doc": "hotel-delivery.md",
-          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
-          "title": "Delivery to Hotels"
-        },
-        {
-          "doc": "english-support.md",
-          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
-          "title": "English Language Support"
+          "doc": "odeme-yontemleri.md",
+          "section": "Ödeme Yöntemleri > Kabul Edilen Yöntemler | Ödeme Yöntemleri > Havale ve EFT İndirimi | Ödeme Yöntemleri > Kapıda Ödeme | Ödeme Yöntemleri > Güvenli Ödeme",
+          "title": "Ödeme Yöntemleri"
         }
       ],
       "gold_hit": false,
@@ -3443,19 +3461,19 @@
       },
       "mrr": null,
       "correct": true,
-      "judge_reason": "The assistant correctly declines to provide the Instagram account information as it is not available in the reference.",
+      "judge_reason": "The assistant correctly states that the information is not available, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 8.263137899998583,
-      "cost_usd": 0.0038182199999999998,
-      "llm_calls": 12
+      "latency_s": 1.522212199999558,
+      "cost_usd": 0.0018353700000000002,
+      "llm_calls": 3
     },
     {
       "id": "tr-063",
       "category": "factual",
       "answerable": true,
       "question": "Şifremi unuttum, sıfırlama bağlantısı ne kadar geçerli?",
-      "answer": "Şifremi unuttum bağlantısına tıkladığınızda gönderilen sıfırlama bağlantısı 30 dakika geçerlidir. [Üyelik ve Hesap Yönetimi:Şifre Sıfırlama]",
+      "answer": "Şifrenizi unuttuğunuzda gönderilen sıfırlama bağlantısı 30 dakika geçerlidir. [Üyelik ve Hesap Yönetimi:Şifre Sıfırlama]",
       "abstained": false,
       "ranked": [
         {
@@ -3474,19 +3492,19 @@
           "title": "İade Süreci Adım Adım"
         },
         {
-          "doc": "siparis-iptali.md",
-          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
-          "title": "Sipariş İptali"
-        },
-        {
           "doc": "iade-politikasi.md",
           "section": "İade Politikası > Yürürlük Tarihi",
           "title": "İade Politikası"
         },
         {
-          "doc": "taksit-ve-kampanyalar.md",
-          "section": "Taksit ve Kampanyalar > Taksit Seçenekleri | Taksit ve Kampanyalar > Taksit İçin Alt Limit | Taksit ve Kampanyalar > İndirim Kuponları | Taksit ve Kampanyalar > Fiyat Farkı İadesi",
-          "title": "Taksit ve Kampanyalar"
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
+        },
+        {
+          "doc": "garanti-kosullari.md",
+          "section": "Garanti Koşulları > Garanti Süresi | Garanti Koşulları > Garanti Kapsamı | Garanti Koşulları > Garanti Kapsamı Dışındaki Durumlar | Garanti Koşulları > Garanti Belgesi",
+          "title": "Garanti Koşulları"
         }
       ],
       "gold_hit": true,
@@ -3501,16 +3519,16 @@
       "judge_reason": "The assistant correctly states that the reset link is valid for 30 minutes, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.5933705999991616,
-      "cost_usd": 0.00171497,
-      "llm_calls": 5
+      "latency_s": 2.4787583999986964,
+      "cost_usd": 0.0019538199999999998,
+      "llm_calls": 3
     },
     {
       "id": "tr-064",
       "category": "factual",
       "answerable": true,
       "question": "Açık siparişim varken üyeliğimi silebilir miyim?",
-      "answer": "Açık siparişiniz varken üyeliğinizi silemezsiniz. Üyelik silme işlemi ancak açık siparişiniz olmadığında gerçekleştirilebilir. Açık siparişi olan üyelikler silinemez [Üyelik ve Hesap Yönetimi:Üyeliği Silme].",
+      "answer": "Açık siparişiniz varken üyeliğinizi silemezsiniz. Üyelik silme talebi ancak açık siparişiniz yoksa gerçekleştirilebilir ve silme işlemi 30 gün içinde tamamlanır [Üyelik ve Hesap Yönetimi:Üyeliği Silme].",
       "abstained": false,
       "ranked": [
         {
@@ -3553,19 +3571,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer correctly states that memberships with open orders cannot be deleted, matching the reference answer.",
+      "judge_reason": "The assistant correctly states that membership cannot be deleted while there is an open order, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.8666842999996334,
-      "cost_usd": 0.0016871400000000002,
-      "llm_calls": 5
+      "latency_s": 3.1051557000000685,
+      "cost_usd": 0.00195679,
+      "llm_calls": 3
     },
     {
       "id": "tr-065",
       "category": "factual",
       "answerable": true,
       "question": "Fatura bilgilerimi değiştirmek için kaç günüm var?",
-      "answer": "Fatura bilgisi değişikliği yalnızca teslimat tarihinden itibaren 7 gün içinde, müşteri hizmetleri aracılığıyla yapılabilir[ Fatura ve Belgeler:Fatura Bilgisi Değişikliği].",
+      "answer": "Fatura bilgisi değişikliği yalnızca teslimat tarihinden itibaren 7 gün içinde, müşteri hizmetleri aracılığıyla yapılabilir. Bu süre sonrasında fatura iptal edilemez. [Fatura ve Belgeler:Fatura Bilgisi Değişikliği]",
       "abstained": false,
       "ranked": [
         {
@@ -3584,19 +3602,19 @@
           "title": "Teslimat Adresi Değişikliği"
         },
         {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
+        },
+        {
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
+        },
+        {
           "doc": "degisim-politikasi.md",
           "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
           "title": "Değişim Politikası"
-        },
-        {
-          "doc": "siparis-iptali.md",
-          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
-          "title": "Sipariş İptali"
-        },
-        {
-          "doc": "iade-politikasi-2023.md",
-          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
-          "title": "İade Politikası (2023)"
         }
       ],
       "gold_hit": true,
@@ -3608,19 +3626,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant answer correctly states the 7-day period from the delivery date and the need to contact customer service, matching the reference.",
+      "judge_reason": "The assistant correctly states the 7-day period from the delivery date and the need to contact customer service, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.1206504000006134,
-      "cost_usd": 0.0016348600000000001,
-      "llm_calls": 5
+      "latency_s": 4.138747499999226,
+      "cost_usd": 0.0019994599999999998,
+      "llm_calls": 3
     },
     {
       "id": "tr-066",
       "category": "unanswerable",
       "answerable": false,
       "question": "R5 robot süpürge köpek tüylerinde ne kadar etkili?",
-      "answer": "R5 robot süpürgenin teknik özellikleri arasında 2500 Pa emiş gücü bulunmaktadır, bu da köpek tüyleri gibi ince partiküllerin temizlenmesinde etkili olabilir. Ayrıca, halı algılama özelliği sayesinde halı üzerine çıktığında emiş gücünü otomatik artırır, bu da tüylerin halıdan daha iyi temizlenmesini sağlar. Ancak, uzun tüylü halılarda bu özellik kapatılabilir [Robot Süpürge R5 Kullanım Kılavuzu:Teknik Özellikler] [Robot Süpürge R5 Kullanım Kılavuzu:Halı Algılama].",
+      "answer": "Elimizdeki kaynaklarda R5 robot süpürgenin köpek tüylerindeki etkinliği hakkında doğrudan bilgi bulunmamaktadır. Bu konuda daha detaylı bilgi almak için müşteri hizmetlerimizle iletişime geçmenizi öneririm.",
       "abstained": false,
       "ranked": [
         {
@@ -3662,20 +3680,20 @@
         "recall@8": null
       },
       "mrr": null,
-      "correct": false,
-      "judge_reason": "The reference states the information is not available, but the assistant provides specific effectiveness details, contradicting the reference.",
+      "correct": true,
+      "judge_reason": "Assistant correctly states that the information is not available in the sources and does not invent facts.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.524857200000497,
-      "cost_usd": 0.001987,
-      "llm_calls": 5
+      "latency_s": 2.5627310000008947,
+      "cost_usd": 0.0021526,
+      "llm_calls": 3
     },
     {
       "id": "tr-067",
       "category": "factual",
       "answerable": true,
       "question": "Kişisel verilerimin silinmesini istersem talep ne kadar sürede yanıtlanır?",
-      "answer": "Kişisel verilerinizin silinmesi talebi 30 gün içinde yanıtlanır [KVKK ve Gizlilik:Veri Silme Talebi].",
+      "answer": "Kişisel verilerinizin silinmesini talep ettiğinizde, talepler 30 gün içinde yanıtlanır. Ancak yasal saklama yükümlülüğü olan veriler silinmez. [KVKK ve Gizlilik:Veri Silme Talebi]",
       "abstained": false,
       "ranked": [
         {
@@ -3687,11 +3705,6 @@
           "doc": "uyelik-ve-hesap.md",
           "section": "Üyelik ve Hesap Yönetimi > Şifre Sıfırlama | Üyelik ve Hesap Yönetimi > İki Adımlı Doğrulama | Üyelik ve Hesap Yönetimi > Üyeliği Silme | Üyelik ve Hesap Yönetimi > E-posta Adresi Değiştirme",
           "title": "Üyelik ve Hesap Yönetimi"
-        },
-        {
-          "doc": "musteri-hizmetleri.md",
-          "section": "Müşteri Hizmetleri > Çalışma Saatleri | Müşteri Hizmetleri > İletişim Kanalları | Müşteri Hizmetleri > Yanıt Süreleri | Müşteri Hizmetleri > Şikâyet ve Öneri",
-          "title": "Müşteri Hizmetleri"
         },
         {
           "doc": "garanti-basvuru.md",
@@ -3707,6 +3720,11 @@
           "doc": "iade-politikasi.md",
           "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
           "title": "İade Politikası"
+        },
+        {
+          "doc": "fatura-ve-belgeler.md",
+          "section": "Fatura ve Belgeler > E-Fatura ve E-Arşiv | Fatura ve Belgeler > Kurumsal Fatura | Fatura ve Belgeler > Fatura Bilgisi Değişikliği | Fatura ve Belgeler > Garanti ve Fatura",
+          "title": "Fatura ve Belgeler"
         }
       ],
       "gold_hit": true,
@@ -3718,19 +3736,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant answer correctly states that requests are responded to within 30 days, matching the reference answer.",
+      "judge_reason": "The assistant correctly states that requests are answered within 30 days, matching the reference answer, and adds relevant extra information without contradiction.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.6672543999998197,
-      "cost_usd": 0.00169815,
-      "llm_calls": 5
+      "latency_s": 2.1717419999999947,
+      "cost_usd": 0.0020583,
+      "llm_calls": 3
     },
     {
       "id": "tr-068",
       "category": "factual",
       "answerable": true,
       "question": "Fatura kayıtları kaç yıl saklanıyor?",
-      "answer": "Fatura ve sipariş kayıtları yasal zorunluluk nedeniyle 10 yıl saklanır [KVKK ve Gizlilik:Saklama Süreleri].",
+      "answer": "Fatura ve sipariş kayıtları yasal zorunluluk nedeniyle 10 yıl saklanır. [KVKK ve Gizlilik:Saklama Süreleri]",
       "abstained": false,
       "ranked": [
         {
@@ -3749,19 +3767,19 @@
           "title": "Garanti Koşulları"
         },
         {
-          "doc": "iade-politikasi-2023.md",
-          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
-          "title": "İade Politikası (2023)"
-        },
-        {
-          "doc": "iade-politikasi.md",
-          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
-          "title": "İade Politikası"
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
         },
         {
           "doc": "hediye-cekleri.md",
           "section": "Hediye Çekleri > Hediye Çeki Tutarları | Hediye Çekleri > Geçerlilik ve Kullanım | Hediye Çekleri > İade ve Nakde Çevirme | Hediye Çekleri > Kayıp Kod",
           "title": "Hediye Çekleri"
+        },
+        {
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
         }
       ],
       "gold_hit": true,
@@ -3776,16 +3794,16 @@
       "judge_reason": "The assistant's answer matches the reference by stating invoices are kept for 10 years due to legal obligation.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.637194300000374,
-      "cost_usd": 0.0016634999999999998,
-      "llm_calls": 5
+      "latency_s": 2.8571885000001203,
+      "cost_usd": 0.0019381999999999997,
+      "llm_calls": 3
     },
     {
       "id": "tr-069",
       "category": "factual",
       "answerable": true,
       "question": "Hediye çekini nakde çevirebilir miyim?",
-      "answer": "Hediye çekleri iade edilemez ve nakde çevrilemez. Ancak, hediye çeki ile satın alınan ürünler iade edildiğinde tutar hediye çeki bakiyesi olarak geri yüklenir [Hediye Çekleri:İade ve Nakde Çevirme].",
+      "answer": "Hayır, hediye çekleri iade edilemez ve nakde çevrilemez. Ancak hediye çeki ile satın alınan ürünler iade edildiğinde tutar hediye çeki bakiyesi olarak geri yüklenir [Hediye Çekleri:İade ve Nakde Çevirme].",
       "abstained": false,
       "ranked": [
         {
@@ -3827,21 +3845,21 @@
         "recall@8": 1.0
       },
       "mrr": 1.0,
-      "correct": true,
-      "judge_reason": "The assistant correctly states that gift vouchers cannot be returned or converted to cash, matching the reference answer.",
+      "correct": false,
+      "judge_reason": "The assistant adds information about product returns and balance refunds not mentioned in the reference, which may cause confusion.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.542183899999145,
-      "cost_usd": 0.0017236899999999997,
-      "llm_calls": 5
+      "latency_s": 2.2367429999994783,
+      "cost_usd": 0.00205129,
+      "llm_calls": 3
     },
     {
       "id": "tr-070",
       "category": "unanswerable",
       "answerable": false,
       "question": "Siparişlerde randevulu teslimat seçeneği var mı?",
-      "answer": "Bu konuda şirket belgelerinde güvenilir bir bilgi bulamadım, lütfen destek ekibiyle iletişime geçin.",
-      "abstained": true,
+      "answer": "Siparişlerde randevulu teslimat seçeneği bulunmamaktadır. Teslimatlar hafta içi 09:00 ile 19:00, cumartesi 09:00 ile 15:00 saatleri arasında yapılmaktadır ve pazar günü teslimat yapılmaz. Ayrıca, standart teslimat 2-4 iş günü sürer, ekspres teslimat ise sadece İstanbul, Ankara ve İzmir için ertesi iş günü teslim edilir [Kargo Sıkça Sorulan Sorular:Teslimat Saatleri].",
+      "abstained": false,
       "ranked": [
         {
           "doc": "kargo-sss.md",
@@ -3854,9 +3872,9 @@
           "title": "Teslimat Adresi Değişikliği"
         },
         {
-          "doc": "yurt-disi-ve-kktc-gonderim.md",
-          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
-          "title": "Yurt Dışı ve KKTC Gönderimi"
+          "doc": "kargo-takip.md",
+          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
+          "title": "Kargo Takibi"
         },
         {
           "doc": "hotel-delivery.md",
@@ -3864,14 +3882,14 @@
           "title": "Delivery to Hotels"
         },
         {
-          "doc": "kargo-takip.md",
-          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
-          "title": "Kargo Takibi"
-        },
-        {
           "doc": "siparis-iptali.md",
           "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
           "title": "Sipariş İptali"
+        },
+        {
+          "doc": "stok-ve-on-siparis.md",
+          "section": "Stok ve Ön Sipariş > Stok Bildirimi | Stok ve Ön Sipariş > Ön Sipariş | Stok ve Ön Sipariş > Ön Sipariş İptali | Stok ve Ön Sipariş > Stok Yetersizliği",
+          "title": "Stok ve Ön Sipariş"
         }
       ],
       "gold_hit": false,
@@ -3882,20 +3900,20 @@
         "recall@8": null
       },
       "mrr": null,
-      "correct": true,
-      "judge_reason": "Assistant correctly states that the information is not available in the documents.",
+      "correct": false,
+      "judge_reason": "The reference states the information is not available, but the assistant provides specific delivery details, contradicting the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 7.545335399999658,
-      "cost_usd": 0.00383059,
-      "llm_calls": 12
+      "latency_s": 2.8057101000013063,
+      "cost_usd": 0.0020102500000000003,
+      "llm_calls": 3
     },
     {
       "id": "tr-071",
       "category": "factual",
       "answerable": true,
       "question": "Hediye çekleri hangi tutarlarda satılıyor?",
-      "answer": "Hediye çekleri 100 TL, 250 TL ve 500 TL değerlerinde satılmaktadır [Hediye Çekleri:Hediye Çeki Tutarları].",
+      "answer": "Hediye çekleri 100 TL, 250 TL ve 500 TL değerlerinde satılmaktadır. [Hediye Çekleri:Hediye Çeki Tutarları]",
       "abstained": false,
       "ranked": [
         {
@@ -3938,19 +3956,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant answer correctly states the same gift voucher amounts as the reference.",
+      "judge_reason": "The assistant's answer matches the reference answer in key details about the gift voucher amounts.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.3196324999989884,
-      "cost_usd": 0.0016161499999999998,
-      "llm_calls": 5
+      "latency_s": 2.472602300001199,
+      "cost_usd": 0.0019188999999999999,
+      "llm_calls": 3
     },
     {
       "id": "tr-072",
       "category": "factual",
       "answerable": true,
       "question": "Ön sipariş verdiğim ürün ne zaman kargoya verilir?",
-      "answer": "Ön sipariş ürünleri, çıkış tarihinden sonra en geç 15 iş günü içinde kargoya verilir [Stok ve Ön Sipariş:Ön Sipariş].",
+      "answer": "Ön sipariş ürünleri, çıkış tarihinden sonra en geç 15 iş günü içinde kargoya verilir. Ayrıca ön sipariş ürünlerinde ekspres teslimat seçeneği bulunmamaktadır [Stok ve Ön Sipariş:Ön Sipariş].",
       "abstained": false,
       "ranked": [
         {
@@ -3969,19 +3987,19 @@
           "title": "Kargo Takibi"
         },
         {
-          "doc": "teslimat-adres-degisikligi.md",
-          "section": "Teslimat Adresi Değişikliği > Adres Değiştirme Koşulları | Teslimat Adresi Değişikliği > Adres Değişikliği Nasıl Yapılır | Teslimat Adresi Değişikliği > Farklı Şehre Gönderim",
-          "title": "Teslimat Adresi Değişikliği"
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
+        },
+        {
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
         },
         {
           "doc": "siparis-iptali.md",
           "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
           "title": "Sipariş İptali"
-        },
-        {
-          "doc": "hasarli-ve-eksik-urun.md",
-          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
-          "title": "Hasarlı veya Eksik Ürün"
         }
       ],
       "gold_hit": true,
@@ -3993,19 +4011,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant's answer matches the reference by stating the product ships within 15 business days after the release date.",
+      "judge_reason": "The assistant's answer matches the reference's key information about shipping within 15 business days after release date and adds relevant extra detail.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.3870953999999074,
-      "cost_usd": 0.0016200700000000001,
-      "llm_calls": 5
+      "latency_s": 2.513915100000304,
+      "cost_usd": 0.00198457,
+      "llm_calls": 3
     },
     {
       "id": "tr-073",
       "category": "factual",
       "answerable": true,
       "question": "Aynı siparişte iki indirim kuponu kullanabilir miyim?",
-      "answer": "Hayır, aynı siparişte yalnızca bir indirim kuponu kullanılabilir. [Taksit ve Kampanyalar:İndirim Kuponları]",
+      "answer": "Hayır, bir siparişte yalnızca bir indirim kuponu kullanılabilir. Kuponlar indirimli kampanya ürünlerinde geçerli değildir. Kuponun son kullanma tarihi kupon üzerinde yazar. [Taksit ve Kampanyalar:İndirim Kuponları]",
       "abstained": false,
       "ranked": [
         {
@@ -4034,9 +4052,9 @@
           "title": "Değişim Politikası"
         },
         {
-          "doc": "sadakat-programi.md",
-          "section": "KargoPuan Sadakat Programı > Puan Kazanma | KargoPuan Sadakat Programı > Puan Kullanma | KargoPuan Sadakat Programı > Puan Geçerlilik Süresi | KargoPuan Sadakat Programı > Üyelik Seviyeleri",
-          "title": "KargoPuan Sadakat Programı"
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
         }
       ],
       "gold_hit": true,
@@ -4048,19 +4066,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly states that only one discount coupon can be used per order, matching the reference answer.",
+      "judge_reason": "The assistant correctly states that only one coupon can be used per order, matching the reference answer, and the extra details do not contradict the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.7750310999995236,
-      "cost_usd": 0.0016491999999999998,
-      "llm_calls": 5
+      "latency_s": 2.519723999999769,
+      "cost_usd": 0.0019846,
+      "llm_calls": 3
     },
     {
       "id": "tr-074",
       "category": "unanswerable",
       "answerable": false,
       "question": "Taksitli alışverişte iade yaparsam ödediğim faiz geri verilir mi?",
-      "answer": "Taksitli alışverişlerde iade yapıldığında ödediğiniz faizle ilgili kaynaklarımızda doğrudan bir bilgi bulunmamaktadır. Bu konuda net bilgi almak için müşteri hizmetlerimizle iletişime geçmenizi öneririm.",
+      "answer": "Kaynaklarda taksitli alışverişlerde iade durumunda ödediğiniz faizin geri ödenip ödenmeyeceği hakkında bilgi bulunmamaktadır. Bu konuda net bilgi almak için lütfen KargoShop müşteri hizmetleri ile iletişime geçiniz.",
       "abstained": false,
       "ranked": [
         {
@@ -4074,24 +4092,24 @@
           "title": "İade Süreci Adım Adım"
         },
         {
-          "doc": "taksit-ve-kampanyalar.md",
-          "section": "Taksit ve Kampanyalar > Taksit Seçenekleri | Taksit ve Kampanyalar > Taksit İçin Alt Limit | Taksit ve Kampanyalar > İndirim Kuponları | Taksit ve Kampanyalar > Fiyat Farkı İadesi",
-          "title": "Taksit ve Kampanyalar"
-        },
-        {
           "doc": "iade-politikasi-2023.md",
           "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
           "title": "İade Politikası (2023)"
         },
         {
-          "doc": "siparis-iptali.md",
-          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
-          "title": "Sipariş İptali"
+          "doc": "taksit-ve-kampanyalar.md",
+          "section": "Taksit ve Kampanyalar > Taksit Seçenekleri | Taksit ve Kampanyalar > Taksit İçin Alt Limit | Taksit ve Kampanyalar > İndirim Kuponları | Taksit ve Kampanyalar > Fiyat Farkı İadesi",
+          "title": "Taksit ve Kampanyalar"
         },
         {
           "doc": "iade-politikasi.md",
           "section": "İade Politikası > Yürürlük Tarihi",
           "title": "İade Politikası"
+        },
+        {
+          "doc": "stok-ve-on-siparis.md",
+          "section": "Stok ve Ön Sipariş > Stok Bildirimi | Stok ve Ön Sipariş > Ön Sipariş | Stok ve Ön Sipariş > Ön Sipariş İptali | Stok ve Ön Sipariş > Stok Yetersizliği",
+          "title": "Stok ve Ön Sipariş"
         }
       ],
       "gold_hit": false,
@@ -4103,19 +4121,19 @@
       },
       "mrr": null,
       "correct": true,
-      "judge_reason": "The assistant correctly states that the information is not available in the documents and does not invent facts.",
+      "judge_reason": "The assistant correctly states that the information is not available in the sources and does not invent facts.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.573920000000726,
-      "cost_usd": 0.0021899099999999998,
-      "llm_calls": 5
+      "latency_s": 1.8081151000005775,
+      "cost_usd": 0.0018675099999999997,
+      "llm_calls": 3
     },
     {
       "id": "tr-075",
       "category": "numeric",
       "answerable": true,
       "question": "Aldığım ürünün fiyatı 5 gün sonra düştü, aradaki fark iade edilir mi?",
-      "answer": "Evet, satın aldığınız ürünün fiyatı teslimattan sonraki 7 gün içinde düşerse, aradaki fark talep üzerine iade edilir. Ancak kampanya ve flaş indirim ürünleri bu uygulamanın dışındadır[ Taksit ve Kampanyalar:Fiyat Farkı İadesi].",
+      "answer": "Evet, satın aldığınız ürünün fiyatı teslimattan sonraki 7 gün içinde düşerse aradaki fark talep üzerine iade edilir. Ancak kampanya ve flaş indirim ürünleri bu uygulamanın dışındadır [Taksit ve Kampanyalar:Fiyat Farkı İadesi].",
       "abstained": false,
       "ranked": [
         {
@@ -4161,16 +4179,16 @@
       "judge_reason": "The assistant's answer matches the reference by stating the 7-day period and exclusions for campaign and flash discount products.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.6240867999995316,
-      "cost_usd": 0.00171197,
-      "llm_calls": 5
+      "latency_s": 2.524169700001039,
+      "cost_usd": 0.00203182,
+      "llm_calls": 3
     },
     {
       "id": "tr-076",
       "category": "factual",
       "answerable": true,
       "question": "KKTC'ye gönderimde kargo ücreti ne kadar?",
-      "answer": "KKTC gönderimlerinde kargo ücreti sepet tutarından bağımsız olarak 149,90 TL'dir. Ücretsiz kargo limiti KKTC için geçerli değildir [Yurt Dışı ve KKTC Gönderimi:KKTC Kargo Ücreti].",
+      "answer": "KKTC'ye gönderimlerde kargo ücreti sepet tutarından bağımsız olarak 149,90 TL'dir. Ücretsiz kargo limiti KKTC için geçerli değildir [Yurt Dışı ve KKTC Gönderimi:KKTC Kargo Ücreti].",
       "abstained": false,
       "ranked": [
         {
@@ -4213,19 +4231,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant provides the exact shipping cost and clarifies that free shipping does not apply, matching the reference information.",
+      "judge_reason": "The assistant provides the same key information about the shipping cost and adds relevant details without contradiction.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.531888799999251,
-      "cost_usd": 0.0016639200000000002,
-      "llm_calls": 5
+      "latency_s": 2.5462250000000495,
+      "cost_usd": 0.00195617,
+      "llm_calls": 3
     },
     {
       "id": "tr-077",
       "category": "multi",
       "answerable": true,
       "question": "Teslim aldığım ürünü 25 gün sonra iade etmek istiyorum, kargo ücreti öder miyim?",
-      "answer": "Teslim aldığınız ürünü 25 gün sonra iade etmek istediğinizde, iade süresi 30 gün olduğu için iade talebi oluşturabilirsiniz. İade kargo ücreti ise, Anadolu Kargo ile yapılan iadelerde ücretsizdir; iade kodunu şubede göstermeniz yeterlidir. Ancak ürünü kendi kargonuzla gönderirseniz kargo ücreti iade edilmez. Bu nedenle, kargo ücreti ödememek için Anadolu Kargo'yu kullanmanız gerekir [İade Politikası:İade Süresi] [İade Politikası:İade Kargo Ücreti].",
+      "answer": "Teslim aldığınız ürünü 25 gün sonra iade etmek istediğinizde, iade süresi 30 gün olduğu için iade talebinizi oluşturabilirsiniz. Anlaşmalı kargo firması Anadolu Kargo ile yapılan iadelerde kargo ücretsizdir; iade kodunu şubede göstermeniz yeterlidir. Ancak ürünü kendi kargonuzla gönderirseniz kargo ücreti iade edilmez. Yani, Anadolu Kargo ile gönderirseniz kargo ücreti ödemezsiniz [İade Politikası:İade Süresi] [İade Politikası:İade Kargo Ücreti].",
       "abstained": false,
       "ranked": [
         {
@@ -4249,14 +4267,14 @@
           "title": "Değişim Politikası"
         },
         {
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
+        },
+        {
           "doc": "hasarli-ve-eksik-urun.md",
           "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
           "title": "Hasarlı veya Eksik Ürün"
-        },
-        {
-          "doc": "kargo-takip.md",
-          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
-          "title": "Kargo Takibi"
         }
       ],
       "gold_hit": true,
@@ -4271,16 +4289,16 @@
       "judge_reason": "The assistant correctly states the 30-day return period and that shipping is free with Anadolu Kargo, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.112524099998609,
-      "cost_usd": 0.00207954,
-      "llm_calls": 5
+      "latency_s": 3.0231036999994103,
+      "cost_usd": 0.00213664,
+      "llm_calls": 3
     },
     {
       "id": "tr-078",
       "category": "multi",
       "answerable": true,
       "question": "Ürünüm garanti süresinde bozuldu, nasıl başvururum ve servise gönderim ücretini kim öder?",
-      "answer": "Ürününüz garanti süresinde bozulduysa, Hesabım sayfasından Garanti Talebi seçeneğini açarak arızayı kısaca anlatmalı ve mümkünse bir fotoğraf eklemelisiniz. Talebiniz 1 iş günü içinde değerlendirilir ve size servis bilgisi gönderilir. Arızalı ürün, KargoShop'un anlaşmalı yetkili servisine gönderilir ve servise gönderim kargo ücreti KargoShop tarafından karşılanır [Garanti Başvuru Süreci:Başvuru Adımları] [Garanti Başvuru Süreci:Yetkili Servis].",
+      "answer": "Garanti başvurusu yapmak için Hesabım sayfasından Garanti Talebi seçeneğini açıp arızayı kısaca anlatmanız ve mümkünse bir fotoğraf eklemeniz gerekir. Talebiniz 1 iş günü içinde değerlendirilir ve size servis bilgisi gönderilir. Arızalı ürün, KargoShop'un anlaşmalı yetkili servisine gönderilir ve servise gönderim kargo ücreti KargoShop tarafından karşılanır. Onarım süresi en fazla 20 iş günüdür ve bu süre ürünün serviste teslim alındığı günden itibaren hesaplanır [Garanti Başvuru Süreci:Başvuru Adımları] [Garanti Başvuru Süreci:Yetkili Servis] [Garanti Başvuru Süreci:Onarım Süresi].",
       "abstained": false,
       "ranked": [
         {
@@ -4294,9 +4312,9 @@
           "title": "Garanti Koşulları"
         },
         {
-          "doc": "iade-sureci.md",
-          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
-          "title": "İade Süreci Adım Adım"
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
         },
         {
           "doc": "iade-politikasi.md",
@@ -4309,9 +4327,9 @@
           "title": "İade Politikası (2023)"
         },
         {
-          "doc": "warranty-for-international-buyers.md",
-          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
-          "title": "Warranty for International Buyers"
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
         }
       ],
       "gold_hit": true,
@@ -4323,19 +4341,19 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant answer correctly explains the application process and states that KargoShop covers the shipping cost, matching the reference answer.",
+      "judge_reason": "The assistant correctly explains the application process and states that KargoShop covers the shipping cost, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.7133429999994405,
-      "cost_usd": 0.00197373,
-      "llm_calls": 5
+      "latency_s": 3.8712573000011616,
+      "cost_usd": 0.00214993,
+      "llm_calls": 3
     },
     {
       "id": "tr-079",
       "category": "conflict",
       "answerable": true,
       "question": "Kulak içi kulaklık iade edilebilir mi?",
-      "answer": "Ambalajı açılmış kulak içi kulaklıklar iade edilemez. Ancak ambalajı açılmamış ise iade edilebilir. [İade Politikası:İade Edilemeyen Ürünler]",
+      "answer": "Ambalajı açılmış kulak içi kulaklıklar iade edilemez. Bu kural 15 Ocak 2025 tarihinden itibaren geçerli olan iade politikasına göre uygulanmaktadır. Ayrıca kişisel bakım ürünleri ve açılmış yazılım paketleri de iade edilemeyen ürünler arasındadır [İade Politikası:İade Edilemeyen Ürünler].",
       "abstained": false,
       "ranked": [
         {
@@ -4364,9 +4382,9 @@
           "title": "Hasarlı veya Eksik Ürün"
         },
         {
-          "doc": "siparis-iptali.md",
-          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
-          "title": "Sipariş İptali"
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Yürürlük Tarihi",
+          "title": "İade Politikası"
         }
       ],
       "gold_hit": true,
@@ -4377,20 +4395,20 @@
         "recall@8": 1.0
       },
       "mrr": 0.5,
-      "correct": true,
-      "judge_reason": "The assistant's answer matches the reference by stating that unopened in-ear headphones can be returned, while opened ones cannot.",
+      "correct": false,
+      "judge_reason": "The assistant answer omits that unopened in-ear headphones can be returned, which is stated in the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 2.8245959000000767,
-      "cost_usd": 0.0016955700000000002,
-      "llm_calls": 5
+      "latency_s": 2.0311232000003656,
+      "cost_usd": 0.00198802,
+      "llm_calls": 3
     },
     {
       "id": "tr-080",
       "category": "conflict",
       "answerable": true,
       "question": "İade bedelinin 10 iş günü içinde yattığını biliyordum, hâlâ öyle mi?",
-      "answer": "İade bedeli, ürün depoya ulaşıp kontrolden geçtikten sonra 5 iş günü içinde ödeme aynı yönteme iade edilir. Bu süre 10 iş günü değildir, 5 iş günüdür. Kapıda ödeme yapılan siparişlerde ise iade, hesap sahibinin IBAN numarasına yapılır [İade Politikası:Geri Ödeme Süresi].",
+      "answer": "Hayır, iade bedelinin geri ödemesi artık ürün depoya ulaşıp kontrolden geçtikten sonra 5 iş günü içinde aynı ödeme yöntemine yapılmaktadır. Önceki kural olan 10 iş günü içinde ödeme iadesi artık geçerli değildir ve 2025 tarihli güncel politika uygulanmaktadır [İade Politikası: Geri Ödeme Süresi].",
       "abstained": false,
       "ranked": [
         {
@@ -4409,14 +4427,14 @@
           "title": "İade Süreci Adım Adım"
         },
         {
-          "doc": "stok-ve-on-siparis.md",
-          "section": "Stok ve Ön Sipariş > Stok Bildirimi | Stok ve Ön Sipariş > Ön Sipariş | Stok ve Ön Sipariş > Ön Sipariş İptali | Stok ve Ön Sipariş > Stok Yetersizliği",
-          "title": "Stok ve Ön Sipariş"
-        },
-        {
           "doc": "garanti-basvuru.md",
           "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
           "title": "Garanti Başvuru Süreci"
+        },
+        {
+          "doc": "stok-ve-on-siparis.md",
+          "section": "Stok ve Ön Sipariş > Stok Bildirimi | Stok ve Ön Sipariş > Ön Sipariş | Stok ve Ön Sipariş > Ön Sipariş İptali | Stok ve Ön Sipariş > Stok Yetersizliği",
+          "title": "Stok ve Ön Sipariş"
         },
         {
           "doc": "degisim-politikasi.md",
@@ -4433,12 +4451,12 @@
       },
       "mrr": 1.0,
       "correct": true,
-      "judge_reason": "The assistant correctly states the updated refund period as 5 business days after warehouse inspection, matching the reference answer.",
+      "judge_reason": "The assistant correctly states the updated refund policy as 5 business days after warehouse inspection, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.6606548999998267,
-      "cost_usd": 0.0017705499999999999,
-      "llm_calls": 5
+      "latency_s": 2.5156032000008963,
+      "cost_usd": 0.0020450499999999996,
+      "llm_calls": 3
     }
   ]
 }

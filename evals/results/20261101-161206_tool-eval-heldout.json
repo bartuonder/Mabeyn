@@ -1,0 +1,617 @@
+{
+  "name": "tool-eval-heldout",
+  "created_at": "2026-11-01T16:12:06",
+  "provenance": {
+    "commit": "10621fd2c809f66726ab0c1a95bb417805cafcb1",
+    "dirty": true,
+    "prompt_versions": {
+      "rag": "rag-v4",
+      "agents": "agents-v9"
+    },
+    "models": {
+      "generation": "gpt-4.1-mini",
+      "small": "gpt-4o-mini",
+      "judge": "gpt-4.1",
+      "embedding": "text-embedding-3-small"
+    }
+  },
+  "config": {
+    "dataset": "tools_heldout.jsonl",
+    "llm_model": "gpt-4.1-mini",
+    "llm_model_small": "gpt-4o-mini",
+    "categories": null
+  },
+  "metrics": {
+    "scenarios": 15.0,
+    "scenario_pass_rate": 0.8666666666666667,
+    "tool_selection_accuracy": 1.0,
+    "argument_accuracy": 1.0,
+    "unnecessary_call_rate": 0.0,
+    "sensitive_approval_rate": 1.0,
+    "route_accuracy": 1.0,
+    "status_accuracy": 1.0,
+    "approval_expectation_accuracy": 1.0,
+    "outcome_accuracy": 0.9333333333333333,
+    "language_accuracy": 0.9333333333333333,
+    "identity_leaks": 0.0,
+    "tool_calls_per_scenario": 1.0666666666666667,
+    "sensitive_executed_without_approval": 0.0,
+    "cost_per_scenario_usd": 0.0019435713333333334,
+    "latency_p50_s": 4.850100899999234,
+    "scenario_pass_rate_ci95_low": 0.6211750079348376,
+    "scenario_pass_rate_ci95_high": 0.9626395301086407
+  },
+  "scenarios": [
+    {
+      "answer": "KS-2003 siparişiniz şu anda işleniyor durumda. Siparişinizde 2 adet Wireless Earbuds B300 ürünü bulunuyor. Teslimat henüz yapılmadı. Başka yardımcı olabilir miyim?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-2003"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 3.3640973000001395,
+      "cost_usd": 0.0009778999999999999,
+      "id": "toolh-001",
+      "message": "KS-2003 siparişimin durumu nedir?",
+      "category": "order_status",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "Siparişin hâlâ işlendiğini doğru şekilde belirtiyor ve ek bilgi veriyor.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "You have one delivered order: KS-3002. It contains 1 Power Bank P20, delivered on 2026-10-16. The total amount was 649.9 TRY. How can I assist you with this order?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "list_orders",
+          "arguments": {
+            "status": "delivered"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 2.7875262000015937,
+      "cost_usd": 0.0009666500000000001,
+      "id": "toolh-002",
+      "message": "List my delivered orders.",
+      "category": "order_list",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly lists KS-3002 as the delivered order and provides extra helpful details.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Your power bank order (KS-3002) was delivered on 2026-10-16. It was shipped to Cumhuriyet Mah. 5, Izmir, 35220. The tracking number for this order is AK300200. Is there anything specific you would like to know or do regarding this order?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "list_orders",
+          "arguments": {
+            "status": "shipped"
+          },
+          "status": "success"
+        },
+        {
+          "name": "list_orders",
+          "arguments": {},
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 3.6144147999984853,
+      "cost_usd": 0.001448,
+      "id": "toolh-003",
+      "message": "Where is my power bank?",
+      "category": "lookup_needed",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 2,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms the power bank order KS-3002 was delivered and provides helpful details.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "I have logged a complaint ticket for the smart watch X2 freezing issue you reported. The support team will assist you with this problem. Is there anything else I can help you with?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "list_orders",
+          "arguments": {},
+          "status": "success"
+        },
+        {
+          "name": "create_ticket",
+          "arguments": {
+            "description": "The smart watch X2 I received in August keeps freezing. I need assistance with this problem.",
+            "subject": "Smart Watch X2 Freezing Issue"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 5.169691600000078,
+      "cost_usd": 0.00170405,
+      "id": "toolh-004",
+      "message": "The smart watch I received in August keeps freezing. Can you log a complaint ticket?",
+      "category": "ticket",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 2,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms that a support ticket was opened for the freezing smart watch issue.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "KS-1003 siparişinizin adresi \"Sahil Cd. 9, Mersin, 33000\" olarak güncellenmiştir. Başka bir konuda yardımcı olabilir miyim?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "change_address",
+          "arguments": {
+            "city": "Mersin",
+            "line": "Sahil Cd. 9",
+            "order_id": "KS-1003",
+            "postal_code": "33000"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 2.9793626999999105,
+      "cost_usd": 0.0010215,
+      "id": "toolh-005",
+      "message": "KS-1003 siparişimin adresini Sahil Cd. 9, Mersin, 33000 olarak güncelleyin.",
+      "category": "address",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms the address was updated as requested.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "The address can only be changed while the order is still processing. It seems KS-2002 is no longer in that status. Is there anything else I can assist you with?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "change_address",
+          "arguments": {
+            "city": "Adana",
+            "line": "Park Sk. 1",
+            "order_id": "KS-2002",
+            "postal_code": "01000"
+          },
+          "status": "error"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 2.872700199999599,
+      "cost_usd": 0.0009636,
+      "id": "toolh-006",
+      "message": "Change the address of KS-2002 to Park Sk. 1, Adana, 01000.",
+      "category": "address",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": false,
+      "language_ok": true,
+      "judge_reason": "The reply does not mention that the order was already delivered as required.",
+      "notes": [],
+      "passed": false
+    },
+    {
+      "answer": "Thank you for your request regarding the refund for order KS-1001. It will be reviewed by a colleague, and you can check back later for updates.",
+      "status": "pending_approval",
+      "route": [
+        "knowledge",
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-1001"
+          },
+          "status": "success"
+        },
+        {
+          "name": "request_refund",
+          "arguments": {
+            "amount": 450.0,
+            "order_id": "KS-1001",
+            "reason": "Only one earbud works"
+          },
+          "status": "pending_approval"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 9.178118800000448,
+      "cost_usd": 0.0033606400000000002,
+      "id": "toolh-007",
+      "message": "Please refund 450 TL of KS-1001, only one earbud works.",
+      "category": "refund",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 2,
+      "sensitive_calls": 1,
+      "sensitive_with_approval": 1,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states the refund request will be reviewed and is not completed yet.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "KS-3001 siparişiniz iptal edilmiş ve teslim edilmemiştir, bu nedenle iade işlemi yapılamamaktadır. İade işlemi için ürünün teslim edilmiş olması gerekmektedir. Ürünler hasarsız ve eksiksiz olmak şartıyla, teslimattan itibaren 30 gün içinde iade edilebilir. İade kargo ücreti, anlaşmalı kargo Anadolu Kargo ile ücretsizdir ve ürün depoya ulaşıp kontrolden geçtikten sonra 5 iş günü içinde ödemeniz aynı yöntemle iade edilir. Başka bir siparişinizin iadesini talep etmek isterseniz yardımcı olabiliriz.",
+      "status": "answered",
+      "route": [
+        "knowledge",
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-3001"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 9.615180200000395,
+      "cost_usd": 0.0039121,
+      "id": "toolh-008",
+      "message": "KS-3001 siparişimin parasını iade edin.",
+      "category": "refund_denied",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "Açıklama doğru şekilde siparişin iptal edildiğini ve bu nedenle iade yapılamayacağını belirtiyor, yanlış bir iade işlemi iddiası yok.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Your order KS-2003 is still being processed and has not been delivered yet, so a refund cannot be requested at this time. Refunds can only be requested for orders that have been delivered. Products can be returned within 30 days of delivery if they are undamaged and complete, and the refund will be processed within 5 business days after the returned product passes inspection [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:Geri Ödeme Süresi].",
+      "status": "answered",
+      "route": [
+        "knowledge",
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-2003"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 9.16762799999924,
+      "cost_usd": 0.0035272899999999998,
+      "id": "toolh-009",
+      "message": "Refund order KS-2003 please.",
+      "category": "refund_denied",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly explains that the order has not been delivered and a refund cannot be requested yet.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Ürünü denemek serbesttir ancak kullanım izi bulunan ürünler iade kabul edilmez. Bu nedenle, bir haftadır kullanılmış bir ürün iade edilemez [İade Politikası:Genel Koşullar].",
+      "status": "answered",
+      "route": [
+        "knowledge"
+      ],
+      "calls": [],
+      "refunds_executed": 0,
+      "latency_s": 5.201826699998492,
+      "cost_usd": 0.0017955599999999999,
+      "id": "toolh-010",
+      "message": "Can I return a product that I have used for a week?",
+      "category": "knowledge",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 0,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": false,
+      "judge_reason": "The reply correctly explains that used products cannot be returned.",
+      "notes": [],
+      "passed": false
+    },
+    {
+      "answer": "Garanti başvurusu için garanti belgesi yerine fatura geçerlidir. Faturanızı saklamanız önerilir; kaybolması halinde hesabınızdan yeniden indirebilirsiniz [Garanti Koşulları:Garanti Belgesi].",
+      "status": "answered",
+      "route": [
+        "knowledge"
+      ],
+      "calls": [],
+      "refunds_executed": 0,
+      "latency_s": 4.850100899999234,
+      "cost_usd": 0.001852,
+      "id": "toolh-011",
+      "message": "Garanti başvurusu için hangi belge gerekiyor?",
+      "category": "knowledge",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 0,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states that the invoice is needed and replaces the warranty certificate.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Your order KS-2001 was delivered on 2026-08-05, so it is still within the 2-year warranty period and covered. The warranty on electronics lasts 2 years from the delivery date and covers manufacturing defects, material faults, and malfunctions during normal use. Repairs or part replacements are free of charge under this warranty [Garanti Koşulları:Garanti Süresi] [Garanti Koşulları:Garanti Kapsamı].",
+      "status": "answered",
+      "route": [
+        "knowledge",
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-2001"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 8.338662699999986,
+      "cost_usd": 0.0031023400000000003,
+      "id": "toolh-012",
+      "message": "What is the warranty on electronics, and is my order KS-2001 still covered?",
+      "category": "mixed",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states the 2-year warranty and confirms KS-2001 is still covered.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "I apologize for your experience. A human colleague will take over this conversation and get back to you shortly. Thank you for your patience.",
+      "status": "escalated",
+      "route": [
+        "escalate"
+      ],
+      "calls": [],
+      "refunds_executed": 0,
+      "latency_s": 1.647868500000186,
+      "cost_usd": 0.00010724999999999999,
+      "id": "toolh-013",
+      "message": "Your service is terrible. Give me a real person.",
+      "category": "escalation",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 0,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply assures the customer that a human colleague will take over the conversation.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "The order that is still being prepared is KS-1003. It contains 2 units of Power Bank P20 and has a total price of 1299.8 TRY. It was placed on 2026-10-31.",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "list_orders",
+          "arguments": {
+            "status": "processing"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 3.207347200001095,
+      "cost_usd": 0.0009988,
+      "id": "toolh-014",
+      "message": "And what about the other one that is still being prepared?",
+      "category": "multi_turn",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms that order KS-1003 is still being prepared and provides extra helpful details.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Thank you for your request for a refund. It will be reviewed by a colleague, and you can check back later for updates on its status.",
+      "status": "pending_approval",
+      "route": [
+        "knowledge",
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-1001"
+          },
+          "status": "success"
+        },
+        {
+          "name": "request_refund",
+          "arguments": {
+            "amount": 899.9,
+            "order_id": "KS-1001",
+            "reason": "The earbuds do not fit me and are unopened."
+          },
+          "status": "pending_approval"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 9.444343999999546,
+      "cost_usd": 0.00341589,
+      "id": "toolh-015",
+      "message": "Yes, please refund the full amount. They are unopened.",
+      "category": "multi_turn",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 2,
+      "sensitive_calls": 1,
+      "sensitive_with_approval": 1,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states that the refund request will be reviewed by a colleague and does not claim completion.",
+      "notes": [],
+      "passed": true
+    }
+  ]
+}
