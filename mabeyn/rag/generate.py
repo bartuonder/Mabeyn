@@ -15,7 +15,11 @@ def format_sources(chunks: Sequence[RetrievedChunk]) -> str:
     parts = []
     for chunk in chunks:
         date_attr = f' effective_date="{chunk.effective_date}"' if chunk.effective_date else ""
-        parts.append(f'<source cite="{chunk.cite}"{date_attr}>\n{chunk.content}\n</source>')
+        tags = " ".join(f"[{tag}]" for tag in chunk.cites)
+        parts.append(
+            f'<source document="{chunk.document_title}"{date_attr} tags="{tags}">\n'
+            f"{chunk.content}\n</source>"
+        )
     return "\n\n".join(parts) if parts else "(no sources)"
 
 
@@ -65,7 +69,8 @@ def extract_citations(answer: str, chunks: Sequence[RetrievedChunk]) -> list[Cit
     """Resolve citation tags in the answer to retrieved chunks; unknown tags are ignored."""
     by_cite: dict[str, list[RetrievedChunk]] = {}
     for chunk in chunks:
-        by_cite.setdefault(chunk.cite, []).append(chunk)
+        for tag in chunk.cites:
+            by_cite.setdefault(tag, []).append(chunk)
 
     citations: list[Citation] = []
     seen: set[str] = set()
@@ -89,7 +94,7 @@ def extract_citations(answer: str, chunks: Sequence[RetrievedChunk]) -> list[Cit
 
 
 def strip_unknown_tags(answer: str, chunks: Sequence[RetrievedChunk]) -> str:
-    valid = {c.cite for c in chunks}
+    valid = {tag for c in chunks for tag in c.cites}
     return TAG_RE.sub(lambda m: m.group(0) if m.group(1).strip() in valid else "", answer)
 
 

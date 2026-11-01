@@ -8,6 +8,7 @@ from mabeyn.rag import prompts
 from mabeyn.rag.generate import (
     build_messages,
     extract_citations,
+    format_sources,
     generate_answer,
     safe_fallback,
     strip_unknown_tags,
@@ -104,10 +105,23 @@ def test_prompt_marks_sources_as_data_and_includes_dates():
     assert messages[0]["role"] == "system" and "KargoShop" in messages[0]["content"]
     assert "untrusted" in messages[0]["content"]
     assert (
-        '<source cite="Return Policy:Eligibility" effective_date="2025-01-01">'
-        in messages[-1]["content"]
+        '<source document="Return Policy" effective_date="2025-01-01" '
+        'tags="[Return Policy:Eligibility]">' in messages[-1]["content"]
     )
     assert prompts.PROMPT_VERSION
+
+
+def test_merged_chunk_offers_a_tag_per_section_and_resolves_each():
+    merged = make_chunk(
+        title="Return Policy", section="Return Policy > Period | Return Policy > Shipping Cost"
+    )
+    assert merged.cites == ["Return Policy:Period", "Return Policy:Shipping Cost"]
+    assert "[Return Policy:Period] [Return Policy:Shipping Cost]" in format_sources([merged])
+
+    answer = "Free shipping [Return Policy:Shipping Cost]."
+    (citation,) = extract_citations(answer, [merged])
+    assert citation.cite == "Return Policy:Shipping Cost"
+    assert citation.chunk_ids == (merged.chunk_id,)
 
 
 def test_history_is_trimmed_to_recent_messages():

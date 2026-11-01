@@ -24,11 +24,17 @@ class RetrievedChunk:
     score: float
 
     @property
+    def cites(self) -> list[str]:
+        """One `document:heading` tag per section the chunk covers."""
+        title = _clean(self.document_title)
+        headings = [
+            label.split(PATH_SEPARATOR)[-1] for label in self.section.split(SECTION_SEPARATOR)
+        ]
+        return [f"{title}:{_clean(h)}" for h in headings if h.strip()] or [title + ":"]
+
+    @property
     def cite(self) -> str:
-        """Citation tag text: `document:section` using the first section's last heading."""
-        first_path = self.section.split(SECTION_SEPARATOR)[0]
-        heading = first_path.split(PATH_SEPARATOR)[-1]
-        return f"{_clean(self.document_title)}:{_clean(heading)}"
+        return self.cites[0]
 
 
 @dataclass(frozen=True)
