@@ -6,7 +6,7 @@ from mabeyn.llm.client import LLM, LLMError, chat_json
 from mabeyn.rag import prompts
 from mabeyn.rag.types import RetrievedChunk
 
-PASSAGE_CHARS = 700
+PASSAGE_CHARS = 1500
 
 
 class Reranker(Protocol):

@@ -168,3 +168,13 @@ async def test_grader_sees_effective_dates_to_resolve_conflicts(tenant):
     )
     assert "effective_date: 2025-" in grade_prompt
     assert "latest effective_date" in prompts.GRADE_SYSTEM
+
+
+async def test_grader_receives_whole_merged_chunks(tenant):
+    script = Script()
+    _, llm = await run(tenant, script, RagConfig())
+    grade_prompt = next(
+        m[1]["content"] for _, m in llm.chat_calls if script.kind(m[0]["content"]) == "grade"
+    )
+    # The late sections of long merged chunks must not be cut off before grading.
+    assert "Gümrük" in grade_prompt or "KKTC Kargo Ücreti" in grade_prompt

@@ -22,7 +22,7 @@ from mabeyn.rag.retrieval import embed_query, vector_search
 from mabeyn.rag.service import Final, RagEvent, Retract, Token
 from mabeyn.rag.types import RetrievedChunk
 
-GRADE_PASSAGE_CHARS = 600
+GRADE_PASSAGE_CHARS = 2000
 FAITHFULNESS_MAX_TOKENS = 300
 
 
