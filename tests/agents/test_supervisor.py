@@ -1,3 +1,5 @@
+import contextlib
+
 from mabeyn.agents.action import AGENT_RISKS, MAX_TOOL_CALLS
 from mabeyn.agents.service import SupervisorService
 from mabeyn.db import models as m
@@ -301,3 +303,20 @@ async def test_unknown_language_falls_back_to_mirroring_the_customer(fresh_tenan
         m[0]["content"] for _, m in env.llm.chat_calls if m[0]["content"].startswith("Write one")
     )
     assert "Write in the language the customer used" in prompt
+
+
+async def test_resuming_twice_does_not_refund_twice(fresh_tenant, checkpointer):
+    brain = Brain(
+        route=["action"],
+        tool_turns=[tool_call("request_refund", **REFUND), say("Refund submitted."), say("Again.")],
+    )
+    env = await build_env(fresh_tenant, checkpointer, brain)
+    await env.ask("Refund KS-1001")
+    await env.service.resume(env.turn(), approved=True, note=None)
+    assert len(env.store.refunds) == 1
+
+    # A second, stale resume on the finished thread must not run the tool again.
+    with contextlib.suppress(Exception):  # LangGraph may reject a resume on a finished thread
+        await env.service.resume(env.turn(), approved=True, note=None)
+    assert len(env.store.refunds) == 1
+    assert len([c for c in await env.tool_calls() if c.tool_name == "request_refund"]) == 1

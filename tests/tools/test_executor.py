@@ -185,3 +185,18 @@ async def test_against_the_mock_shop_backend(allow_shop):
     )
     assert own.ok and own.data["status"] == "delivered"
     assert not foreign.ok and foreign.status_code == 404
+
+
+async def test_writes_carry_a_stable_idempotency_key_and_reads_do_not(allow_shop):
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append((request.method, request.headers.get("idempotency-key")))
+        return json_response({"ok": 1})
+
+    run = executor(handler)
+    await run.execute(ToolEndpoint("POST", "http://shop/refund"), {}, CONTEXT, "call-1")
+    await run.execute(ToolEndpoint("POST", "http://shop/refund"), {}, CONTEXT, "call-1")
+    await run.execute(ToolEndpoint("GET", "http://shop/orders"), {}, CONTEXT, "call-2")
+    await run.execute(ToolEndpoint("PUT", "http://shop/address"), {}, CONTEXT)
+    assert seen == [("POST", "call-1"), ("POST", "call-1"), ("GET", None), ("PUT", None)]

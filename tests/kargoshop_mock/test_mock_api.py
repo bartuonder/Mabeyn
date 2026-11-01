@@ -95,3 +95,43 @@ async def test_each_store_is_independent():
     first, second = Store(), Store()
     first.orders["KS-1001"]["status"] = "cancelled"
     assert second.orders["KS-1001"]["status"] == "delivered"
+
+
+async def test_repeating_a_write_with_the_same_key_acts_only_once(shop):
+    refund = {"customer_id": "customer-1", "amount": 899.90, "reason": "Changed my mind"}
+    first = await shop.post(
+        "/orders/KS-1001/refund", json=refund, headers={"Idempotency-Key": "k1"}
+    )
+    again = await shop.post(
+        "/orders/KS-1001/refund", json=refund, headers={"Idempotency-Key": "k1"}
+    )
+    other = await shop.post(
+        "/orders/KS-1001/refund", json=refund, headers={"Idempotency-Key": "k2"}
+    )
+
+    assert first.status_code == again.status_code == 201
+    assert first.json() == again.json()
+    assert len(shop.store.refunds) == 1
+    assert other.status_code == 409  # a different attempt is still refused
+
+
+async def test_idempotency_covers_tickets_and_address_changes(shop):
+    ticket = {"customer_id": "customer-1", "subject": "Late parcel", "description": "Not here yet"}
+    for _ in range(2):
+        await shop.post("/tickets", json=ticket, headers={"Idempotency-Key": "t1"})
+    assert len(shop.store.tickets) == 1
+
+    address = {
+        "customer_id": "customer-1",
+        "line": "Yeni Sk. 4",
+        "city": "Bursa",
+        "postal_code": "16000",
+    }
+    first = await shop.put(
+        "/orders/KS-1003/address", json=address, headers={"Idempotency-Key": "a1"}
+    )
+    shop.store.orders["KS-1003"]["status"] = "shipped"
+    again = await shop.put(
+        "/orders/KS-1003/address", json=address, headers={"Idempotency-Key": "a1"}
+    )
+    assert first.status_code == again.status_code == 200

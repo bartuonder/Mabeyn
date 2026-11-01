@@ -110,7 +110,7 @@ async def finish_call(tenant_id: uuid.UUID, call_id: uuid.UUID, result: ToolResu
         if call is None:
             return
         call.status = ToolCallStatus.SUCCESS if result.ok else ToolCallStatus.ERROR
-        call.result = {"status": result.status_code, "data": result.for_model(STORED_RESULT_CHARS)}
+        call.result = {"status": result.status_code, "data": _storable(result.data)}
         call.error = result.error
         call.duration_ms = result.duration_ms
 
@@ -121,6 +121,28 @@ async def reject_call(tenant_id: uuid.UUID, call_id: uuid.UUID, reason: str) -> 
         if call is not None:
             call.status = ToolCallStatus.REJECTED
             call.error = reason[:500]
+
+
+def _storable(data: Any) -> Any:
+    """Keep small results as structured JSON and cut large ones."""
+    text = json.dumps(data, ensure_ascii=False, default=str)
+    return data if len(text) <= STORED_RESULT_CHARS else {"truncated": text[:STORED_RESULT_CHARS]}
+
+
+async def finished_result(tenant_id: uuid.UUID, call_id: uuid.UUID) -> ToolResult | None:
+    """The stored outcome of a call that already ran, so it is never executed twice."""
+    async with tenant_session(tenant_id) as session:
+        call = await session.get(ToolCall, call_id)
+        if call is None or call.status not in (ToolCallStatus.SUCCESS, ToolCallStatus.ERROR):
+            return None
+        stored = call.result or {}
+        return ToolResult(
+            ok=call.status is ToolCallStatus.SUCCESS,
+            data=stored.get("data"),
+            error=call.error,
+            status_code=stored.get("status"),
+            duration_ms=call.duration_ms or 0,
+        )
 
 
 def parse_arguments(tool: LoadedTool, raw: str) -> dict[str, Any] | str:
@@ -156,6 +178,10 @@ class ToolRunner:
         call_id = call_id or await start_call(
             context.tenant_id, conversation_id, tool.name, arguments
         )
-        result = await self.executor.execute(tool.endpoint, arguments, context)
+        if (done := await finished_result(context.tenant_id, call_id)) is not None:
+            return done
+        result = await self.executor.execute(
+            tool.endpoint, arguments, context, idempotency_key=str(call_id)
+        )
         await finish_call(context.tenant_id, call_id, result)
         return result

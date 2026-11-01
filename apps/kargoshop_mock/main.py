@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import FastAPI, Header, HTTPException, Query, status
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 ORDERS_FILE = Path(__file__).resolve().parents[2] / "seed" / "kargoshop" / "orders.json"
@@ -49,6 +50,7 @@ class Store:
         self.orders: dict[str, dict[str, Any]] = {o["id"]: o for o in copy.deepcopy(raw["orders"])}
         self.tickets: list[dict[str, Any]] = []
         self.refunds: list[dict[str, Any]] = []
+        self.replays: dict[str, tuple[int, Any]] = {}
 
     def order_for(self, order_id: str, customer_id: str) -> dict[str, Any]:
         order = self.orders.get(order_id)
@@ -56,6 +58,23 @@ class Store:
         if order is None or order["customer_id"] != customer_id:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Order not found")
         return order
+
+
+IdempotencyKey = Annotated[str | None, Header()]
+
+
+def replayed(store: Store, scope: str, key: str | None) -> JSONResponse | None:
+    """Answer a repeated request with the original response instead of acting again."""
+    if key and f"{scope}:{key}" in store.replays:
+        code, body = store.replays[f"{scope}:{key}"]
+        return JSONResponse(body, status_code=code)
+    return None
+
+
+def remember(store: Store, scope: str, key: str | None, code: int, body: Any) -> Any:
+    if key:
+        store.replays[f"{scope}:{key}"] = (code, body)
+    return body
 
 
 def create_app(store: Store | None = None) -> FastAPI:
@@ -81,16 +100,20 @@ def create_app(store: Store | None = None) -> FastAPI:
     async def get_order(order_id: str, customer_id: str) -> dict[str, Any]:
         return store.order_for(order_id, customer_id)
 
-    @app.post("/tickets", status_code=status.HTTP_201_CREATED)
-    async def create_ticket(
-        body: TicketIn, x_tenant_id: Annotated[str | None, Header()] = None
-    ) -> dict[str, Any]:
+    @app.post("/tickets", status_code=status.HTTP_201_CREATED, response_model=None)
+    async def create_ticket(body: TicketIn, idempotency_key: IdempotencyKey = None) -> Any:
+        if (again := replayed(store, "ticket", idempotency_key)) is not None:
+            return again
         ticket = {"id": f"T-{uuid.uuid4().hex[:8].upper()}", "status": "open", **body.model_dump()}
         store.tickets.append(ticket)
-        return ticket
+        return remember(store, "ticket", idempotency_key, 201, ticket)
 
-    @app.post("/orders/{order_id}/refund", status_code=status.HTTP_201_CREATED)
-    async def request_refund(order_id: str, body: RefundIn) -> dict[str, Any]:
+    @app.post("/orders/{order_id}/refund", status_code=status.HTTP_201_CREATED, response_model=None)
+    async def request_refund(
+        order_id: str, body: RefundIn, idempotency_key: IdempotencyKey = None
+    ) -> Any:
+        if (again := replayed(store, "refund", idempotency_key)) is not None:
+            return again
         order = store.order_for(order_id, body.customer_id)
         if order["status"] != "delivered":
             raise HTTPException(status.HTTP_409_CONFLICT, "Only delivered orders can be refunded")
@@ -109,10 +132,14 @@ def create_app(store: Store | None = None) -> FastAPI:
             "status": "initiated",
         }
         store.refunds.append(refund)
-        return refund
+        return remember(store, "refund", idempotency_key, 201, refund)
 
-    @app.put("/orders/{order_id}/address")
-    async def change_address(order_id: str, body: AddressChangeIn) -> dict[str, Any]:
+    @app.put("/orders/{order_id}/address", response_model=None)
+    async def change_address(
+        order_id: str, body: AddressChangeIn, idempotency_key: IdempotencyKey = None
+    ) -> Any:
+        if (again := replayed(store, "address", idempotency_key)) is not None:
+            return again
         order = store.order_for(order_id, body.customer_id)
         if order["status"] != "processing":
             raise HTTPException(
@@ -120,7 +147,7 @@ def create_app(store: Store | None = None) -> FastAPI:
                 "The address can only change while the order is processing",
             )
         order["address"] = body.model_dump(exclude={"customer_id"})
-        return order
+        return remember(store, "address", idempotency_key, 200, order)
 
     return app
 

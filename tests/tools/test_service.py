@@ -125,7 +125,7 @@ async def test_runner_executes_and_audits_a_successful_call(fresh_tenant, shop_r
     row = await audit(fresh_tenant, call_id)
     assert result.ok and row.status is m.ToolCallStatus.SUCCESS
     assert row.arguments == {"order_id": "KS-1001"} and row.duration_ms is not None
-    assert "delivered" in row.result["data"]
+    assert row.result["data"]["status"] == "delivered"
 
 
 async def test_runner_audits_failures_and_blocks_other_customers_data(fresh_tenant, shop_runner):
@@ -139,3 +139,25 @@ async def test_runner_audits_failures_and_blocks_other_customers_data(fresh_tena
     async with tenant_session(fresh_tenant) as s:
         row = await s.scalar(select(m.ToolCall).where(m.ToolCall.conversation_id == conv))
     assert row is not None and row.status is m.ToolCallStatus.ERROR and row.error == "http 404"
+
+
+async def test_a_finished_call_is_never_executed_twice(fresh_tenant, shop_runner):
+    await add_tool(fresh_tenant, "get_order_status", m.RiskLevel.READ)
+    (tool,) = await load_tools(fresh_tenant)
+    conv = await conversation(fresh_tenant)
+    context = ToolContext(fresh_tenant, "customer-1")
+    call_id = await start_call(fresh_tenant, conv, tool.name, {"order_id": "KS-1001"})
+
+    sent = []
+    inner = shop_runner.executor.execute
+
+    async def counting(*args, **kwargs):
+        sent.append(kwargs.get("idempotency_key"))
+        return await inner(*args, **kwargs)
+
+    shop_runner.executor.execute = counting  # type: ignore[method-assign]
+    first = await shop_runner.run(context, conv, tool, {"order_id": "KS-1001"}, call_id)
+    second = await shop_runner.run(context, conv, tool, {"order_id": "KS-1001"}, call_id)
+
+    assert sent == [str(call_id)]
+    assert second.ok and second.data == first.data and second.status_code == 200

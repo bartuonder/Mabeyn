@@ -93,7 +93,11 @@ class HttpToolExecutor:
             raise ToolExecutionError(str(exc)) from exc
 
     async def execute(
-        self, endpoint: ToolEndpoint, args: dict[str, Any], context: ToolContext
+        self,
+        endpoint: ToolEndpoint,
+        args: dict[str, Any],
+        context: ToolContext,
+        idempotency_key: str | None = None,
     ) -> ToolResult:
         started = time.perf_counter()
         method = endpoint.method.upper()
@@ -102,17 +106,25 @@ class HttpToolExecutor:
             url = build_url(endpoint.url_template, path_args)
             await self._check_host(url)
             payload = {**rest, "customer_id": context.customer_id}
-            result = await self._send(method, url, payload, context)
+            result = await self._send(method, url, payload, context, idempotency_key)
         except ToolExecutionError as exc:
             result = ToolResult(ok=False, data=None, error=str(exc))
         elapsed = int((time.perf_counter() - started) * 1000)
         return ToolResult(result.ok, result.data, result.error, result.status_code, elapsed)
 
     async def _send(
-        self, method: str, url: str, payload: dict[str, Any], context: ToolContext
+        self,
+        method: str,
+        url: str,
+        payload: dict[str, Any],
+        context: ToolContext,
+        idempotency_key: str | None,
     ) -> ToolResult:
         settings = get_settings()
         headers = {"X-Tenant-Id": str(context.tenant_id)}
+        if idempotency_key and method not in RETRYABLE_METHODS:
+            # The same call always carries the same key, so a replay cannot act twice.
+            headers["Idempotency-Key"] = idempotency_key
         request_args: dict[str, Any] = (
             {"json": payload} if method in BODY_METHODS else {"params": payload}
         )
