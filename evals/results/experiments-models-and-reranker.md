@@ -5,7 +5,7 @@
 | text-embedding-3-small, vector | 0.766 | 0.938 | 0.953 | 0.969 | 0.852 |
 | text-embedding-3-small, hybrid | 0.812 | 0.969 | 0.969 | 0.969 | 0.883 |
 | text-embedding-3-large, vector | 0.812 | 0.969 | 0.969 | 0.984 | 0.882 |
-| text-embedding-3-large, hybrid | 0.844 | 0.969 | 0.984 | 0.984 | 0.902 |
+| text-embedding-3-large, hybrid | 0.859 | 0.969 | 0.984 | 0.984 | 0.912 |
 
 ### reranker
 
