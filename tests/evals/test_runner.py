@@ -57,7 +57,7 @@ def test_unanswerable_questions_do_not_affect_recall():
         return QuestionResult(
             id="x", category="c", answerable=answerable, question="q", answer="a",
             abstained=False, ranked=[], gold_hit=False,
-            recall={"recall@1": recall, "recall@3": recall, "recall@5": recall},
+            recall={f"recall@{k}": recall for k in (1, 3, 5, 8)},
             mrr=recall, correct=True, judge_reason="", faithful=True, unsupported=[],
             latency_s=1.0, cost_usd=0.0, llm_calls=1,
         )  # fmt: skip

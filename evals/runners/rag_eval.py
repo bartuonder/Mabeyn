@@ -1,6 +1,5 @@
 import argparse
 import asyncio
-import time
 from typing import Any
 
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -9,15 +8,8 @@ from evals.budget import budget_limit, configure_ledger, spent_usd
 from evals.cache import CachingLLM
 from evals.configs import CONFIGS, build_service
 from evals.datasets import load_questions
-from evals.runner import (
-    CHUNK_PRESETS,
-    accuracy_by_category,
-    drop_tenant,
-    evaluate,
-    prepare_tenant,
-    summarize,
-    to_json,
-)
+from evals.reporting import build_result
+from evals.runner import CHUNK_PRESETS, drop_tenant, evaluate, prepare_tenant
 from evals.tracking import log_wandb, save_result
 from mabeyn.core.config import get_settings
 from mabeyn.core.tracking import export_tracking_env
@@ -62,7 +54,6 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             await drop_tenant(engine, tenant_id)
         await engine.dispose()
 
-    metrics = summarize(results, retrieval_only=args.retrieval_only)
     config = {
         "config": args.config,
         "dataset": args.dataset,
@@ -74,14 +65,8 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         "judge_model": settings.judge_model,
         "retrieval_only": args.retrieval_only,
     }
-    result = {
-        "name": args.name,
-        "created_at": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        "config": config,
-        "metrics": metrics,
-        "accuracy_by_category": {} if args.retrieval_only else accuracy_by_category(results),
-        "questions": to_json(results),
-    }
+    result = build_result(args.name, config, results, retrieval_only=args.retrieval_only)
+    metrics = result["metrics"]
     path = save_result(args.name, result)
     logged = log_wandb(args.name, config, metrics, tags=[args.config, args.chunk])
 

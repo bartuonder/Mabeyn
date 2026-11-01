@@ -21,7 +21,7 @@ from mabeyn.rag.service import Final, RagService, collect
 from mabeyn.seed import ingest_seed_documents, load_seed_documents
 
 COMPANY = "KargoShop"
-RECALL_KS = (1, 3, 5)
+RECALL_KS = (1, 3, 5, 8)
 
 CHUNK_PRESETS = {
     "default": ChunkConfig(300, 600),
