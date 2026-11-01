@@ -3,10 +3,14 @@ import re
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass
 from functools import lru_cache
-from typing import Any, Protocol, TypedDict, cast
+from typing import Any, NotRequired, Protocol, TypedDict, cast
 
 from openai import AsyncOpenAI
-from openai.types.chat import ChatCompletionMessageParam, ChatCompletionStreamOptionsParam
+from openai.types.chat import (
+    ChatCompletionMessageParam,
+    ChatCompletionStreamOptionsParam,
+    ChatCompletionToolUnionParam,
+)
 
 from mabeyn.core.config import get_settings
 from mabeyn.core.tracking import langsmith_enabled
@@ -18,6 +22,8 @@ EMBED_BATCH_SIZE = 100
 class ChatMessage(TypedDict):
     role: str
     content: str
+    tool_calls: NotRequired[list[dict[str, Any]]]
+    tool_call_id: NotRequired[str]
 
 
 @dataclass(frozen=True)
@@ -25,6 +31,34 @@ class ChatResult:
     text: str
     input_tokens: int
     output_tokens: int
+
+
+@dataclass(frozen=True)
+class ToolCallRequest:
+    id: str
+    name: str
+    arguments: str  # raw JSON text exactly as the model produced it
+
+
+@dataclass(frozen=True)
+class ToolChatResult:
+    text: str
+    tool_calls: tuple[ToolCallRequest, ...]
+    input_tokens: int
+    output_tokens: int
+
+    def as_assistant_message(self) -> ChatMessage:
+        message: ChatMessage = {"role": "assistant", "content": self.text}
+        if self.tool_calls:
+            message["tool_calls"] = [
+                {
+                    "id": call.id,
+                    "type": "function",
+                    "function": {"name": call.name, "arguments": call.arguments},
+                }
+                for call in self.tool_calls
+            ]
+        return message
 
 
 class LLMError(Exception):
@@ -41,6 +75,16 @@ class LLM(Protocol):
         max_tokens: int | None = None,
         json_mode: bool = False,
     ) -> ChatResult: ...
+
+    async def chat_with_tools(
+        self,
+        messages: Sequence[ChatMessage],
+        tools: Sequence[dict[str, Any]],
+        *,
+        model: str | None = None,
+        temperature: float = 0.0,
+        max_tokens: int | None = None,
+    ) -> ToolChatResult: ...
 
     def stream(
         self,
@@ -90,6 +134,37 @@ class OpenAILLM:
         output_tokens = used.completion_tokens if used else 0
         usage.record(model, input_tokens, output_tokens)
         return ChatResult(response.choices[0].message.content or "", input_tokens, output_tokens)
+
+    async def chat_with_tools(
+        self,
+        messages: Sequence[ChatMessage],
+        tools: Sequence[dict[str, Any]],
+        *,
+        model: str | None = None,
+        temperature: float = 0.0,
+        max_tokens: int | None = None,
+    ) -> ToolChatResult:
+        model = model or self._settings.llm_model
+        response = await self._client.chat.completions.create(
+            model=model,
+            messages=_to_params(messages),
+            tools=cast("list[ChatCompletionToolUnionParam]", list(tools)),
+            tool_choice="auto",
+            parallel_tool_calls=False,
+            temperature=temperature,
+            max_completion_tokens=max_tokens,
+        )
+        used = response.usage
+        input_tokens = used.prompt_tokens if used else 0
+        output_tokens = used.completion_tokens if used else 0
+        usage.record(model, input_tokens, output_tokens)
+        message = response.choices[0].message
+        calls = tuple(
+            ToolCallRequest(call.id, call.function.name, call.function.arguments)
+            for call in (message.tool_calls or [])
+            if call.type == "function"
+        )
+        return ToolChatResult(message.content or "", calls, input_tokens, output_tokens)
 
     async def stream(
         self,

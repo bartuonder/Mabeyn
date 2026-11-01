@@ -114,3 +114,37 @@ async def test_chat_json_parses_model_reply():
         return httpx.Response(200, json=chat_response('{"ok": true}'))
 
     assert await chat_json(make_llm(handler), [{"role": "user", "content": "x"}]) == {"ok": True}
+
+
+async def test_chat_with_tools_returns_tool_calls_and_sends_the_tools():
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.update(json.loads(request.content))
+        body = chat_response("")
+        body["choices"][0]["message"]["tool_calls"] = [
+            {
+                "id": "call_9",
+                "type": "function",
+                "function": {"name": "get_order_status", "arguments": '{"order_id": "KS-1"}'},
+            }
+        ]
+        body["choices"][0]["finish_reason"] = "tool_calls"
+        return httpx.Response(200, json=body)
+
+    tools = [{"type": "function", "function": {"name": "get_order_status", "parameters": {}}}]
+    result = await make_llm(handler).chat_with_tools([{"role": "user", "content": "where?"}], tools)
+
+    assert [(c.id, c.name, c.arguments) for c in result.tool_calls] == [
+        ("call_9", "get_order_status", '{"order_id": "KS-1"}')
+    ]
+    assert seen["tools"] == tools and seen["parallel_tool_calls"] is False
+    echoed = result.as_assistant_message()
+    assert echoed["tool_calls"][0]["function"]["name"] == "get_order_status"
+
+
+async def test_chat_with_tools_plain_answer_has_no_calls():
+    llm = make_llm(lambda request: httpx.Response(200, json=chat_response("hello")))
+    result = await llm.chat_with_tools([{"role": "user", "content": "hi"}], [])
+    assert result.text == "hello" and result.tool_calls == ()
+    assert "tool_calls" not in result.as_assistant_message()

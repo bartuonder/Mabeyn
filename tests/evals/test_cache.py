@@ -79,3 +79,16 @@ async def test_cached_latency_is_replayed_into_the_meter(tmp_path):
     with usage.measure() as meter:
         await llm.chat(MESSAGES)
     assert meter.latency_adjustment_s == pytest.approx(1.5)
+
+
+async def test_tool_turns_are_cached_with_their_calls(tmp_path):
+    from tests.fakes import tool_call
+
+    inner = FakeLLM(tool_handler=lambda m, t, model: tool_call("get_order_status", order_id="KS-1"))
+    llm = CachingLLM(inner, tmp_path)
+    tools = [{"type": "function", "function": {"name": "get_order_status"}}]
+    first = await llm.chat_with_tools(MESSAGES, tools)
+    second = await llm.chat_with_tools(MESSAGES, tools)
+    assert len(inner.tool_turns) == 1
+    assert second.tool_calls == first.tool_calls
+    assert second.tool_calls[0].name == "get_order_status"

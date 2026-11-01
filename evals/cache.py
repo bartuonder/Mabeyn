@@ -8,7 +8,7 @@ from typing import Any
 from mabeyn.core.config import get_settings
 from mabeyn.ingestion.chunk import count_tokens
 from mabeyn.llm import usage
-from mabeyn.llm.client import LLM, ChatMessage, ChatResult
+from mabeyn.llm.client import LLM, ChatMessage, ChatResult, ToolCallRequest, ToolChatResult
 
 CACHE_DIR = Path(__file__).resolve().parent / ".cache"
 
@@ -71,6 +71,42 @@ class CachingLLM:
             "latency": time.perf_counter() - started,
         }
         self._store(path, entry)
+        return result
+
+    async def chat_with_tools(
+        self,
+        messages: Sequence[ChatMessage],
+        tools: Sequence[dict[str, Any]],
+        *,
+        model: str | None = None,
+        temperature: float = 0.0,
+        max_tokens: int | None = None,
+    ) -> ToolChatResult:
+        model = model or get_settings().llm_model
+        path = self._path("tools", [model, temperature, max_tokens, list(tools), list(messages)])
+        if entry := self._load(path):
+            usage.record(model, entry["in"], entry["out"], billed=False)
+            usage.adjust_latency(entry["latency"])
+            calls = tuple(ToolCallRequest(**c) for c in entry["calls"])
+            return ToolChatResult(entry["text"], calls, entry["in"], entry["out"])
+
+        started = time.perf_counter()
+        result = await self.inner.chat_with_tools(
+            messages, tools, model=model, temperature=temperature, max_tokens=max_tokens
+        )
+        self._store(
+            path,
+            {
+                "text": result.text,
+                "calls": [
+                    {"id": c.id, "name": c.name, "arguments": c.arguments}
+                    for c in result.tool_calls
+                ],
+                "in": result.input_tokens,
+                "out": result.output_tokens,
+                "latency": time.perf_counter() - started,
+            },
+        )
         return result
 
     async def stream(
