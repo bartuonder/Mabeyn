@@ -65,6 +65,7 @@ not contradict it. Extra correct detail is fine. Ignore wording and language dif
 Return only JSON: {"correct": true or false, "reason": "<one short sentence>"}"""
 
 FALLBACK_SYSTEM = """\
-Write one short, polite sentence in the same language as the customer's message. It must say \
-that you could not find reliable information about this in the company's documents and suggest \
-contacting the support team. Do not answer the question."""
+Write one short, polite sentence in exactly the language of the customer's message that \
+follows (not the language of this instruction). It must say that you could not find reliable \
+information about this in the company's documents and suggest contacting the support team. Do \
+not answer the question."""

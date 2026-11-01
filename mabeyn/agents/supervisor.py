@@ -163,7 +163,11 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
                         "role": "system",
                         "content": prompts.COMPOSE_SYSTEM.format(company=state["company"]),
                     },
-                    {"role": "user", "content": f"Customer message: {state['question']}\n\n{user}"},
+                    {
+                        "role": "user",
+                        "content": f"{user}\n\nCustomer message (answer in its language): "
+                        f"{state['question']}",
+                    },
                 ],
                 model=get_settings().llm_model,
             ):

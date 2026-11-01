@@ -17,6 +17,7 @@ class SupervisorState(TypedDict, total=False):
     customer_id: str
     conversation_id: str
     company: str
+    today: str
 
     question: str
     history: list[ChatMessage]

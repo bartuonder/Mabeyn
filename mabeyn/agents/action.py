@@ -73,7 +73,9 @@ class ActionAgent:
             notes = prompts.NOTES_TEMPLATE.format(summary=state["knowledge_answer"])
         system: ChatMessage = {
             "role": "system",
-            "content": prompts.ACTION_SYSTEM.format(company=state["company"], notes=notes),
+            "content": prompts.ACTION_SYSTEM.format(
+                company=state["company"], notes=notes, today=state.get("today", "unknown")
+            ),
         }
         messages = list(state["action_messages"])
 

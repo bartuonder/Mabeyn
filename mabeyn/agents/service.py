@@ -1,6 +1,7 @@
 import uuid
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass
+from datetime import date
 from typing import Any, Protocol
 
 from langgraph.checkpoint.base import BaseCheckpointSaver
@@ -25,6 +26,7 @@ class TurnContext:
     customer_id: str
     conversation_id: uuid.UUID
     company: str
+    today: date | None = None
 
     @property
     def thread_id(self) -> str:
@@ -116,6 +118,7 @@ class SupervisorService:
             "customer_id": turn.customer_id,
             "conversation_id": str(turn.conversation_id),
             "company": turn.company,
+            "today": (turn.today or date.today()).isoformat(),
             "question": question,
             "history": list(history),
         }
