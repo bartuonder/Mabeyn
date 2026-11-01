@@ -1,0 +1,1142 @@
+{
+  "name": "english-full",
+  "created_at": "2026-11-01T13:23:31",
+  "config": {
+    "config": "full",
+    "dataset": "rag_en.jsonl",
+    "sets": null,
+    "chunk_preset": "default",
+    "embedding_model": "text-embedding-3-small",
+    "llm_model": "gpt-4.1-mini",
+    "llm_model_small": "gpt-4o-mini",
+    "judge_model": "gpt-4.1-mini",
+    "retrieval_only": false
+  },
+  "metrics": {
+    "n": 20.0,
+    "n_answerable": 17.0,
+    "mrr": 1.0,
+    "recall@1": 1.0,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "recall@8": 1.0,
+    "accuracy": 0.95,
+    "accuracy_answerable": 1.0,
+    "accuracy_unanswerable": 0.6666666666666666,
+    "faithfulness": 0.95,
+    "latency_p50_s": 3.7636922000001505,
+    "latency_p95_s": 7.264375499999915,
+    "cost_per_query_usd": 0.001676762,
+    "llm_calls_per_query": 5.75
+  },
+  "accuracy_by_category": {
+    "factual": 1.0,
+    "numeric": 1.0,
+    "procedure": 1.0,
+    "unanswerable": 0.6666666666666666
+  },
+  "questions": [
+    {
+      "id": "en-001",
+      "category": "factual",
+      "answerable": true,
+      "question": "What is the minimum purchase amount for a tourist VAT refund?",
+      "answer": "The minimum purchase amount for a tourist VAT refund is 1,000 TL on a single invoice. [Tourist VAT Refund:Who Is Eligible]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "foreign-cards-and-payment.md",
+          "section": "Paying with Foreign Cards > Accepted Cards | Paying with Foreign Cards > Currency and Fees | Paying with Foreign Cards > Installments | Paying with Foreign Cards > Failed Payments",
+          "title": "Paying with Foreign Cards"
+        },
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "urun-kilavuzu-powerbank-p20.md",
+          "section": "Powerbank P20 Kullanım Kılavuzu > Teknik Özellikler | Powerbank P20 Kullanım Kılavuzu > Şarj Göstergeleri | Powerbank P20 Kullanım Kılavuzu > Uçakta Taşıma | Powerbank P20 Kullanım Kılavuzu > Kendi Kendini Şarj Etme | Powerbank P20 Kullanım Kılavuzu > Sorun Giderme",
+          "title": "Powerbank P20 Kullanım Kılavuzu"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference by stating the minimum purchase amount is 1,000 TL on a single invoice.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.7636922000001505,
+      "cost_usd": 0.00144734,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-002",
+      "category": "factual",
+      "answerable": true,
+      "question": "When must the tax-free form be stamped by customs?",
+      "answer": "The tax-free form must be stamped by customs at the airport when you leave Turkey within 3 months of the purchase [Tourist VAT Refund:How to Claim].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "degisim-politikasi.md",
+          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
+          "title": "Değişim Politikası"
+        },
+        {
+          "doc": "yurt-disi-ve-kktc-gonderim.md",
+          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
+          "title": "Yurt Dışı ve KKTC Gönderimi"
+        },
+        {
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference by stating the form must be stamped at the airport when leaving the country within 3 months of purchase.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 4.085679099999652,
+      "cost_usd": 0.0014455700000000002,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-003",
+      "category": "factual",
+      "answerable": true,
+      "question": "How long does the VAT refund take?",
+      "answer": "The approved VAT refunds are paid to your card within 14 days after the stamped form reaches the refund partner [Tourist VAT Refund:Refund Timing].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
+        },
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        },
+        {
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
+        },
+        {
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference answer regarding the refund timing.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.7362849000001006,
+      "cost_usd": 0.0014948599999999998,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-004",
+      "category": "factual",
+      "answerable": true,
+      "question": "Can I get a VAT refund on online orders delivered to a Turkish address?",
+      "answer": "No, online orders delivered to Turkish addresses are not eligible for a VAT refund [Tourist VAT Refund:Refund Timing].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "yurt-disi-ve-kktc-gonderim.md",
+          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
+          "title": "Yurt Dışı ve KKTC Gönderimi"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "foreign-cards-and-payment.md",
+          "section": "Paying with Foreign Cards > Accepted Cards | Paying with Foreign Cards > Currency and Fees | Paying with Foreign Cards > Installments | Paying with Foreign Cards > Failed Payments",
+          "title": "Paying with Foreign Cards"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer correctly states that online orders delivered to Turkish addresses are not eligible for a VAT refund, matching the reference answer.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.353266699999949,
+      "cost_usd": 0.0014075,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-005",
+      "category": "unanswerable",
+      "answerable": false,
+      "question": "What is the phone number of the English support team?",
+      "answer": "Phone support in English is not available. You can contact English support by writing to english@kargoshop.example or using the English live chat on the website [English Language Support:Channels].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        },
+        {
+          "doc": "musteri-hizmetleri.md",
+          "section": "Müşteri Hizmetleri > Çalışma Saatleri | Müşteri Hizmetleri > İletişim Kanalları | Müşteri Hizmetleri > Yanıt Süreleri | Müşteri Hizmetleri > Şikâyet ve Öneri",
+          "title": "Müşteri Hizmetleri"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "uyelik-ve-hesap.md",
+          "section": "Üyelik ve Hesap Yönetimi > Şifre Sıfırlama | Üyelik ve Hesap Yönetimi > İki Adımlı Doğrulama | Üyelik ve Hesap Yönetimi > Üyeliği Silme | Üyelik ve Hesap Yönetimi > E-posta Adresi Değiştirme",
+          "title": "Üyelik ve Hesap Yönetimi"
+        }
+      ],
+      "gold_hit": false,
+      "recall": {
+        "recall@1": null,
+        "recall@3": null,
+        "recall@5": null,
+        "recall@8": null
+      },
+      "mrr": null,
+      "correct": false,
+      "judge_reason": "The reference states the information is not available, but the assistant provides contact details, which contradicts the reference.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.9483836999997948,
+      "cost_usd": 0.0014722700000000001,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-006",
+      "category": "factual",
+      "answerable": true,
+      "question": "Which foreign cards do you accept?",
+      "answer": "We accept Visa and Mastercard credit and debit cards issued outside Turkey. American Express and Diners Club are not accepted. [Paying with Foreign Cards:Accepted Cards]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "foreign-cards-and-payment.md",
+          "section": "Paying with Foreign Cards > Accepted Cards | Paying with Foreign Cards > Currency and Fees | Paying with Foreign Cards > Installments | Paying with Foreign Cards > Failed Payments",
+          "title": "Paying with Foreign Cards"
+        },
+        {
+          "doc": "odeme-yontemleri.md",
+          "section": "Ödeme Yöntemleri > Kabul Edilen Yöntemler | Ödeme Yöntemleri > Havale ve EFT İndirimi | Ödeme Yöntemleri > Kapıda Ödeme | Ödeme Yöntemleri > Güvenli Ödeme",
+          "title": "Ödeme Yöntemleri"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "yurt-disi-ve-kktc-gonderim.md",
+          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
+          "title": "Yurt Dışı ve KKTC Gönderimi"
+        },
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        },
+        {
+          "doc": "taksit-ve-kampanyalar.md",
+          "section": "Taksit ve Kampanyalar > Taksit Seçenekleri | Taksit ve Kampanyalar > Taksit İçin Alt Limit | Taksit ve Kampanyalar > İndirim Kuponları | Taksit ve Kampanyalar > Fiyat Farkı İadesi",
+          "title": "Taksit ve Kampanyalar"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference by stating acceptance of Visa and Mastercard issued outside Turkey and non-acceptance of American Express and Diners Club.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.796599299999798,
+      "cost_usd": 0.00145674,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-007",
+      "category": "factual",
+      "answerable": true,
+      "question": "Can I pay in installments with a foreign card?",
+      "answer": "No, installment plans are only available for cards issued by partner banks in Turkey. Foreign cards are always charged in a single payment. [Paying with Foreign Cards:Installments]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "foreign-cards-and-payment.md",
+          "section": "Paying with Foreign Cards > Accepted Cards | Paying with Foreign Cards > Currency and Fees | Paying with Foreign Cards > Installments | Paying with Foreign Cards > Failed Payments",
+          "title": "Paying with Foreign Cards"
+        },
+        {
+          "doc": "odeme-yontemleri.md",
+          "section": "Ödeme Yöntemleri > Kabul Edilen Yöntemler | Ödeme Yöntemleri > Havale ve EFT İndirimi | Ödeme Yöntemleri > Kapıda Ödeme | Ödeme Yöntemleri > Güvenli Ödeme",
+          "title": "Ödeme Yöntemleri"
+        },
+        {
+          "doc": "taksit-ve-kampanyalar.md",
+          "section": "Taksit ve Kampanyalar > Taksit Seçenekleri | Taksit ve Kampanyalar > Taksit İçin Alt Limit | Taksit ve Kampanyalar > İndirim Kuponları | Taksit ve Kampanyalar > Fiyat Farkı İadesi",
+          "title": "Taksit ve Kampanyalar"
+        },
+        {
+          "doc": "yurt-disi-ve-kktc-gonderim.md",
+          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
+          "title": "Yurt Dışı ve KKTC Gönderimi"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states that installments are only available for partner bank cards in Turkey and foreign cards are charged in a single payment, matching the reference.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.5176847000002454,
+      "cost_usd": 0.00147242,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-008",
+      "category": "procedure",
+      "answerable": true,
+      "question": "My foreign card payment was declined, what should I check?",
+      "answer": "If your foreign card payment was declined, you should check that online international payments are enabled by your bank and that 3D Secure verification is active. [Paying with Foreign Cards:Failed Payments]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "foreign-cards-and-payment.md",
+          "section": "Paying with Foreign Cards > Accepted Cards | Paying with Foreign Cards > Currency and Fees | Paying with Foreign Cards > Installments | Paying with Foreign Cards > Failed Payments",
+          "title": "Paying with Foreign Cards"
+        },
+        {
+          "doc": "odeme-yontemleri.md",
+          "section": "Ödeme Yöntemleri > Kabul Edilen Yöntemler | Ödeme Yöntemleri > Havale ve EFT İndirimi | Ödeme Yöntemleri > Kapıda Ödeme | Ödeme Yöntemleri > Güvenli Ödeme",
+          "title": "Ödeme Yöntemleri"
+        },
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        },
+        {
+          "doc": "musteri-hizmetleri.md",
+          "section": "Müşteri Hizmetleri > Çalışma Saatleri | Müşteri Hizmetleri > İletişim Kanalları | Müşteri Hizmetleri > Yanıt Süreleri | Müşteri Hizmetleri > Şikâyet ve Öneri",
+          "title": "Müşteri Hizmetleri"
+        },
+        {
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the key facts in the reference answer.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.1467359999996916,
+      "cost_usd": 0.0014440899999999999,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-009",
+      "category": "factual",
+      "answerable": true,
+      "question": "Which cities can I have an order delivered to a hotel in?",
+      "answer": "You can have an order delivered to hotel reception desks in Istanbul, Ankara, and Izmir. [Delivery to Hotels:Where We Deliver]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "teslimat-adres-degisikligi.md",
+          "section": "Teslimat Adresi Değişikliği > Adres Değiştirme Koşulları | Teslimat Adresi Değişikliği > Adres Değişikliği Nasıl Yapılır | Teslimat Adresi Değişikliği > Farklı Şehre Gönderim",
+          "title": "Teslimat Adresi Değişikliği"
+        },
+        {
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
+        },
+        {
+          "doc": "yurt-disi-ve-kktc-gonderim.md",
+          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
+          "title": "Yurt Dışı ve KKTC Gönderimi"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly lists the same cities as the reference answer and adds relevant detail without contradiction.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.495833300000413,
+      "cost_usd": 0.00145881,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-010",
+      "category": "unanswerable",
+      "answerable": false,
+      "question": "Does KargoShop offer student discounts?",
+      "answer": "Lo siento, pero no pude encontrar información confiable sobre esto en los documentos de la empresa; te sugiero que contactes al equipo de soporte.",
+      "abstained": true,
+      "ranked": [
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "kvkk-ve-gizlilik.md",
+          "section": "KVKK ve Gizlilik > Toplanan Veriler | KVKK ve Gizlilik > Saklama Süreleri | KVKK ve Gizlilik > Veri Silme Talebi | KVKK ve Gizlilik > Çerezler",
+          "title": "KVKK ve Gizlilik"
+        },
+        {
+          "doc": "odeme-yontemleri.md",
+          "section": "Ödeme Yöntemleri > Kabul Edilen Yöntemler | Ödeme Yöntemleri > Havale ve EFT İndirimi | Ödeme Yöntemleri > Kapıda Ödeme | Ödeme Yöntemleri > Güvenli Ödeme",
+          "title": "Ödeme Yöntemleri"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "foreign-cards-and-payment.md",
+          "section": "Paying with Foreign Cards > Accepted Cards | Paying with Foreign Cards > Currency and Fees | Paying with Foreign Cards > Installments | Paying with Foreign Cards > Failed Payments",
+          "title": "Paying with Foreign Cards"
+        },
+        {
+          "doc": "kargo-takip.md",
+          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
+          "title": "Kargo Takibi"
+        }
+      ],
+      "gold_hit": false,
+      "recall": {
+        "recall@1": null,
+        "recall@3": null,
+        "recall@5": null,
+        "recall@8": null
+      },
+      "mrr": null,
+      "correct": true,
+      "judge_reason": "The assistant correctly declines to answer due to lack of information, matching the reference.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 7.264375499999915,
+      "cost_usd": 0.0035350100000000003,
+      "llm_calls": 12
+    },
+    {
+      "id": "en-011",
+      "category": "factual",
+      "answerable": true,
+      "question": "What happens if I have checked out of the hotel before the package arrives?",
+      "answer": "If you have checked out of the hotel before the package arrives, the package will be returned to the warehouse and the payment will be refunded. We cannot redirect the package to another hotel once it has shipped [Delivery to Hotels:Missed Deliveries].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "kargo-takip.md",
+          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
+          "title": "Kargo Takibi"
+        },
+        {
+          "doc": "teslimat-adres-degisikligi.md",
+          "section": "Teslimat Adresi Değişikliği > Adres Değiştirme Koşulları | Teslimat Adresi Değişikliği > Adres Değişikliği Nasıl Yapılır | Teslimat Adresi Değişikliği > Farklı Şehre Gönderim",
+          "title": "Teslimat Adresi Değişikliği"
+        },
+        {
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
+        },
+        {
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference answer and provides additional relevant detail without contradiction.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.696480900000097,
+      "cost_usd": 0.00151885,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-012",
+      "category": "factual",
+      "answerable": true,
+      "question": "What are the English support hours?",
+      "answer": "English support is available Monday to Friday between 10:00 and 17:00 Turkey time. The team is closed on weekends and public holidays [English Language Support:Support Hours].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        },
+        {
+          "doc": "musteri-hizmetleri.md",
+          "section": "Müşteri Hizmetleri > Çalışma Saatleri | Müşteri Hizmetleri > İletişim Kanalları | Müşteri Hizmetleri > Yanıt Süreleri | Müşteri Hizmetleri > Şikâyet ve Öneri",
+          "title": "Müşteri Hizmetleri"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference answer and adds relevant details without contradiction.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.5242189999999027,
+      "cost_usd": 0.0014735399999999997,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-013",
+      "category": "factual",
+      "answerable": true,
+      "question": "How fast are English emails answered?",
+      "answer": "Emails in English are answered within 2 business days during support hours. [English Language Support:Response Times]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        },
+        {
+          "doc": "musteri-hizmetleri.md",
+          "section": "Müşteri Hizmetleri > Çalışma Saatleri | Müşteri Hizmetleri > İletişim Kanalları | Müşteri Hizmetleri > Yanıt Süreleri | Müşteri Hizmetleri > Şikâyet ve Öneri",
+          "title": "Müşteri Hizmetleri"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
+        },
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference's key fact about response time within 2 business days.",
+      "faithful": false,
+      "unsupported": [
+        "Emails in English are answered within 2 business days during support hours."
+      ],
+      "latency_s": 3.9660000999992917,
+      "cost_usd": 0.00141849,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-014",
+      "category": "factual",
+      "answerable": true,
+      "question": "Is there phone support in English?",
+      "answer": "Phone support in English is not available. You can contact English support via email or live chat instead [English Language Support:Channels].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        },
+        {
+          "doc": "musteri-hizmetleri.md",
+          "section": "Müşteri Hizmetleri > Çalışma Saatleri | Müşteri Hizmetleri > İletişim Kanalları | Müşteri Hizmetleri > Yanıt Süreleri | Müşteri Hizmetleri > Şikâyet ve Öneri",
+          "title": "Müşteri Hizmetleri"
+        },
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "foreign-cards-and-payment.md",
+          "section": "Paying with Foreign Cards > Accepted Cards | Paying with Foreign Cards > Currency and Fees | Paying with Foreign Cards > Installments | Paying with Foreign Cards > Failed Payments",
+          "title": "Paying with Foreign Cards"
+        },
+        {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states that phone support in English is not available, matching the reference answer.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 4.339147200000298,
+      "cost_usd": 0.0014712399999999997,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-015",
+      "category": "unanswerable",
+      "answerable": false,
+      "question": "Which airlines accept the tax-free form?",
+      "answer": "The sources do not provide information about which airlines accept the tax-free form. Please contact KargoShop support for further assistance.",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "foreign-cards-and-payment.md",
+          "section": "Paying with Foreign Cards > Accepted Cards | Paying with Foreign Cards > Currency and Fees | Paying with Foreign Cards > Installments | Paying with Foreign Cards > Failed Payments",
+          "title": "Paying with Foreign Cards"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "odeme-yontemleri.md",
+          "section": "Ödeme Yöntemleri > Kabul Edilen Yöntemler | Ödeme Yöntemleri > Havale ve EFT İndirimi | Ödeme Yöntemleri > Kapıda Ödeme | Ödeme Yöntemleri > Güvenli Ödeme",
+          "title": "Ödeme Yöntemleri"
+        },
+        {
+          "doc": "taksit-ve-kampanyalar.md",
+          "section": "Taksit ve Kampanyalar > Taksit Seçenekleri | Taksit ve Kampanyalar > Taksit İçin Alt Limit | Taksit ve Kampanyalar > İndirim Kuponları | Taksit ve Kampanyalar > Fiyat Farkı İadesi",
+          "title": "Taksit ve Kampanyalar"
+        }
+      ],
+      "gold_hit": false,
+      "recall": {
+        "recall@1": null,
+        "recall@3": null,
+        "recall@5": null,
+        "recall@8": null
+      },
+      "mrr": null,
+      "correct": true,
+      "judge_reason": "The assistant correctly states that the information is not provided and does not invent facts.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 7.5497184999994715,
+      "cost_usd": 0.0037557599999999995,
+      "llm_calls": 13
+    },
+    {
+      "id": "en-016",
+      "category": "numeric",
+      "answerable": true,
+      "question": "What discount do I get if I order 12 units of the same product?",
+      "answer": "If you order 12 units of the same product, you will receive an 8 percent discount. [Corporate Orders:Volume Discounts]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "sadakat-programi.md",
+          "section": "KargoPuan Sadakat Programı > Puan Kazanma | KargoPuan Sadakat Programı > Puan Kullanma | KargoPuan Sadakat Programı > Puan Geçerlilik Süresi | KargoPuan Sadakat Programı > Üyelik Seviyeleri",
+          "title": "KargoPuan Sadakat Programı"
+        },
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "taksit-ve-kampanyalar.md",
+          "section": "Taksit ve Kampanyalar > Taksit Seçenekleri | Taksit ve Kampanyalar > Taksit İçin Alt Limit | Taksit ve Kampanyalar > İndirim Kuponları | Taksit ve Kampanyalar > Fiyat Farkı İadesi",
+          "title": "Taksit ve Kampanyalar"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states the 8 percent discount for orders of 12 units, matching the reference's information for 10 or more units.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.5964584000003015,
+      "cost_usd": 0.00143402,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-017",
+      "category": "factual",
+      "answerable": true,
+      "question": "Can businesses pay by invoice?",
+      "answer": "Yes, approved business customers can pay by invoice within 30 days of delivery. Credit approval takes up to 5 business days and requires a tax certificate [Corporate Orders:Payment Terms].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "fatura-ve-belgeler.md",
+          "section": "Fatura ve Belgeler > E-Fatura ve E-Arşiv | Fatura ve Belgeler > Kurumsal Fatura | Fatura ve Belgeler > Fatura Bilgisi Değişikliği | Fatura ve Belgeler > Garanti ve Fatura",
+          "title": "Fatura ve Belgeler"
+        },
+        {
+          "doc": "odeme-yontemleri.md",
+          "section": "Ödeme Yöntemleri > Kabul Edilen Yöntemler | Ödeme Yöntemleri > Havale ve EFT İndirimi | Ödeme Yöntemleri > Kapıda Ödeme | Ödeme Yöntemleri > Güvenli Ödeme",
+          "title": "Ödeme Yöntemleri"
+        },
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        },
+        {
+          "doc": "foreign-cards-and-payment.md",
+          "section": "Paying with Foreign Cards > Accepted Cards | Paying with Foreign Cards > Currency and Fees | Paying with Foreign Cards > Installments | Paying with Foreign Cards > Failed Payments",
+          "title": "Paying with Foreign Cards"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference and provides additional relevant details without contradiction.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.8498297999994975,
+      "cost_usd": 0.0014251199999999998,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-018",
+      "category": "factual",
+      "answerable": true,
+      "question": "When does a business customer get a dedicated account manager?",
+      "answer": "A business customer gets a dedicated account manager if their yearly purchases exceed 100,000 TL. This account manager handles orders, returns, and warranty claims for the customer [Corporate Orders:Account Manager].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "urun-kilavuzu-powerbank-p20.md",
+          "section": "Powerbank P20 Kullanım Kılavuzu > Teknik Özellikler | Powerbank P20 Kullanım Kılavuzu > Şarj Göstergeleri | Powerbank P20 Kullanım Kılavuzu > Uçakta Taşıma | Powerbank P20 Kullanım Kılavuzu > Kendi Kendini Şarj Etme | Powerbank P20 Kullanım Kılavuzu > Sorun Giderme",
+          "title": "Powerbank P20 Kullanım Kılavuzu"
+        },
+        {
+          "doc": "musteri-hizmetleri.md",
+          "section": "Müşteri Hizmetleri > Çalışma Saatleri | Müşteri Hizmetleri > İletişim Kanalları | Müşteri Hizmetleri > Yanıt Süreleri | Müşteri Hizmetleri > Şikâyet ve Öneri",
+          "title": "Müşteri Hizmetleri"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference by stating the threshold of yearly purchases above 100,000 TL for getting a dedicated account manager.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.8605319999996937,
+      "cost_usd": 0.00144327,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-019",
+      "category": "factual",
+      "answerable": true,
+      "question": "Is the warranty valid outside Turkey?",
+      "answer": "The manufacturer warranty is valid only inside Turkey. Products taken abroad can only be repaired if they are sent back to Turkey for service [Warranty for International Buyers:Where the Warranty Applies].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "garanti-kosullari.md",
+          "section": "Garanti Koşulları > Garanti Süresi | Garanti Koşulları > Garanti Kapsamı | Garanti Koşulları > Garanti Kapsamı Dışındaki Durumlar | Garanti Koşulları > Garanti Belgesi",
+          "title": "Garanti Koşulları"
+        },
+        {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
+        },
+        {
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
+        },
+        {
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
+        },
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states the warranty is valid only inside Turkey and adds relevant detail about repairs abroad.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.880286100000376,
+      "cost_usd": 0.00152584,
+      "llm_calls": 5
+    },
+    {
+      "id": "en-020",
+      "category": "factual",
+      "answerable": true,
+      "question": "In how many cities are the authorized service centers?",
+      "answer": "Authorized service centers operate in 12 Turkish cities. [Warranty for International Buyers:Service Centers]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "musteri-hizmetleri.md",
+          "section": "Müşteri Hizmetleri > Çalışma Saatleri | Müşteri Hizmetleri > İletişim Kanalları | Müşteri Hizmetleri > Yanıt Süreleri | Müşteri Hizmetleri > Şikâyet ve Öneri",
+          "title": "Müşteri Hizmetleri"
+        },
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        },
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference by stating the service centers are in 12 Turkish cities.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.660451699999612,
+      "cost_usd": 0.0014345,
+      "llm_calls": 5
+    }
+  ]
+}
