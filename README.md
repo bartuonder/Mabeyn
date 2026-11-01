@@ -11,14 +11,21 @@ See [docs/ROADMAP.md](docs/ROADMAP.md) for the plan, [docs/adr](docs/adr) for de
 ```
 upload ──> API ──> Redis queue ──> worker: parse → chunk → embed ──> PostgreSQL (pgvector, full text, RLS)
 
-customer ──> /chat (SSE) ──> LangGraph RAG subgraph
-                              rewrite_query → retrieve (hybrid + reranker) → grade_documents (CRAG)
-                              → generate (streamed, cited) → check_faithfulness → answer or "I don't know"
+customer ──> /chat (SSE) ──> supervisor graph (LangGraph, Postgres checkpointer)
+              input_guard → supervisor ──> knowledge agent: RAG subgraph (documents only, no tools)
+                                       ──> action agent: ReAct over tenant tools (never sees documents)
+                                       ──> escalate: hand over to a human
+              → compose → output_guard
+
+action agent ── read / write tool ──> executes, audits in tool_calls
+              └─ sensitive tool ──> Approval record + interrupt ... admin POST /approvals/{id} resumes
 ```
 
 - Tenant isolation is enforced by PostgreSQL Row-Level Security ([ADR-0001](docs/adr/0001-row-level-security.md)).
 - Answers cite `[document:section]`; the citation points at the section inside the retrieved chunk that holds the fact.
 - Retrieval combines pgvector similarity with Turkish/English full text search (Reciprocal Rank Fusion), then an LLM reranker narrows 30 candidates to 6.
+- A supervisor routes each message to a knowledge agent, an action agent or a human ([ADR-0002](docs/adr/0002-supervisor-and-two-agents.md)). Tools are registered per tenant with a JSON Schema and a risk level (`read`, `write`, `sensitive`); the platform, not the model, supplies the customer identity.
+- `sensitive` tools such as refunds never run directly: the graph pauses, an admin approves or rejects, and the paused conversation survives restarts. Walk-through: [docs/demo-scenarios.md](docs/demo-scenarios.md).
 
 ## Quick start
 
@@ -26,9 +33,9 @@ Requirements: Docker, [uv](https://docs.astral.sh/uv/), an OpenAI API key.
 
 ```bash
 cp .env.example .env                 # add OPENAI_API_KEY
-docker compose up -d --build         # api, worker, postgres (pgvector), redis; migrations run first
+docker compose up -d --build         # api, worker, mock shop, postgres (pgvector), redis; migrations run first
 uv sync
-uv run python -m mabeyn.cli seed-kargoshop   # demo tenant with 32 documents (prompts for a password)
+uv run python -m mabeyn.cli seed-kargoshop --shop-url http://kargoshop-mock:9000   # demo tenant: 32 documents, 5 tools
 curl localhost:8000/health
 ```
 
@@ -45,7 +52,7 @@ curl -N -X POST localhost:8000/chat -H "Authorization: Bearer $SESSION" \
   -H 'content-type: application/json' -d '{"message": "How long does delivery to KKTC take?"}'
 ```
 
-Documents are added with `POST /documents` (PDF, Markdown, HTML upload) or `POST /documents/url`.
+Documents are added with `POST /documents` (PDF, Markdown, HTML upload) or `POST /documents/url`. Tools are managed with `POST /tools` and `DELETE /tools/{id}`; pending refunds are listed with `GET /approvals?status=pending` and decided with `POST /approvals/{id}`.
 
 ## Development
 
@@ -106,9 +113,29 @@ The corpus is small, so Recall@5 saturates; Recall@1 and MRR separate the config
 
 On 20 sampled answers the LLM judge agrees with the manual labels on 20 of 20 (Cohen's kappa 1.0). All labels were reviewed by the maintainer (`evals/datasets/judge_calibration.jsonl`). Only two judged-incorrect answers existed to sample, so the figure says more about the correct verdicts than about the judge's ability to catch errors.
 
+### Tool use and approvals
+
+40 scenarios on the supervisor with the mock shop (`evals/datasets/tools.jsonl`, [how it is scored](docs/evaluation.md#tool-use-evaluation)). The reply language is checked with a heuristic and the reply content by an LLM judge.
+
+| Metric | Result |
+| --- | ---: |
+| Scenarios passed | 0.975 |
+| Correct tool selection | 1.000 |
+| Correct arguments | 1.000 |
+| Unnecessary tool calls | 0.000 |
+| Sensitive calls that reached approval | 1.000 |
+| Sensitive actions executed without approval | 0 |
+| Routing accuracy | 1.000 |
+| Replies in the customer's language | 1.000 |
+| Other customer's data in a reply | 0 |
+| Cost per scenario | $0.002 |
+
+The one failing scenario is an English question asked against Turkish-only documents ("Do you ship to Germany?"); retrieval across languages is not handled yet.
+
 ## Status
 
 - Phase 1 — foundation, tenant isolation, auth: done
 - Phase 2 — ingestion and RAG v1: done
 - Phase 3 — RAG v2 and evaluation: done
-- Phases 4–8 — agents, memory, firewall, LLMOps, product polish: planned, see the roadmap
+- Phase 4 — agentic layer, tools, human approval: done
+- Phases 5–8 — memory, firewall, LLMOps, product polish: planned, see the roadmap
