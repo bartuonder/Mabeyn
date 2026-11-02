@@ -36,4 +36,5 @@ jobs:
       - run: uv run mypy mabeyn apps evals
       - run: uv run alembic upgrade head
       - run: uv run python -m mabeyn.agents.checkpoint
+      - run: uv run python -m mabeyn.memory.store
       - run: uv run pytest
