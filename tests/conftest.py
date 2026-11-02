@@ -78,3 +78,12 @@ async def checkpointer(admin_engine: AsyncEngine):
     await setup_checkpoint_tables()
     async with open_checkpointer() as saver:
         yield saver
+
+
+@pytest_asyncio.fixture(scope="session")
+async def memory_store(admin_engine: AsyncEngine):
+    from mabeyn.memory.store import open_memory_store, setup_store_tables
+
+    await setup_store_tables()
+    async with open_memory_store() as store:
+        yield store

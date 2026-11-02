@@ -39,7 +39,7 @@ services:
 
   migrate:
     build: .
-    command: ["sh", "-c", "alembic upgrade head && python -m mabeyn.agents.checkpoint"]
+    command: ["sh", "-c", "alembic upgrade head && python -m mabeyn.agents.checkpoint && python -m mabeyn.memory.store"]
     environment:
       DATABASE_URL: postgresql+asyncpg://mabeyn_app:mabeyn_app@postgres:5432/mabeyn
       ADMIN_DATABASE_URL: postgresql+asyncpg://mabeyn:mabeyn@postgres:5432/mabeyn
