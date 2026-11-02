@@ -13,8 +13,9 @@ htmlcov/
 .env.*
 !.env.example
 
-# IDE
+# IDE and OS
 .idea/
+.DS_Store
 
 # Local planning material
 *.pdf
