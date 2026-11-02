@@ -40,6 +40,13 @@ def count_tokens(text: str) -> int:
     return len(_encoding().encode(text))
 
 
+def truncate_tokens(text: str, max_tokens: int) -> str:
+    tokens = _encoding().encode(text)
+    if len(tokens) <= max_tokens:
+        return text
+    return _encoding().decode(tokens[:max_tokens])
+
+
 @dataclass(frozen=True)
 class _Block:
     path: tuple[str, ...]

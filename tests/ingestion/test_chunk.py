@@ -70,3 +70,12 @@ def test_empty_document_has_no_chunks():
 
 def test_count_tokens_is_positive_for_text():
     assert count_tokens("hello world") >= 2
+
+
+def test_truncate_tokens_keeps_short_text_and_cuts_long_text():
+    from mabeyn.ingestion.chunk import count_tokens, truncate_tokens
+
+    assert truncate_tokens("short text", 50) == "short text"
+    long = "word " * 500
+    cut = truncate_tokens(long, 20)
+    assert count_tokens(cut) <= 20 and long.startswith(cut)
