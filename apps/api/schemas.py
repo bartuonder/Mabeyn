@@ -12,6 +12,7 @@ from mabeyn.db.models import (
     MessageRole,
     RiskLevel,
 )
+from mabeyn.memory.schema import MemoryCategory
 
 
 class StrictRequest(BaseModel):
@@ -100,6 +101,23 @@ class ConversationOut(Response):
 
 class ConversationDetail(ConversationOut):
     messages: list[MessageOut]
+
+
+class ConversationClosed(Response):
+    status: ConversationStatus
+    memories_saved: int
+    memories_blocked: int
+
+
+class MemoryOut(Response):
+    key: str
+    category: MemoryCategory
+    text: str
+    updated_at: datetime | None
+
+
+class MemoryDeleted(Response):
+    deleted: int
 
 
 class ToolCreate(StrictRequest):

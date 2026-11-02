@@ -10,20 +10,28 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 
 from apps.api.deps import Customer
-from apps.api.schemas import ChatRequest, ConversationDetail, ConversationOut, MessageOut
+from apps.api.schemas import (
+    ChatRequest,
+    ConversationClosed,
+    ConversationDetail,
+    ConversationOut,
+    MessageOut,
+)
 from mabeyn.agents.persist import save_assistant_message
-from mabeyn.agents.runtime import get_agent_service
+from mabeyn.agents.runtime import get_agent_service, get_memory_service
 from mabeyn.agents.service import AgentService, TurnContext
 from mabeyn.db.models import Conversation, ConversationStatus, Message, MessageRole, Tenant
 from mabeyn.db.session import tenant_session
 from mabeyn.llm.client import ChatMessage
+from mabeyn.memory.service import MemoryService
+from mabeyn.memory.short_term import Compacted
 from mabeyn.rag.service import Final, Retract, Token
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 log = structlog.get_logger()
 
 Agents = Annotated[AgentService, Depends(get_agent_service)]
-HISTORY_MESSAGES = 10
+Memories = Annotated[MemoryService, Depends(get_memory_service)]
 
 
 def sse(event: str, data: Any) -> str:
@@ -31,11 +39,12 @@ def sse(event: str, data: Any) -> str:
 
 
 async def _open_conversation(
-    tenant_id: uuid.UUID, customer_id: str, body: ChatRequest
+    memory: MemoryService, tenant_id: uuid.UUID, customer_id: str, body: ChatRequest
 ) -> tuple[TurnContext, list[ChatMessage], bool]:
+    summary, summarized = "", 0
+    pending: list[ChatMessage] = []
     async with tenant_session(tenant_id) as session:
         company = await session.scalar(select(Tenant.name)) or "the company"
-        history: list[ChatMessage] = []
         if body.conversation_id is None:
             conversation = Conversation(tenant_id=tenant_id, customer_id=customer_id)
             session.add(conversation)
@@ -45,31 +54,53 @@ async def _open_conversation(
             if existing is None or existing.customer_id != customer_id:
                 raise HTTPException(status.HTTP_404_NOT_FOUND, "Conversation not found")
             conversation = existing
+            summary, summarized = conversation.summary or "", conversation.summarized_messages
             rows = await session.scalars(
                 select(Message)
                 .where(Message.conversation_id == conversation.id)
                 .where(Message.role.in_([MessageRole.USER, MessageRole.ASSISTANT]))
-                .order_by(Message.created_at.desc())
-                .limit(HISTORY_MESSAGES)
+                .order_by(Message.created_at)
+                .offset(summarized)
             )
-            history = [{"role": m.role.value, "content": m.content} for m in reversed(rows.all())]
+            pending = [{"role": m.role.value, "content": m.content} for m in rows]
+        conversation_id = conversation.id
+        escalated = conversation.status is ConversationStatus.ESCALATED
+
+    # A human owns escalated conversations, so no model call is spent on their context.
+    compacted = (
+        Compacted(summary, summarized, [])
+        if escalated
+        else await memory.compact(summary, summarized, pending)
+    )
+    async with tenant_session(tenant_id) as session:
+        current = await session.get(Conversation, conversation_id)
+        if current is None:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Conversation not found")
+        if compacted.summarized != summarized:
+            current.summary = compacted.summary
+            current.summarized_messages = compacted.summarized
+        if current.status is ConversationStatus.CLOSED:
+            current.status = ConversationStatus.OPEN
+        # New messages may hold new facts, so the conversation is mined again when it goes idle.
+        current.memory_extracted_at = None
         session.add(
             Message(
                 tenant_id=tenant_id,
-                conversation_id=conversation.id,
+                conversation_id=conversation_id,
                 role=MessageRole.USER,
                 content=body.message,
             )
         )
-        escalated = conversation.status is ConversationStatus.ESCALATED
-        turn = TurnContext(tenant_id, customer_id, conversation.id, company)
-        return turn, history, escalated
+    turn = TurnContext(tenant_id, customer_id, conversation_id, company, summary=compacted.summary)
+    return turn, compacted.history, escalated
 
 
 @router.post("")
-async def chat(body: ChatRequest, customer: Customer, agents: Agents) -> StreamingResponse:
+async def chat(
+    body: ChatRequest, customer: Customer, agents: Agents, memory: Memories
+) -> StreamingResponse:
     turn, history, escalated = await _open_conversation(
-        customer.tenant_id, customer.customer_id, body
+        memory, customer.tenant_id, customer.customer_id, body
     )
 
     async def events() -> AsyncIterator[str]:
@@ -106,6 +137,24 @@ async def chat(body: ChatRequest, customer: Customer, agents: Agents) -> Streami
 
     return StreamingResponse(
         events(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"}
+    )
+
+
+@router.post("/{conversation_id}/close")
+async def close_conversation(
+    conversation_id: uuid.UUID, customer: Customer, memory: Memories
+) -> ConversationClosed:
+    """End a conversation and keep what the customer said that is worth remembering."""
+    async with tenant_session(customer.tenant_id) as session:
+        conversation = await session.get(Conversation, conversation_id)
+        if conversation is None or conversation.customer_id != customer.customer_id:
+            raise HTTPException(status.HTTP_404_NOT_FOUND, "Conversation not found")
+        if conversation.status is ConversationStatus.OPEN:
+            conversation.status = ConversationStatus.CLOSED
+        state = conversation.status
+    result = await memory.extract(customer.tenant_id, conversation_id)
+    return ConversationClosed(
+        status=state, memories_saved=result.saved, memories_blocked=result.rejected
     )
 
 
