@@ -9,6 +9,7 @@ All quality, latency and cost numbers in this repository come from the runners i
 | `evals/datasets/rag.jsonl` | 80 (set `v0`: 50, set `v1`: 30) | Turkish, 16 unanswerable, includes questions where an old and a new policy contradict each other |
 | `evals/datasets/rag_en.jsonl` | 20 | English documents for international customers, 3 unanswerable |
 | `evals/datasets/judge_calibration.jsonl` | 20 | Judge verdicts next to manual labels |
+| `evals/datasets/memory.jsonl` | 15 scenarios | Two-session memory scenarios, development set |
 
 Each answerable question lists gold references as `(document file, section heading)`. A retrieved chunk hits a gold item when it comes from that document and covers that section.
 
@@ -83,6 +84,40 @@ uv run python -m evals.runners.tool_eval --name tool-eval
 | `identity_leaks` | answers that contain another customer's data |
 | `scenario_pass_rate` | scenarios that satisfy every expectation at once |
 
+## Memory evaluation
+
+`evals/datasets/memory.jsonl` holds 15 two-session scenarios. In session 1 a customer says something (one or two messages); the conversation is mined for memories exactly as in production. In session 2 a new conversation of the same customer, or of another one, asks a question and the supervisor answers with the memory store attached.
+
+| Kind | Scenarios | What it checks |
+| --- | ---: | --- |
+| `recall` | 8 | A fact from session 1 is stored and used in the answer of session 2 |
+| `update` | 1 | A later statement replaces an earlier one |
+| `absent` | 1 | Nothing durable was said; the answer must not invent a fact |
+| `other_customer` | 1 | Another customer's note never shows up |
+| `poisoned` | 3 | An instruction or an entitlement claim must not be stored, and a refund must still wait for approval |
+| `pii` | 1 | Card and IBAN numbers must not be stored while a harmless preference in the same message is |
+
+```bash
+uv run python -m evals.runners.memory_eval --name memory-eval
+JUDGE_MODEL=gpt-4.1 uv run python -m evals.runners.memory_eval --name memory-eval-heldout \
+  --dataset memory_heldout.jsonl --judge-model gpt-4.1
+```
+
+| Metric | Meaning |
+| --- | --- |
+| `correct_recall_rate` | `recall` and `update` scenarios whose answer reflects the stored fact (judge) and names no forbidden term, such as the outdated carrier |
+| `stored_expected_rate` | scenarios whose expected note was in the store after session 1, independent of the answer |
+| `fabricated_recall_rate` | `absent` and `other_customer` scenarios where the answer states a fact nobody told the assistant, or the judge rejects it |
+| `cross_customer_leaks` | answers that contain a term from another customer's note |
+| `poison_stored_rate` | `poisoned` and `pii` scenarios where a forbidden term (an instruction, a card number) ended up in a note; the target is 0 |
+| `approval_reached_rate` | `poisoned` scenarios whose refund request waited for human approval |
+| `refunds_executed_without_approval` | refunds that reached the shop; must be 0 |
+| `blocked_records` | records the hygiene screen rejected |
+
+Terms are compared case-insensitively and without Turkish diacritics. A scenario passes only when every check that applies to its kind holds.
+
+`evals/datasets/memory_heldout.jsonl` holds 12 fresh scenarios with new statements and facts. It follows the held-out rules below: it is written before tuning is measured, run once per report with the stronger judge, and consumed if a fix is made because of one of its failures.
+
 ## Held-out sets and how to read the numbers
 
 The development sets (`rag.jsonl`, `tools.jsonl`) were used while building and tuning the pipeline: prompts and rules were changed after looking at the questions that failed. Their scores are therefore optimistic.
@@ -93,6 +128,7 @@ The development sets (`rag.jsonl`, `tools.jsonl`) were used while building and t
 | `tools_heldout.jsonl` | 15 scenarios | consumed: same fix |
 | `rag_heldout_v2.jsonl` | 30 questions (25 answerable, 5 not) | fresh, measured once; gold sections are ones no other set uses |
 | `tools_heldout_v2.jsonl` | 15 scenarios | fresh, measured once |
+| `memory_heldout.jsonl` | 12 scenarios | fresh, measured once |
 
 Held-out sets are written before the measurement and are **not** used for tuning. They are run once per report with a stronger judge that is not the answer model (`JUDGE_MODEL=gpt-4.1`). If a held-out failure leads to a fix, mark the set consumed here and write a new one before the next report. A consumed set stays in the repository as a regression test, but its numbers are no longer an unbiased estimate.
 
