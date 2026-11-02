@@ -17,6 +17,7 @@ from mabeyn.agents import prompts as agent_prompts
 from mabeyn.agents.supervisor import AgentDeps, build_supervisor_graph
 from mabeyn.core.config import Settings
 from mabeyn.ingestion.chunk import ChunkConfig
+from mabeyn.memory import prompts as memory_prompts
 from mabeyn.rag import graph as rag_graph_module
 from mabeyn.rag import prompts as rag_prompts
 from mabeyn.rag import rerank
@@ -70,7 +71,11 @@ def facts() -> str:
     chunk = {f.name: f.default for f in fields(ChunkConfig)}
     retries = inspect.signature(HttpToolExecutor.__init__).parameters["max_retries"].default
     rows = [
-        ("Prompt versions", f"`{rag_prompts.PROMPT_VERSION}`, `{agent_prompts.PROMPT_VERSION}`"),
+        (
+            "Prompt versions",
+            f"`{rag_prompts.PROMPT_VERSION}`, `{agent_prompts.PROMPT_VERSION}`, "
+            f"`{memory_prompts.PROMPT_VERSION}`",
+        ),
         ("Answer and action model", f"`{_default('llm_model')}`"),
         (
             "Small model (routing, rewriting, grading, reranking, checks)",
@@ -96,6 +101,16 @@ def facts() -> str:
         ("Tool response limit (bytes)", str(_default("tool_max_response_bytes"))),
         ("Retries for `GET` tools", str(retries)),
         ("Customer token lifetime (minutes)", str(_default("customer_token_ttl_minutes"))),
+        (
+            "History budget: summary plus recent messages (tokens)",
+            str(_default("history_token_budget")),
+        ),
+        ("Recent messages kept word for word", str(_default("history_keep_recent"))),
+        ("Summary limit (tokens)", str(_default("summary_max_tokens"))),
+        ("Memory time to live (days)", str(_default("memory_ttl_days"))),
+        ("Memory records per customer", str(_default("memory_max_records"))),
+        ("Notes recalled per message", str(_default("memory_recall_limit"))),
+        ("Idle minutes before a conversation is mined", str(_default("memory_idle_minutes"))),
     ]
     lines = ["| Setting | Value |", "| --- | --- |"]
     lines += [f"| {name} | {value} |" for name, value in rows]

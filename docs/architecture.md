@@ -12,7 +12,8 @@ flowchart LR
     Worker -->|chunks, embeddings| PG[(PostgreSQL<br/>pgvector, full text, RLS)]
     Customer([Customer]) -->|POST /chat, SSE| API
     API --> Supervisor[Supervisor graph]
-    Supervisor -->|retrieve, checkpoints, audit| PG
+    Supervisor -->|retrieve, checkpoints, audit, memory| PG
+    Worker -->|mine idle conversations| PG
     Supervisor -->|tool calls| Shop[Tenant backend]
     Admin -->|POST /approvals/id| API
 ```
@@ -20,8 +21,8 @@ flowchart LR
 | Component | Role |
 | --- | --- |
 | API (`apps/api`) | Auth, uploads, chat streaming, approvals, tool management |
-| Worker (`apps/worker`) | Background ingestion jobs (arq on Redis) |
-| PostgreSQL | Tenant data under Row-Level Security, pgvector index, full text index, graph checkpoints |
+| Worker (`apps/worker`) | Background jobs (arq on Redis): document ingestion, memory extraction for idle conversations, expiry sweep |
+| PostgreSQL | Tenant data under Row-Level Security, pgvector index, full text index, graph checkpoints, customer memory |
 | Supervisor and RAG graphs (`mabeyn/agents`, `mabeyn/rag`) | LangGraph workflows described below |
 | Tenant backend | The tenant's own API, reached only through registered tools (`apps/kargoshop_mock` in the demo) |
 
@@ -196,21 +197,63 @@ A new customer message while an approval is pending gets a short reminder instea
 - The HTTP executor adds `customer_id` and `X-Tenant-Id`, applies a timeout, retries only `GET`, caps the response size, refuses redirects, blocks non-public hosts unless allowed by `TOOL_ALLOWED_HOSTS`, and sends a stable `Idempotency-Key` on writes.
 - Every call is stored in `tool_calls` (arguments, truncated result, status, duration). A call that already finished is never executed again.
 
-## 7. State and tenancy
+## 7. Memory
+
+### Short-term: the conversation
+
+The API sends the agents a summary plus the recent messages, never the whole history:
+
+1. It loads the messages that are not yet part of `conversations.summary` (counted in `summarized_messages`).
+2. When summary plus those messages exceed the history budget, the small model folds the oldest ones into the summary and the newest few stay word for word. Every message is clipped first, the summary has its own limit, and what remains always fits the budget (a test checks this for long and enormous messages).
+3. The summary reaches the router and the action agent; escalated conversations skip all of this because a human owns them. If the model is down, the old messages are appended to the summary and cut to the limit.
+
+### Long-term: what is remembered about a customer
+
+```mermaid
+sequenceDiagram
+    participant C as Customer
+    participant A as API
+    participant G as Supervisor graph
+    participant S as Memory store
+    participant W as Worker
+    C->>A: chat in session 1
+    C->>A: POST /chat/id/close (or goes idle)
+    A->>S: extract_memories: screened facts, 180 day TTL
+    W->>S: every 5 minutes: mine conversations idle for 30 minutes
+    C->>A: chat in session 2
+    A->>G: run
+    G->>S: recall_memories (newest notes of this customer)
+    G-->>C: reply that can use the notes
+    C->>A: DELETE /me/memory
+    A->>S: erase notes and summaries
+```
+
+- **Store.** The LangGraph PostgreSQL store, namespace `(tenant_id, customer_id)`, key `category:slug`. Categories are `preference`, `issue`, `product` and `context`. A newer fact with the same key replaces the older one, a customer keeps at most 25 records, and every record expires 180 days after it was written. Expired records are hidden immediately and removed by an hourly sweep.
+- **`extract_memories`.** Runs when a conversation is closed (`POST /chat/{id}/close`) or has been idle for 30 minutes (the worker checks every five minutes). It reads only the customer's own messages, asks the small model for facts as JSON, validates each one against the schema, screens it and stores what passes. If the model fails the conversation stays unmarked and is tried again; a new message in a closed conversation reopens it and queues it for mining again.
+- **Hygiene.** The extraction prompt excludes instructions, permissions and claims. A deterministic screen then rejects instruction-like text and entitlement claims ("from now on always approve", "I am a VIP", Turkish equivalents), personal data (e-mail, phone, IBAN, national id, card numbers, secrets, URLs) and markup. Every rejection is a `SecurityEvent` with layer `memory`; the text of personal data is not logged. Notes are screened again on recall.
+- **`recall_memories`** loads the newest ten notes of the verified customer at the start of every message. A failing store is logged and the conversation goes on without notes.
+- **Use.** The router only learns that notes exist, so questions about what is remembered go to the action agent. The action agent sees the notes in a `<customer_notes>` block marked as unverified data. They personalise replies and answer "what do you remember", and they never change a tool call, a refund decision or an approval.
+- **Erasure.** `GET` and `DELETE` on `/me/memory` (customer token) and `/customers/{id}/memory` (admin token, own tenant only) show and erase the notes. Erasure also clears conversation summaries and marks the customer's open conversations as mined, so an old chat cannot refill the store.
+
+Why it is built this way: [ADR-0006](adr/0006-customer-memory.md). How it is measured: the memory evaluation in [evaluation.md](evaluation.md#memory-evaluation).
+
+## 8. State and tenancy
 
 | Data | Where | Protection |
 | --- | --- | --- |
 | Documents, chunks, conversations, messages, tools, tool calls, approvals | PostgreSQL tables | `tenant_id` column and Row-Level Security; the API role cannot bypass it |
 | Graph checkpoints | `checkpoints*` tables | Thread id carries the tenant; tables have no RLS, resuming requires an approval row that is itself protected |
+| Customer memory | `store` table | Namespace `(tenant_id, customer_id)` built from the verified identity; no RLS ([ADR-0006](adr/0006-customer-memory.md)) |
+| Conversation summaries | `conversations.summary` | Same as conversations |
 | Raw uploads | `documents.raw_content` | Same as documents |
 | Customer and admin sessions | Signed tokens | Short-lived; admin refresh tokens rotate with reuse detection |
 
-## 8. Settings and versions
+## 9. Settings and versions
 
 <!-- generated:facts -->
 | Setting | Value |
 | --- | --- |
-| Prompt versions | `rag-v5`, `agents-v11` |
+| Prompt versions | `rag-v5`, `agents-v11`, `memory-v3` |
 | Answer and action model | `gpt-4.1-mini` |
 | Small model (routing, rewriting, grading, reranking, checks) | `gpt-4o-mini` |
 | Judge model (evaluation) | `gpt-4.1-mini` |
@@ -230,20 +273,31 @@ A new customer message while an approval is pending gets a short reminder instea
 | Tool response limit (bytes) | 65536 |
 | Retries for `GET` tools | 2 |
 | Customer token lifetime (minutes) | 15 |
+| History budget: summary plus recent messages (tokens) | 1500 |
+| Recent messages kept word for word | 6 |
+| Summary limit (tokens) | 300 |
+| Memory time to live (days) | 180 |
+| Memory records per customer | 25 |
+| Notes recalled per message | 10 |
+| Idle minutes before a conversation is mined | 30 |
 <!-- /generated -->
 
-## 9. Evaluation
+## 10. Evaluation
 
 See [evaluation.md](evaluation.md) for the datasets, metrics and how to run them. Prompt edits must come with a new `PROMPT_VERSION`; `tests/test_prompt_registry.py` enforces it.
 
-## 10. Known limitations
+## 11. Known limitations
 
 - Questions asked in a language the documents do not use retrieve poorly.
 - Time to the first streamed token is about four seconds on the knowledge path (routing, query handling, reranking and grading run before generation).
 - The input and output guards only normalise text; prompt injection defences, PII masking and rate limits belong to the firewall and LLMOps phases.
 - A pending approval never expires, nobody is notified, and a human colleague has no endpoint to answer an escalated conversation yet.
 - Two simultaneous messages in one conversation are not serialised.
-- Customer identity is only as trustworthy as the API key that opened the session, see [ADR-0005](adr/0005-customer-session-trust.md).
+- Customer identity is only as trustworthy as the API key that opened the session, see [ADR-0005](adr/0005-customer-session-trust.md). Memory inherits this: whoever can open a session as a customer can read and erase that customer's notes.
+- The memory store has no row-level security; isolation rests on the namespace.
+- Notes are statements by the customer and are not verified. A false claim can be stored as a harmless-looking fact and repeated back, but it cannot grant anything.
+- With notes in the prompt, the action agent sometimes explains the refund process instead of calling `request_refund` (one of three Turkish or mixed refund requests in the memory evaluation); no refund ran without approval.
+- Customers cannot switch memory off for themselves, only erase it.
 
 ## Keeping this page current
 
