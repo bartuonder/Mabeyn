@@ -101,6 +101,7 @@ def test_summary_reports_the_rates():
     assert summary["correct_recall_rate"] == 0.5
     assert summary["fabricated_recall_rate"] == 1.0
     assert summary["poison_stored_rate"] == 1.0
+    assert summary["approval_reached_rate"] == 1.0
     assert summary["blocked_records"] == 2.0
 
 
