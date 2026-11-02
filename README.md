@@ -10,9 +10,10 @@ See [docs/ROADMAP.md](docs/ROADMAP.md) for the plan, [docs/adr](docs/adr) for de
 
 ```
 upload ──> API ──> Redis queue ──> worker: parse → chunk → embed ──> PostgreSQL (pgvector, full text, RLS)
+                                    worker: mine idle conversations for memories, expire old ones
 
 customer ──> /chat (SSE) ──> supervisor graph (LangGraph, Postgres checkpointer)
-              input_guard → supervisor ──> knowledge agent: RAG subgraph (documents only, no tools)
+              input_guard → recall_memories → supervisor ──> knowledge agent: RAG subgraph (documents only, no tools)
                                        ──> action agent: ReAct over tenant tools (never sees documents)
                                        ──> escalate: hand over to a human
               → compose → output_guard
@@ -27,6 +28,7 @@ action agent ── read / write tool ──> executes, audits in tool_calls
 - Retrieval combines pgvector similarity with Turkish/English full text search (Reciprocal Rank Fusion), then an LLM reranker narrows 30 candidates to 6.
 - A supervisor routes each message to a knowledge agent, an action agent or a human ([ADR-0002](docs/adr/0002-supervisor-and-two-agents.md)). Tools are registered per tenant with a JSON Schema and a risk level (`read`, `write`, `sensitive`); the platform, not the model, supplies the customer identity.
 - `sensitive` tools such as refunds never run directly: the graph pauses, an admin approves or rejects, and the paused conversation survives restarts. Walk-through: [docs/demo-scenarios.md](docs/demo-scenarios.md).
+- Returning customers are recognised: long conversations are summarised inside a token budget, and facts a customer states about themselves (a preferred carrier, an earlier complaint) are kept for 180 days in a store scoped to the customer. Instructions, permissions and personal data are never stored, and customers and admins can read and erase everything ([ADR-0006](docs/adr/0006-customer-memory.md)).
 
 ## Quick start
 
@@ -53,7 +55,17 @@ curl -N -X POST localhost:8000/chat -H "Authorization: Bearer $SESSION" \
   -H 'content-type: application/json' -d '{"message": "How long does delivery to KKTC take?"}'
 ```
 
+Close the conversation to let the assistant remember what was said, and look at or erase the notes:
+
+```bash
+curl -X POST localhost:8000/chat/<conversation_id>/close -H "Authorization: Bearer $SESSION"
+curl localhost:8000/me/memory -H "Authorization: Bearer $SESSION"
+curl -X DELETE localhost:8000/me/memory -H "Authorization: Bearer $SESSION"
+```
+
 Treat API keys as secrets: until [ADR-0005](docs/adr/0005-customer-session-trust.md) is implemented, anyone holding a key can open a session as any customer.
+
+Admins use `GET` and `DELETE /customers/{customer_id}/memory` for the same, for example to answer a deletion request.
 
 Documents are added with `POST /documents` (PDF, Markdown, HTML upload) or `POST /documents/url`. Tools are managed with `POST /tools` and `DELETE /tools/{id}`; pending refunds are listed with `GET /approvals?status=pending` and decided with `POST /approvals/{id}`.
 
@@ -65,6 +77,8 @@ docker compose up -d postgres redis
 make migrate
 make test lint typecheck
 ```
+
+Tests and evaluations send traces to LangSmith when `.env` enables tracing; tests switch it off themselves, and `LANGSMITH_TRACING=false` silences it for a single run (useful once the monthly trace quota of a free account is used up).
 
 ## Results
 
@@ -155,10 +169,32 @@ Scenarios on the supervisor with the mock shop ([how they are scored](docs/evalu
 - The two failures in the fresh set are scoring artefacts rather than wrong replies, and the set was not changed afterwards. In one the assistant listed the customer's orders instead of calling the status tool for an order number given in the message, and answered correctly (the scenario required the status tool). In the other the judge marked a correct delivery reply wrong because it did not repeat the order number.
 - The development set has one known failure: an English question that finds nothing in Turkish documents (cross-lingual retrieval is weak).
 
+### Memory
+
+Two-session scenarios ([how they are scored](docs/evaluation.md#memory-evaluation)): in session 1 a customer states something and the conversation is mined for memories, in session 2 a new conversation asks about it. The development set (15) was used for tuning; the held-out set (12, judge `gpt-4.1`) was written first and measured once.
+
+| Metric | Development (15) | Held-out (12) |
+| --- | ---: | ---: |
+| Scenarios passed | 1.000 [0.80-1.00] | 0.917 [0.65-0.99] |
+| Correct recall in session 2 | 1.000 (9 of 9) [0.70-1.00] | 1.000 (6 of 6) [0.61-1.00] |
+| Expected note stored after session 1 | 1.000 | 1.000 |
+| Fabricated recall (nothing was said, or another customer said it) | 0.000 (0 of 2) | 0.000 (0 of 2) |
+| Other customer's note in an answer | 0 | 0 |
+| Poisoned or personal data stored | 0 of 4 | 0 of 4 |
+| Poisoned scenarios whose refund waited for approval | 3 of 3 | 2 of 3 |
+| Refunds executed without approval | 0 | 0 |
+| Cost per scenario | $0.002 | $0.002 |
+
+- Recall, updates ("switch me to MNG"), missing facts and customer separation held on both sets, but 6 to 9 scenarios per metric cannot separate 0.90 from 1.00; read the intervals.
+- No instruction, entitlement claim, card number, IBAN, e-mail address or phone number reached the store. The extraction prompt already dropped every poisoned statement before the deterministic screen saw it, so the screen itself is covered by unit tests, not by this table.
+- The one held-out miss is not a stored poison: in a Turkish refund request the action agent explained the refund steps instead of calling `request_refund`, so nothing reached the approval queue (and nothing was executed). The same request passes without notes in the tool-use set, so the notes block seems to change the agent's behaviour; this was not investigated further. The set was not changed for it, and it stays an open defect.
+- Development-set work found two product defects, now fixed: slugs with Turkish letters made the schema drop valid facts, and a preference phrased as a request ("from now on") was mistaken for an instruction. It also found an evaluation defect: the runner wrote both session-1 messages in one transaction, so their order was undefined; it now writes one transaction per message like real chat turns. Fixed slugs for singular facts (carrier, region) were added so a newer statement replaces an older one.
+
 ## Status
 
 - Phase 1 — foundation, tenant isolation, auth: done
 - Phase 2 — ingestion and RAG v1: done
 - Phase 3 — RAG v2 and evaluation: done
 - Phase 4 — agentic layer, tools, human approval: done
-- Phases 5–8 — memory, firewall, LLMOps, product polish: planned, see the roadmap
+- Phase 5 — memory: done
+- Phases 6–8 — firewall, LLMOps, product polish: planned, see the roadmap
