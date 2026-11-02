@@ -152,10 +152,14 @@ async def close_conversation(
         if conversation.status is ConversationStatus.OPEN:
             conversation.status = ConversationStatus.CLOSED
         state = conversation.status
-    result = await memory.extract(customer.tenant_id, conversation_id)
-    return ConversationClosed(
-        status=state, memories_saved=result.saved, memories_blocked=result.rejected
-    )
+    saved = blocked = 0
+    try:
+        result = await memory.extract(customer.tenant_id, conversation_id)
+        saved, blocked = result.saved, result.rejected
+    except Exception:
+        # The conversation stays unmarked, so the idle job tries again.
+        log.exception("memory_extraction_failed", conversation_id=str(conversation_id))
+    return ConversationClosed(status=state, memories_saved=saved, memories_blocked=blocked)
 
 
 @router.get("/{conversation_id}")

@@ -193,3 +193,18 @@ async def test_erasing_memory_clears_summaries_and_stops_old_chats_being_mined(
     (row,) = rows
     assert row.summary is None and row.summarized_messages == 0
     assert row.memory_extracted_at is not None
+
+
+async def test_closing_still_works_when_extraction_fails(
+    client: AsyncClient, fresh_tenant, agent, memory_service
+):
+    def explode(messages, model):
+        raise ConnectionError("model is down")
+
+    memory_service.llm.handler = explode
+    conversation = await say(client, fresh_tenant, "I prefer Aras Kargo.")
+    closed = await client.post(f"/chat/{conversation}/close", headers=auth(fresh_tenant))
+    assert closed.status_code == 200 and closed.json()["status"] == "closed"
+    async with tenant_session(fresh_tenant) as session:
+        row = await session.get(m.Conversation, uuid.UUID(conversation))
+        assert row is not None and row.memory_extracted_at is None
