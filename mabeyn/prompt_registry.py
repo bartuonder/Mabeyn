@@ -7,7 +7,7 @@ from pathlib import Path
 from types import ModuleType
 
 REGISTRY_FILE = Path(__file__).with_name("prompt_versions.json")
-PROMPT_MODULES = ("mabeyn.rag.prompts", "mabeyn.agents.prompts")
+PROMPT_MODULES = ("mabeyn.rag.prompts", "mabeyn.agents.prompts", "mabeyn.memory.prompts")
 
 
 def fingerprint(module: ModuleType) -> str:
