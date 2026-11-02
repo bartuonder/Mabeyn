@@ -189,6 +189,9 @@ class Conversation(TenantModel):
         _enum(ConversationStatus), server_default=ConversationStatus.OPEN.value
     )
     escalation_reason: Mapped[str | None] = mapped_column(Text)
+    summary: Mapped[str | None] = mapped_column(Text)
+    summarized_messages: Mapped[int] = mapped_column(Integer, server_default=text("0"))
+    memory_extracted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class Message(TenantModel):
