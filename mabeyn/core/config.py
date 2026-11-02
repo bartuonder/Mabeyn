@@ -30,6 +30,17 @@ class Settings(BaseSettings):
     tool_max_response_bytes: int = 65536
     url_fetch_timeout_seconds: float = 15.0
 
+    # Short-term memory: the history sent to the agents never exceeds this many tokens.
+    history_token_budget: int = 1500
+    history_keep_recent: int = 6
+    summary_max_tokens: int = 300
+
+    # Long-term memory.
+    memory_ttl_days: int = 180
+    memory_max_records: int = 25
+    memory_recall_limit: int = 10
+    memory_idle_minutes: int = 30
+
     jwt_secret: SecretStr = Field(
         default=SecretStr("dev-only-secret-change-before-deploying"), min_length=32
     )
