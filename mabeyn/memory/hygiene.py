@@ -69,8 +69,12 @@ def fold(text: str) -> str:
 
 def screen(record: MemoryRecord) -> Rejection | None:
     """Return why a record must not be stored, or None when it is a plain fact."""
-    text = fold(record.text)
-    if _MARKUP.search(record.text):
+    return screen_text(record.text)
+
+
+def screen_text(raw: str) -> Rejection | None:
+    text = fold(raw)
+    if _MARKUP.search(raw):
         return Rejection("markup", "markup or control characters")
     for name, pattern in _PII.items():
         for match in pattern.finditer(text):
