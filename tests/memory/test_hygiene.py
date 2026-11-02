@@ -89,3 +89,23 @@ def test_record_schema_normalises_slugs_and_rejects_bad_input():
         MemoryRecord(category="issue", slug="x", text="Too short slug.")
     with pytest.raises(ValueError):
         MemoryRecord(category="issue", slug="long_text", text="x" * 201)
+
+
+@pytest.mark.parametrize(
+    ("raw", "slug"),
+    [
+        ("owns_robot_süpürge_r5", "owns_robot_supurge_r5"),
+        ("Interested in Hava Fritözü F6", "interested_in_hava_fritozu_f6"),
+        ("preferred-carrier", "preferred_carrier"),
+        ("  İletişim Kanalı ", "iletisim_kanali"),
+    ],
+)
+def test_slugs_are_folded_to_plain_ascii(raw, slug):
+    assert MemoryRecord(category="product", slug=raw, text="Owns something.").slug == slug
+
+
+def test_overlong_slugs_are_cut_and_empty_ones_rejected():
+    long = MemoryRecord(category="issue", slug="a" * 80, text="Something happened.")
+    assert len(long.slug) == 40
+    with pytest.raises(ValueError):
+        MemoryRecord(category="issue", slug="!!", text="Something happened.")

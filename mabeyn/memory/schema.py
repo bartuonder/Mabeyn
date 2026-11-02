@@ -1,10 +1,13 @@
 import enum
 import re
+import unicodedata
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 SLUG = re.compile(r"^[a-z][a-z0-9_]{2,39}$")
+NOT_SLUG = re.compile(r"[^a-z0-9]+")
+MAX_SLUG_CHARS = 40
 MAX_TEXT_CHARS = 200
 
 
@@ -27,7 +30,12 @@ class MemoryRecord(BaseModel):
     @field_validator("slug")
     @classmethod
     def _slug(cls, value: str) -> str:
-        value = value.lower().replace("-", "_").replace(" ", "_")
+        ascii_text = unicodedata.normalize("NFKD", value.replace("ı", "i")).encode(
+            "ascii", "ignore"
+        )
+        value = (
+            NOT_SLUG.sub("_", ascii_text.decode().lower()).strip("_")[:MAX_SLUG_CHARS].strip("_")
+        )
         if not SLUG.match(value):
             raise ValueError("slug must be a short snake_case name")
         return value
