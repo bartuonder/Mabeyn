@@ -1,7 +1,10 @@
 {
   "agents-v10": "8fa4744053abf610",
+  "agents-v11": "aa9ad140be0fbc5d",
   "agents-v9": "17f79e4b02aefe75",
   "memory-v1": "6815fdb7b84c1df6",
+  "memory-v2": "2aa0921a9f5f2b7f",
+  "memory-v3": "0d89916561e06d56",
   "rag-v4": "dafaa53d48eafb9c",
   "rag-v5": "9f770a3c297d11b1"
 }

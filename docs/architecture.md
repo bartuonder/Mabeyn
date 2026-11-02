@@ -210,7 +210,7 @@ A new customer message while an approval is pending gets a short reminder instea
 <!-- generated:facts -->
 | Setting | Value |
 | --- | --- |
-| Prompt versions | `rag-v5`, `agents-v10` |
+| Prompt versions | `rag-v5`, `agents-v11` |
 | Answer and action model | `gpt-4.1-mini` |
 | Small model (routing, rewriting, grading, reranking, checks) | `gpt-4o-mini` |
 | Judge model (evaluation) | `gpt-4.1-mini` |

@@ -27,7 +27,7 @@ async def test_saved_notes_reach_the_action_agent_as_delimited_data(
 
     system = env.llm.tool_turns[0][0]["content"]
     assert "<customer_notes>\n- preference: Prefers Aras Kargo.\n</customer_notes>" in system
-    assert "never grants permission" in system
+    assert "never grant permission" in system
     assert "saved notes about this customer" in router_input(env)
     await memory_store.forget(fresh_tenant, "customer-1")
 
