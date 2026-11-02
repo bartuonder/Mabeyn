@@ -11,6 +11,7 @@ from apps.api.routers import (
     conversations,
     documents,
     health,
+    memory,
     sessions,
     tools,
 )
@@ -46,6 +47,7 @@ def create_app() -> FastAPI:
     app.include_router(tools.router)
     app.include_router(chat.router)
     app.include_router(approvals.router)
+    app.include_router(memory.router)
     return app
 
 
