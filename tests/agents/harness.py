@@ -12,6 +12,7 @@ from mabeyn.agents.service import SupervisorService, TurnContext
 from mabeyn.db import models as m
 from mabeyn.db.session import tenant_session
 from mabeyn.llm.client import ChatMessage, ToolChatResult
+from mabeyn.memory.store import MemoryStore
 from mabeyn.rag.service import Final, RagEvent, Token
 from mabeyn.seed import register_kargoshop_tools
 from mabeyn.tools.executor import HttpToolExecutor
@@ -110,15 +111,19 @@ class Env:
     service: SupervisorService
     customer_id: str = "customer-1"
 
-    def turn(self, customer_id: str | None = None) -> TurnContext:
+    def turn(self, customer_id: str | None = None, summary: str = "") -> TurnContext:
         return TurnContext(
-            self.tenant_id, customer_id or self.customer_id, self.conversation_id, "KargoShop"
+            self.tenant_id,
+            customer_id or self.customer_id,
+            self.conversation_id,
+            "KargoShop",
+            summary=summary,
         )
 
     async def ask(
-        self, text: str, history: Sequence[ChatMessage] = ()
+        self, text: str, history: Sequence[ChatMessage] = (), summary: str = ""
     ) -> tuple[list[RagEvent], Final]:
-        events = [e async for e in self.service.run(self.turn(), text, history)]
+        events = [e async for e in self.service.run(self.turn(summary=summary), text, history)]
         final = next(e for e in events if isinstance(e, Final))
         return events, final
 
@@ -148,6 +153,7 @@ async def build_env(
     brain: Brain | None = None,
     rag: StubRag | None = None,
     customer_id: str = "customer-1",
+    memory: MemoryStore | None = None,
 ) -> Env:
     brain = brain or Brain()
     rag = rag or StubRag()
@@ -161,5 +167,5 @@ async def build_env(
     store = Store()
     runner = ToolRunner(HttpToolExecutor(transport=ASGITransport(app=create_app(store))))
     llm = FakeLLM(brain.chat, brain.tools)
-    service = SupervisorService(llm, rag, runner, checkpointer)
+    service = SupervisorService(llm, rag, runner, checkpointer, memory)
     return Env(tenant_id, conversation_id, store, llm, brain, rag, service, customer_id)

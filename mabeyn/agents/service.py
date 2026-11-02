@@ -15,6 +15,7 @@ from mabeyn.core.config import get_settings
 from mabeyn.db.models import Approval, ApprovalStatus
 from mabeyn.db.session import tenant_session
 from mabeyn.llm.client import LLM, ChatMessage
+from mabeyn.memory.store import MemoryStore
 from mabeyn.rag.service import Final, RagEvent, RagService, Retract, Token
 from mabeyn.rag.types import Citation
 from mabeyn.tools.service import ToolRunner
@@ -27,6 +28,7 @@ class TurnContext:
     conversation_id: uuid.UUID
     company: str
     today: date | None = None
+    summary: str = ""
 
     @property
     def thread_id(self) -> str:
@@ -59,10 +61,15 @@ class SupervisorService:
     """Runs the supervisor graph for one conversation thread and resumes it after approvals."""
 
     def __init__(
-        self, llm: LLM, rag: RagService, runner: ToolRunner, checkpointer: BaseCheckpointSaver[Any]
+        self,
+        llm: LLM,
+        rag: RagService,
+        runner: ToolRunner,
+        checkpointer: BaseCheckpointSaver[Any],
+        memory: MemoryStore | None = None,
     ) -> None:
         self.llm = llm
-        self.graph: Any = build_supervisor_graph(AgentDeps(llm, rag, runner)).compile(
+        self.graph: Any = build_supervisor_graph(AgentDeps(llm, rag, runner, memory)).compile(
             checkpointer=checkpointer
         )
 
@@ -126,6 +133,7 @@ class SupervisorService:
             "today": (turn.today or date.today()).isoformat(),
             "question": question,
             "history": list(history),
+            "summary": turn.summary,
         }
         config = self._config(turn)
         async for mode, payload in self.graph.astream(

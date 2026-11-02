@@ -2,6 +2,7 @@ import uuid
 from dataclasses import dataclass
 from typing import Any
 
+import structlog
 from langgraph.config import get_stream_writer
 from langgraph.graph import END, START, StateGraph
 
@@ -13,9 +14,13 @@ from mabeyn.db.models import Conversation, ConversationStatus
 from mabeyn.db.session import tenant_session
 from mabeyn.guard.basic import check_input, check_output
 from mabeyn.llm.client import LLM, ChatMessage, LLMError, chat_json
+from mabeyn.memory.recall import recall
+from mabeyn.memory.store import MemoryStore
 from mabeyn.rag.generate import safe_fallback
 from mabeyn.rag.service import Final, RagService, Retract, Token
 from mabeyn.tools.service import ToolRunner
+
+log = structlog.get_logger()
 
 VALID_ROUTES = (
     ["knowledge"],
@@ -32,6 +37,7 @@ class AgentDeps:
     llm: LLM
     rag: RagService
     runner: ToolRunner
+    memory: MemoryStore | None = None
 
 
 def _history_text(history: list[ChatMessage]) -> str:
@@ -74,13 +80,36 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
         return update
 
     def after_input_guard(state: SupervisorState) -> str:
-        return "output_guard" if state.get("blocked") else "supervisor"
+        return "output_guard" if state.get("blocked") else "recall_memories"
+
+    async def recall_memories(state: SupervisorState) -> dict[str, Any]:
+        if deps.memory is None:
+            return {"memories": []}
+        try:
+            notes = await recall(
+                deps.memory,
+                uuid.UUID(state["tenant_id"]),
+                state["customer_id"],
+                get_settings().memory_recall_limit,
+            )
+        except Exception:
+            # Memory is a convenience; a failing store must never stop the conversation.
+            log.exception("memory_recall_failed")
+            notes = []
+        return {"memories": notes}
 
     async def supervisor(state: SupervisorState) -> dict[str, Any]:
         route, reason, knowledge_question, language = ["knowledge"], "default", "", ""
         user = state["question"]
+        context = []
+        if state.get("summary"):
+            context.append(f"Summary of the earlier conversation:\n{state['summary']}")
         if state.get("history"):
-            user = f"Conversation so far:\n{_history_text(state['history'])}\n\nLatest: {user}"
+            context.append(f"Conversation so far:\n{_history_text(state['history'])}")
+        if state.get("memories"):
+            context.append(prompts.ROUTER_MEMORY_HINT)
+        if context:
+            user = "\n\n".join([*context, f"Latest: {user}"])
         try:
             data = await chat_json(
                 llm,
@@ -201,6 +230,7 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
     graph = StateGraph(SupervisorState)
     for name, node in {
         "input_guard": input_guard,
+        "recall_memories": recall_memories,
         "supervisor": supervisor,
         "dispatch": dispatch,
         "knowledge_agent": knowledge_agent,
@@ -219,8 +249,9 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
     graph.add_conditional_edges(
         "input_guard",
         after_input_guard,
-        {"supervisor": "supervisor", "output_guard": "output_guard"},
+        {"recall_memories": "recall_memories", "output_guard": "output_guard"},
     )
+    graph.add_edge("recall_memories", "supervisor")
     graph.add_edge("supervisor", "dispatch")
     graph.add_conditional_edges(
         "dispatch",

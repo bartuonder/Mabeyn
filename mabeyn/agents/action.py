@@ -71,11 +71,20 @@ class ActionAgent:
         notes = ""
         if state.get("knowledge_answer"):
             notes = prompts.NOTES_TEMPLATE.format(summary=state["knowledge_answer"])
+        memory = ""
+        if state.get("memories"):
+            lines = "\n".join(f"- {n['category']}: {n['text']}" for n in state["memories"])
+            memory = prompts.MEMORY_TEMPLATE.format(notes=lines)
+        earlier = ""
+        if state.get("summary"):
+            earlier = prompts.EARLIER_TEMPLATE.format(summary=state["summary"])
         system: ChatMessage = {
             "role": "system",
             "content": prompts.ACTION_SYSTEM.format(
                 company=state["company"],
                 notes=notes,
+                memory=memory,
+                earlier=earlier,
                 today=state.get("today", "unknown"),
                 language_rule=prompts.language_rule(state.get("language")),
             ),

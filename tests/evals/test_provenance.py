@@ -7,7 +7,7 @@ from evals.reporting import markdown_table
 
 def test_results_record_commit_prompts_and_models():
     info = provenance()
-    assert set(info["prompt_versions"]) == {"rag", "agents"}
+    assert set(info["prompt_versions"]) == {"rag", "agents", "memory"}
     assert info["models"]["generation"] and info["models"]["judge"]
     assert info["commit"] is None or len(info["commit"]) == 40
 

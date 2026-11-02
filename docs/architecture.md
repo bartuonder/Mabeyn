@@ -101,6 +101,7 @@ config:
 graph TD;
 	__start__([<p>__start__</p>]):::first
 	input_guard(input_guard)
+	recall_memories(recall_memories)
 	supervisor(supervisor)
 	dispatch(dispatch)
 	knowledge_agent(knowledge_agent)
@@ -129,8 +130,9 @@ graph TD;
 	dispatch -.-> knowledge_agent;
 	escalate --> output_guard;
 	input_guard -.-> output_guard;
-	input_guard -.-> supervisor;
+	input_guard -.-> recall_memories;
 	knowledge_agent --> dispatch;
+	recall_memories --> supervisor;
 	supervisor --> dispatch;
 	output_guard --> __end__;
 	classDef default fill:#f2f0ff,line-height:1.2
@@ -142,6 +144,7 @@ graph TD;
 | Node | What it does |
 | --- | --- |
 | `input_guard` | Normalises the text (invisible and control characters, length). An unusable message skips routing and gets a short "please rephrase" reply. Also resets the per-turn part of the state. |
+| `recall_memories` | Loads the saved notes about this customer from the long-term store (newest first, at most ten, screened again before use). A failing store is logged and the conversation goes on without notes. |
 | `supervisor` | One small-model call returns the route (`knowledge`, `action`, both, or `escalate`), the customer's language by name, and, for mixed requests, a clean policy question without order details. |
 | `dispatch` | Picks the next step of the plan; a pending `needs_human` flag always wins and goes to `escalate`. |
 | `knowledge_agent` | Runs the RAG subgraph. Streams live only when it is the whole plan. An abstention is dropped so it never reaches the action agent or the customer. |
@@ -207,7 +210,7 @@ A new customer message while an approval is pending gets a short reminder instea
 <!-- generated:facts -->
 | Setting | Value |
 | --- | --- |
-| Prompt versions | `rag-v5`, `agents-v9` |
+| Prompt versions | `rag-v5`, `agents-v10` |
 | Answer and action model | `gpt-4.1-mini` |
 | Small model (routing, rewriting, grading, reranking, checks) | `gpt-4o-mini` |
 | Judge model (evaluation) | `gpt-4.1-mini` |
