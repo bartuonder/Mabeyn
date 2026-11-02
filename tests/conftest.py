@@ -1,3 +1,4 @@
+import os
 import uuid
 from collections.abc import AsyncIterator
 
@@ -13,6 +14,10 @@ from mabeyn.db.provisioning import create_tenant
 from tests.factories import SeededTenant, delete_tenant, seed_tenant
 
 use_selector_loop_on_windows()
+
+# Tests never send traces; the flags are set before any module reads .env.
+os.environ["LANGSMITH_TRACING"] = "false"
+os.environ["LANGCHAIN_TRACING_V2"] = "false"
 
 
 @pytest_asyncio.fixture(scope="session")
