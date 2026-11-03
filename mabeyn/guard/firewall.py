@@ -1,7 +1,10 @@
 import uuid
 from dataclasses import dataclass
 
-from mabeyn.db.models import SecurityAction
+from sqlalchemy import func, select
+
+from mabeyn.db.models import Chunk, SecurityAction
+from mabeyn.db.session import tenant_session
 from mabeyn.guard import canary as canary_module
 from mabeyn.guard.classifier import InjectionClassifier, Verdict
 from mabeyn.guard.events import record_event, snippet
@@ -10,6 +13,11 @@ from mabeyn.guard.rules import FLAG, inspect_input, override_match
 from mabeyn.guard.settings import GuardSettings, load_guard_settings
 
 FLAG_SHARE = 0.6
+_SQUASHED = " -()."
+
+
+def _squash(value: str) -> str:
+    return value.lower().translate({ord(c): None for c in _SQUASHED})
 
 
 @dataclass(frozen=True)
@@ -109,6 +117,21 @@ class Firewall:
             )
         return InputDecision(True, None, verdict.score)
 
+    async def _published(self, tenant_id: uuid.UUID, value: str) -> bool:
+        """True when the tenant's own documents contain the value, like a support address."""
+        needle = _squash(value)
+        async with tenant_session(tenant_id) as session:
+            found = await session.scalar(
+                select(Chunk.id)
+                .where(
+                    func.strpos(func.translate(func.lower(Chunk.content), _SQUASHED, ""), needle)
+                    > 0,
+                    Chunk.flagged.is_(False),
+                )
+                .limit(1)
+            )
+        return found is not None
+
     async def scan_chunk(self, text: str) -> Verdict:
         """Rate a document passage for instructions aimed at an AI assistant."""
         if override_match(text):
@@ -132,6 +155,10 @@ class Firewall:
             )
             return OutputDecision(replacement, True, True)
         masked = mask_pii(text)
+        if masked.changed:
+            published = {v for v in masked.values if await self._published(tenant_id, v)}
+            if published:
+                masked = mask_pii(text, frozenset(published))
         if masked.changed:
             await record_event(
                 tenant_id,

@@ -51,6 +51,7 @@ def iban_valid(value: str) -> bool:
 class MaskResult:
     text: str
     kinds: list[str] = field(default_factory=list)
+    values: list[str] = field(default_factory=list)
 
     @property
     def changed(self) -> bool:
@@ -61,17 +62,22 @@ def _digits(value: str) -> str:
     return re.sub(r"\D", "", value)
 
 
-def mask_pii(text: str) -> MaskResult:
-    """Replace values that are validated personal data. Order numbers and totals stay intact."""
+def mask_pii(text: str, keep: frozenset[str] = frozenset()) -> MaskResult:
+    """Replace values that are validated personal data. Order numbers and totals stay intact.
+
+    Values in `keep` (for example the shop's own contact details) are left as they are.
+    """
     kinds: list[str] = []
+    values: list[str] = []
 
     def replace(pattern: re.Pattern[str], kind: str, valid) -> None:  # type: ignore[no-untyped-def]
         nonlocal text
 
         def sub(match: re.Match[str]) -> str:
-            if not valid(match.group()):
+            if match.group() in keep or not valid(match.group()):
                 return match.group()
             kinds.append(kind)
+            values.append(match.group())
             return LABELS[kind]
 
         text = pattern.sub(sub, text)
@@ -81,4 +87,4 @@ def mask_pii(text: str) -> MaskResult:
     replace(CARD, "card", lambda v: 13 <= len(_digits(v)) <= 19 and luhn_valid(_digits(v)))
     replace(NATIONAL_ID, "national_id", lambda v: national_id_valid(_digits(v)))
     replace(PHONE, "phone", lambda v: len(_digits(v)) >= 10)
-    return MaskResult(text, kinds)
+    return MaskResult(text, kinds, values)

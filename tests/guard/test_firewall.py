@@ -146,3 +146,26 @@ async def test_settings_default_save_and_stay_per_tenant(fresh_tenant, tenant_a)
     assert await load_guard_settings(tenant_a.id) == GuardSettings()
     cleared = await save_guard_settings(fresh_tenant, {"tool_allowlist": None})
     assert cleared.tool_allowlist is None
+
+
+async def test_contact_details_from_the_tenants_own_documents_are_not_masked(fresh_tenant):
+    from mabeyn.ingestion.pipeline import add_document, ingest_document
+
+    page = b"# Support\n\nWrite to destek@kargoshop.example or call 0850 123 45 67 for help.\n"
+    async with tenant_session(fresh_tenant) as session:
+        document = await add_document(
+            session,
+            tenant_id=fresh_tenant,
+            title="Support",
+            source_type=m.DocumentSource.MARKDOWN,
+            data=page,
+        )
+        document_id = document.id
+    await ingest_document(fresh_tenant, document_id, llm=FakeLLM())
+
+    reply = "Write to destek@kargoshop.example, or to ali@example.com, or call 0850 123 45 67."
+    result = await firewall(rater(0)).filter_output(fresh_tenant, None, reply, "n/a")
+    assert "destek@kargoshop.example" in result.text and "0850 123 45 67" in result.text
+    assert "ali@example.com" not in result.text and "[email]" in result.text
+    (event,) = await events(fresh_tenant)
+    assert event.detail == {"kinds": ["email"]}
