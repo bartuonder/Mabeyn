@@ -17,6 +17,7 @@ from mabeyn.agents import prompts as agent_prompts
 from mabeyn.agents.supervisor import AgentDeps, build_supervisor_graph
 from mabeyn.core.config import Settings
 from mabeyn.guard import prompts as guard_prompts
+from mabeyn.guard import settings as guard_settings
 from mabeyn.ingestion.chunk import ChunkConfig
 from mabeyn.memory import prompts as memory_prompts
 from mabeyn.rag import graph as rag_graph_module
@@ -112,6 +113,17 @@ def facts() -> str:
         ("Memory records per customer", str(_default("memory_max_records"))),
         ("Notes recalled per message", str(_default("memory_recall_limit"))),
         ("Idle minutes before a conversation is mined", str(_default("memory_idle_minutes"))),
+        ("Injection threshold (tenant default)", str(guard_settings.DEFAULT_THRESHOLD)),
+        (
+            "Write tool rate limit per customer (tenant default)",
+            f"{guard_settings.DEFAULT_RATE_LIMIT} per "
+            f"{guard_settings.DEFAULT_RATE_WINDOW_MINUTES} minutes",
+        ),
+        (
+            "Session requests per window (address, key)",
+            f"{_default('session_rate_per_address')}, {_default('session_rate_per_key')} "
+            f"per {_default('session_rate_window_seconds')} s",
+        ),
     ]
     lines = ["| Setting | Value |", "| --- | --- |"]
     lines += [f"| {name} | {value} |" for name, value in rows]

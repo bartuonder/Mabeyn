@@ -145,7 +145,7 @@ graph TD;
 | Node | What it does |
 | --- | --- |
 | `input_guard` | Normalises the text (invisible and control characters, length), then runs the firewall's input layer: rules for override phrases, hidden characters and encoded payloads, then a small-model rating compared with the tenant's threshold. A blocked message skips routing and gets a fixed reply; the attempt is written to the security events. Also resets the per-turn part of the state and decides whether replies are held back for checking. |
-| `recall_memories` | Loads the saved notes about this customer from the long-term store (newest first, at most ten, screened again before use). A failing store is logged and the conversation goes on without notes. |
+| `recall_memories` | Loads the saved notes about this customer from the long-term store (newest first, at most ten, screened again before use). Anonymous sessions skip it. A failing store is logged and the conversation goes on without notes. |
 | `supervisor` | One small-model call returns the route (`knowledge`, `action`, both, or `escalate`), the customer's language by name, and, for mixed requests, a clean policy question without order details. |
 | `dispatch` | Picks the next step of the plan; a pending `needs_human` flag always wins and goes to `escalate`. |
 | `knowledge_agent` | Runs the RAG subgraph. Streams live only when it is the whole plan. An abstention is dropped so it never reaches the action agent or the customer. |
@@ -237,18 +237,37 @@ sequenceDiagram
 
 Why it is built this way: [ADR-0006](adr/0006-customer-memory.md). How it is measured: the memory evaluation in [evaluation.md](evaluation.md#memory-evaluation).
 
-## 8. State and tenancy
+## 8. Firewall
+
+Four layers plus a log, each switched by the tenant's `firewall_enabled` setting. Rationale and alternatives: [ADR-0003](adr/0003-defense-layers.md).
+
+| Layer | Where it runs | What it does |
+| --- | --- | --- |
+| Input | `input_guard` | Rules before any model: hidden and tag characters, base64 and hex payloads (decoded and checked again) and known override phrases in English, Turkish and German. Then a small model rates the message from 0 to 1; the tenant threshold (default 0.7) decides, and an unreadable rating blocks. A blocked message gets a fixed bilingual reply and is stored with `blocked = true`, so summaries and memory ignore it. |
+| Indirect injection | ingestion and `generate` | Every passage is rated with a document prompt when it is ingested; passages above the threshold are flagged and excluded from vector and full-text retrieval. Retrieved text sits in `<source>` blocks declared untrusted, and forged source tags inside a document are neutralised. |
+| Tools | `action_tools`, `action_await_approval` | A tenant allowlist hides tools from the model. A refund is checked against the real order, fetched with the customer's injected identity: the order must belong to the customer and the amount may not exceed the total. Write and sensitive calls are rate limited per customer (default 5 per hour). Checks run before an approval is opened and again before an approved call runs. A failed check is an error the model sees, never a call. |
+| Output | `output_guard` | A per-tenant canary token sits in the agents' prompts; a reply that contains it, even spaced out, is replaced. Validated IBAN, card, national id, e-mail and phone values are masked. While the layer is active, replies are held until checked and released as one token event; with the layer off they stream as before. |
+| Log | everywhere | Each block or flag is a `security_events` row (layers `input`, `ingestion`, `tool`, `output`, `memory`) with a masked excerpt. `GET /security-events` lists them, filtered by layer or action. |
+
+Tenant settings (`GET` and `PUT /settings/firewall`): master switch, injection threshold, write rate limit and window, and an optional tool allowlist (`null` allows every tool).
+
+### Who is the customer
+
+Secret API keys (`mbn_sec_…`) stay on the tenant's server and open sessions for a named customer. Publishable keys (`mbn_pub_…`) are safe in a browser: they only open anonymous sessions (`anon:<random>`), may be limited to a list of origins, and cannot name a customer. Anonymous sessions get no memory, and the action agent sees only tools registered with `requires_identity: false`. Session creation is rate limited per client address and per key.
+
+## 9. State and tenancy
 
 | Data | Where | Protection |
 | --- | --- | --- |
 | Documents, chunks, conversations, messages, tools, tool calls, approvals | PostgreSQL tables | `tenant_id` column and Row-Level Security; the API role cannot bypass it |
 | Graph checkpoints | `checkpoints*` tables | Thread id carries the tenant; tables have no RLS, resuming requires an approval row that is itself protected |
 | Customer memory | `store` table | Namespace `(tenant_id, customer_id)` built from the verified identity; no RLS ([ADR-0006](adr/0006-customer-memory.md)) |
+| Firewall settings and security events | `tenant_settings`, `security_events` | `tenant_id` column and Row-Level Security |
 | Conversation summaries | `conversations.summary` | Same as conversations |
 | Raw uploads | `documents.raw_content` | Same as documents |
 | Customer and admin sessions | Signed tokens | Short-lived; admin refresh tokens rotate with reuse detection |
 
-## 9. Settings and versions
+## 10. Settings and versions
 
 <!-- generated:facts -->
 | Setting | Value |
@@ -280,17 +299,24 @@ Why it is built this way: [ADR-0006](adr/0006-customer-memory.md). How it is mea
 | Memory records per customer | 25 |
 | Notes recalled per message | 10 |
 | Idle minutes before a conversation is mined | 30 |
+| Injection threshold (tenant default) | 0.7 |
+| Write tool rate limit per customer (tenant default) | 5 per 60 minutes |
+| Session requests per window (address, key) | 20, 60 per 60 s |
 <!-- /generated -->
 
-## 10. Evaluation
+## 11. Evaluation
 
 See [evaluation.md](evaluation.md) for the datasets, metrics and how to run them. Prompt edits must come with a new `PROMPT_VERSION`; `tests/test_prompt_registry.py` enforces it.
 
-## 11. Known limitations
+## 12. Known limitations
 
 - Questions asked in a language the documents do not use retrieve poorly.
 - Time to the first streamed token is about four seconds on the knowledge path (routing, query handling, reranking and grading run before generation).
-- The input and output guards only normalise text; prompt injection defences, PII masking and rate limits belong to the firewall and LLMOps phases.
+- The firewall's rating sees one message at a time, so an attack spread over several messages is judged message by message; rules and the canary catch known phrases and verbatim leaks, not paraphrases.
+- Argument policies exist for the KargoShop tools (`request_refund`, `change_address`); a tenant without a `get_order_status` tool is not checked.
+- Small sections are merged into one passage, so one poisoned sentence withholds its whole passage from retrieval.
+- The firewall adds a small-model call to every message and a call per passage at ingestion.
+- Rate limits for requests in general and for the chat endpoint arrive with the LLMOps phase; only session creation is limited today.
 - A pending approval never expires, nobody is notified, and a human colleague has no endpoint to answer an escalated conversation yet.
 - Two simultaneous messages in one conversation are not serialised.
 - Customer identity is only as trustworthy as the API key that opened the session, see [ADR-0005](adr/0005-customer-session-trust.md). Memory inherits this: whoever can open a session as a customer can read and erase that customer's notes.
