@@ -13,15 +13,16 @@ Do not start a phase before the previous one meets its definition of done.
 | 3 RAG v2 and evals | done | Ablation, experiments and a held-out set; see [evaluation.md](evaluation.md) |
 | 4 Agentic layer | done | ADR-0002, [architecture.md](architecture.md) |
 | 5 Memory | done | ADR-0006, [architecture.md](architecture.md#7-memory) |
-| 6 LLM firewall and red-team | planned | ADR-0003 reserved; also closes the open items in [ADR-0005](adr/0005-customer-session-trust.md) and the isolation note of [ADR-0006](adr/0006-customer-memory.md) |
+| 6 LLM firewall and red-team | done | [ADR-0003](adr/0003-defense-layers.md), [ADR-0005](adr/0005-customer-session-trust.md) implemented; the memory store still has no RLS ([ADR-0006](adr/0006-customer-memory.md)) |
 | 7 LLMOps, cache, performance | planned | |
-| 8 Productization | planned | Widget and session keys follow ADR-0005 |
+| 8 Productization | planned | The widget uses publishable keys ([ADR-0005](adr/0005-customer-session-trust.md)) |
 
 Deliberate differences from the plan below:
 - Embeddings come from the OpenAI API instead of a local bge-m3, and the reranker is an LLM listwise reranker instead of a cross-encoder.
 - Gold references in the evaluation sets point to a document and a section heading instead of chunk ids, so chunk size experiments reuse the same questions ([ADR-0004](adr/0004-evaluation-driven-rag.md)).
 - The demo documents and the golden set are Turkish, with a small English set.
 - The plan's phases 0 and 1 are one phase here, and weeks are not tracked.
+- The classifier is a small OpenAI model instead of Llama Prompt Guard, and personal data is masked with validated regular expressions instead of Presidio ([ADR-0003](adr/0003-defense-layers.md)).
 - Memory recall lists the newest notes of the verified customer instead of searching them, and extraction runs when a conversation is closed or idle instead of at an unspecified end.
 - Evaluation results are reported with 95% confidence intervals, and a held-out set that is never used for tuning backs the development numbers.
 
