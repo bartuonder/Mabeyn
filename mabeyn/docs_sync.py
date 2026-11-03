@@ -16,8 +16,8 @@ from mabeyn.agents import action
 from mabeyn.agents import prompts as agent_prompts
 from mabeyn.agents.supervisor import AgentDeps, build_supervisor_graph
 from mabeyn.core.config import Settings
-from mabeyn.ingestion.chunk import ChunkConfig
 from mabeyn.guard import prompts as guard_prompts
+from mabeyn.ingestion.chunk import ChunkConfig
 from mabeyn.memory import prompts as memory_prompts
 from mabeyn.rag import graph as rag_graph_module
 from mabeyn.rag import prompts as rag_prompts

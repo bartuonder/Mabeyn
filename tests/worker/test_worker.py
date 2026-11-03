@@ -13,14 +13,17 @@ def test_job_name_matches_worker_function():
 async def test_worker_delegates_to_pipeline(monkeypatch):
     seen = {}
 
-    async def fake_ingest(tenant_id: uuid.UUID, document_id: uuid.UUID) -> DocumentStatus:
+    async def fake_ingest(
+        tenant_id: uuid.UUID, document_id: uuid.UUID, firewall=None
+    ) -> DocumentStatus:
         seen["ids"] = (tenant_id, document_id)
+        seen["firewall"] = firewall
         return DocumentStatus.READY
 
     monkeypatch.setattr(worker, "ingest_document", fake_ingest)
     tenant, document = uuid.uuid4(), uuid.uuid4()
-    assert await worker.ingest({}, str(tenant), str(document)) == "ready"
-    assert seen["ids"] == (tenant, document)
+    assert await worker.ingest({"firewall": "fw"}, str(tenant), str(document)) == "ready"
+    assert seen["ids"] == (tenant, document) and seen["firewall"] == "fw"
 
 
 def test_memory_jobs_are_scheduled():

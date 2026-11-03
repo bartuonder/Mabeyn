@@ -8,6 +8,8 @@ from arq.connections import RedisSettings
 from mabeyn.core.config import get_settings
 from mabeyn.core.logging import configure_logging
 from mabeyn.core.tracking import export_tracking_env
+from mabeyn.guard.classifier import LlmInjectionClassifier
+from mabeyn.guard.firewall import Firewall
 from mabeyn.ingestion.pipeline import ingest_document
 from mabeyn.llm.client import get_llm
 from mabeyn.memory.idle import extract_idle
@@ -16,7 +18,9 @@ from mabeyn.memory.store import open_memory_store
 
 
 async def ingest(ctx: dict[str, Any], tenant_id: str, document_id: str) -> str:
-    status = await ingest_document(uuid.UUID(tenant_id), uuid.UUID(document_id))
+    status = await ingest_document(
+        uuid.UUID(tenant_id), uuid.UUID(document_id), firewall=ctx.get("firewall")
+    )
     return status.value
 
 
@@ -35,7 +39,9 @@ async def startup(ctx: dict[str, Any]) -> None:
     stack = AsyncExitStack()
     store = await stack.enter_async_context(open_memory_store())
     ctx["stack"] = stack
-    ctx["memory"] = MemoryService(get_llm(), store)
+    llm = get_llm()
+    ctx["memory"] = MemoryService(llm, store)
+    ctx["firewall"] = Firewall(LlmInjectionClassifier(llm))
 
 
 async def shutdown(ctx: dict[str, Any]) -> None:
