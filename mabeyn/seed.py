@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from mabeyn.db.models import Document, DocumentSource, RiskLevel, Tenant, ToolDefinition
 from mabeyn.db.provisioning import create_tenant
 from mabeyn.db.session import tenant_session
+from mabeyn.guard.firewall import Firewall
 from mabeyn.ingestion.chunk import ChunkConfig
 from mabeyn.ingestion.parse import parse_markdown
 from mabeyn.ingestion.pipeline import add_document, ingest_document
@@ -60,6 +61,7 @@ async def ingest_seed_documents(
     llm: LLM,
     chunk_config: ChunkConfig | None = None,
     embedding_model: str | None = None,
+    firewall: Firewall | None = None,
 ) -> None:
     gate = asyncio.Semaphore(INGEST_CONCURRENCY)
 
@@ -83,6 +85,7 @@ async def ingest_seed_documents(
                 llm=llm,
                 chunk_config=chunk_config,
                 embedding_model=embedding_model,
+                firewall=firewall,
             )
 
     await asyncio.gather(*(ingest(d) for d in documents))

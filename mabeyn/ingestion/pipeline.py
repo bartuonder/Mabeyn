@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 from datetime import date
 
@@ -6,9 +7,12 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import undefer
 
-from mabeyn.db.models import Chunk, Document, DocumentSource, DocumentStatus
+from mabeyn.db.models import Chunk, Document, DocumentSource, DocumentStatus, SecurityAction
 from mabeyn.db.session import tenant_session
-from mabeyn.ingestion.chunk import ChunkConfig, chunk_document
+from mabeyn.guard.classifier import Verdict
+from mabeyn.guard.events import record_event, snippet
+from mabeyn.guard.firewall import Firewall
+from mabeyn.ingestion.chunk import ChunkConfig, DraftChunk, chunk_document
 from mabeyn.ingestion.fetch import FetchError, fetch_url
 from mabeyn.ingestion.parse import ParseError, detect_language, parse_document
 from mabeyn.llm.client import LLM, get_llm
@@ -17,6 +21,7 @@ log = structlog.get_logger()
 
 EXPECTED_ERRORS = (ParseError, FetchError)
 FTS_CONFIGS = {"tr": "turkish", "en": "english"}
+SCAN_CONCURRENCY = 8
 
 
 async def add_document(
@@ -53,6 +58,24 @@ async def _set_failed(tenant_id: uuid.UUID, document_id: uuid.UUID, message: str
             document.error = message[:500]
 
 
+async def _scan(
+    firewall: Firewall | None, tenant_id: uuid.UUID, chunks: list[DraftChunk]
+) -> tuple[list[Verdict | None], float]:
+    """Rate every passage for instructions aimed at an assistant (indirect injection)."""
+    if firewall is None or not firewall.config.documents:
+        return [None] * len(chunks), 1.0
+    settings = await firewall.settings(tenant_id)
+    if not settings.firewall_enabled:
+        return [None] * len(chunks), 1.0
+    gate = asyncio.Semaphore(SCAN_CONCURRENCY)
+
+    async def one(chunk: DraftChunk) -> Verdict:
+        async with gate:
+            return await firewall.scan_chunk(chunk.content)
+
+    return list(await asyncio.gather(*(one(c) for c in chunks))), settings.injection_threshold
+
+
 async def ingest_document(
     tenant_id: uuid.UUID,
     document_id: uuid.UUID,
@@ -60,6 +83,7 @@ async def ingest_document(
     llm: LLM | None = None,
     chunk_config: ChunkConfig | None = None,
     embedding_model: str | None = None,
+    firewall: Firewall | None = None,
 ) -> DocumentStatus:
     """Parse, chunk and embed one document. Failures are stored on the document."""
     llm = llm or get_llm()
@@ -86,6 +110,7 @@ async def ingest_document(
         parsed = parse_document(source_type, data)
         chunks = chunk_document(parsed, title, chunk_config)
         vectors = await llm.embed([c.embedding_text for c in chunks], model=embedding_model)
+        verdicts, threshold = await _scan(firewall, tenant_id, chunks)
     except EXPECTED_ERRORS as exc:
         await _set_failed(tenant_id, document_id, str(exc))
         return DocumentStatus.FAILED
@@ -119,11 +144,28 @@ async def ingest_document(
                 token_count=chunk.token_count,
                 embedding=vector,
                 fts_config=FTS_CONFIGS.get(language, "simple"),
+                flagged=bool(verdict and verdict.score >= threshold),
+                injection_score=verdict.score if verdict else None,
             )
-            for chunk, vector in zip(chunks, vectors, strict=True)
+            for chunk, vector, verdict in zip(chunks, vectors, verdicts, strict=True)
         )
         document.language = language
         document.effective_date = effective
         document.status = DocumentStatus.READY
+    for chunk, verdict in zip(chunks, verdicts, strict=True):
+        if verdict and verdict.score >= threshold:
+            await record_event(
+                tenant_id,
+                None,
+                "ingestion",
+                verdict.category,
+                SecurityAction.FLAGGED,
+                {
+                    "document_id": str(document_id),
+                    "position": chunk.position,
+                    "score": verdict.score,
+                    "text": snippet(chunk.content),
+                },
+            )
     log.info("ingestion_done", document_id=str(document_id), chunks=len(chunks))
     return DocumentStatus.READY

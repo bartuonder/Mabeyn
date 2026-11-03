@@ -40,6 +40,7 @@ async def vector_search(
         .where(
             Chunk.tenant_id == tenant_id,
             Chunk.embedding.is_not(None),
+            Chunk.flagged.is_(False),
             Document.status == DocumentStatus.READY,
         )
         .order_by(distance)

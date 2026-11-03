@@ -32,6 +32,7 @@ FTS_SQL = text(
     CROSS JOIN q
     WHERE c.tenant_id = :tenant_id
       AND d.status = :ready
+      AND NOT c.flagged
       AND (
           (c.fts_config = 'turkish'::regconfig AND c.search_vector @@ q.tr)
           OR (c.fts_config = 'english'::regconfig AND c.search_vector @@ q.en)
