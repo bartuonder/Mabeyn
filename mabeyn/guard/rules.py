@@ -23,7 +23,9 @@ OVERRIDE_PATTERNS = [
     r"\bforget (everything|all)\b.{0,30}\b(you|we|told|said|know)",
     r"\b(you are|you re|act as|pretend to be|behave as)\b.{0,25}\b(dan|jailbroken|unrestricted|"
     r"unfiltered|developer mode|evil|without (any )?(rules|restrictions|filters))",
-    r"\b(developer|debug|god|jailbreak|dan) mode\b",
+    r"\b(enable|activate|enter|switch to|turn on|you are in|now in|into)\b.{0,15}"
+    r"\b(developer|debug|god|dan) mode\b",
+    r"\bjailbreak mode\b",
     r"\bdo anything now\b",
     r"\b(reveal|print|show|repeat|display|output|leak|tell me|write out)\b.{0,30}\b(your |the )?"
     r"(system|hidden|initial|secret|internal|original) (prompt|instruction|message|rule)",

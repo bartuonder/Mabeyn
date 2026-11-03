@@ -38,6 +38,8 @@ BENIGN = [
     "Can you repeat the delivery time please?",
     "Ürünün kullanım talimatlarını öğrenebilir miyim?",
     "I want to override the delivery date with a later one.",
+    "Do you have a developer mode on the Smart Watch X2?",
+    "How do I leave debug mode on the air fryer app?",
 ]
 
 
