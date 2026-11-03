@@ -38,6 +38,7 @@ class LoadedTool:
     risk: RiskLevel
     method: str
     url_template: str
+    requires_identity: bool = True
 
     @property
     def endpoint(self) -> ToolEndpoint:
@@ -71,7 +72,7 @@ def validate_definition(name: str, schema: dict[str, Any], method: str, url_temp
 def _loaded(row: ToolDefinition) -> LoadedTool:
     return LoadedTool(
         row.id, row.name, row.description, row.json_schema, row.risk_level, row.http_method,
-        row.url_template,
+        row.url_template, row.requires_identity,
     )  # fmt: skip
 
 
@@ -175,6 +176,10 @@ class ToolRunner:
         arguments: dict[str, Any],
         call_id: uuid.UUID | None = None,
     ) -> ToolResult:
+        if context.anonymous and tool.requires_identity:
+            return ToolResult(
+                ok=False, data=None, error="this tool needs a signed-in customer", status_code=403
+            )
         call_id = call_id or await start_call(
             context.tenant_id, conversation_id, tool.name, arguments
         )

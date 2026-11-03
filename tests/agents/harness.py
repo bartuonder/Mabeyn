@@ -13,6 +13,7 @@ from mabeyn.db import models as m
 from mabeyn.db.session import tenant_session
 from mabeyn.guard.classifier import LlmInjectionClassifier
 from mabeyn.guard.firewall import Firewall, FirewallConfig
+from mabeyn.guard.policies import ToolGuard
 from mabeyn.llm.client import ChatMessage, ToolChatResult
 from mabeyn.memory.store import MemoryStore
 from mabeyn.rag.service import Final, RagEvent, Token
@@ -116,6 +117,7 @@ class Env:
     rag: StubRag
     service: SupervisorService
     customer_id: str = "customer-1"
+    anonymous: bool = False
 
     def turn(self, customer_id: str | None = None, summary: str = "") -> TurnContext:
         return TurnContext(
@@ -124,6 +126,7 @@ class Env:
             self.conversation_id,
             "KargoShop",
             summary=summary,
+            anonymous=self.anonymous,
         )
 
     async def ask(
@@ -161,6 +164,8 @@ async def build_env(
     customer_id: str = "customer-1",
     memory: MemoryStore | None = None,
     firewall: bool | FirewallConfig = False,
+    tool_guard: bool = False,
+    anonymous: bool = False,
 ) -> Env:
     brain = brain or Brain()
     rag = rag or StubRag()
@@ -178,5 +183,7 @@ async def build_env(
     if firewall:
         config = firewall if isinstance(firewall, FirewallConfig) else FirewallConfig()
         guard = Firewall(LlmInjectionClassifier(llm), config)
-    service = SupervisorService(llm, rag, runner, checkpointer, memory, guard)
-    return Env(tenant_id, conversation_id, store, llm, brain, rag, service, customer_id)
+    service = SupervisorService(
+        llm, rag, runner, checkpointer, memory, guard, ToolGuard(runner) if tool_guard else None
+    )
+    return Env(tenant_id, conversation_id, store, llm, brain, rag, service, customer_id, anonymous)

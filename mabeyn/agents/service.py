@@ -15,6 +15,7 @@ from mabeyn.core.config import get_settings
 from mabeyn.db.models import Approval, ApprovalStatus
 from mabeyn.db.session import tenant_session
 from mabeyn.guard.firewall import Firewall
+from mabeyn.guard.policies import ToolGuard
 from mabeyn.llm.client import LLM, ChatMessage
 from mabeyn.memory.store import MemoryStore
 from mabeyn.rag.service import Final, RagEvent, RagService, Retract, Token
@@ -30,6 +31,7 @@ class TurnContext:
     company: str
     today: date | None = None
     summary: str = ""
+    anonymous: bool = False
 
     @property
     def thread_id(self) -> str:
@@ -69,10 +71,11 @@ class SupervisorService:
         checkpointer: BaseCheckpointSaver[Any],
         memory: MemoryStore | None = None,
         firewall: Firewall | None = None,
+        tool_guard: ToolGuard | None = None,
     ) -> None:
         self.llm = llm
         self.graph: Any = build_supervisor_graph(
-            AgentDeps(llm, rag, runner, memory, firewall)
+            AgentDeps(llm, rag, runner, memory, firewall, tool_guard)
         ).compile(checkpointer=checkpointer)
 
     @staticmethod
@@ -130,6 +133,7 @@ class SupervisorService:
         initial: SupervisorState = {
             "tenant_id": str(turn.tenant_id),
             "customer_id": turn.customer_id,
+            "anonymous": turn.anonymous,
             "conversation_id": str(turn.conversation_id),
             "company": turn.company,
             "today": (turn.today or date.today()).isoformat(),

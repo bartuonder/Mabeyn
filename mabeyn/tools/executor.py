@@ -24,6 +24,7 @@ class ToolContext:
 
     tenant_id: uuid.UUID
     customer_id: str
+    anonymous: bool = False
 
 
 @dataclass(frozen=True)

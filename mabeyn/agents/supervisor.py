@@ -14,6 +14,7 @@ from mabeyn.db.models import Conversation, ConversationStatus
 from mabeyn.db.session import tenant_session
 from mabeyn.guard.basic import check_input, check_output
 from mabeyn.guard.firewall import Firewall
+from mabeyn.guard.policies import ToolGuard
 from mabeyn.llm.client import LLM, ChatMessage, LLMError, chat_json
 from mabeyn.memory.recall import recall
 from mabeyn.memory.store import MemoryStore
@@ -40,6 +41,7 @@ class AgentDeps:
     runner: ToolRunner
     memory: MemoryStore | None = None
     firewall: Firewall | None = None
+    tool_guard: ToolGuard | None = None
 
 
 def _history_text(history: list[ChatMessage]) -> str:
@@ -71,7 +73,12 @@ async def _short_reply(llm: LLM, system: str, question: str) -> str:
 def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
     llm = deps.llm
     firewall = deps.firewall
-    action = ActionAgent(llm, deps.runner, canary_guard=bool(firewall and firewall.config.output))
+    action = ActionAgent(
+        llm,
+        deps.runner,
+        canary_guard=bool(firewall and firewall.config.output),
+        guard=deps.tool_guard,
+    )
 
     async def input_guard(state: SupervisorState) -> dict[str, Any]:
         tenant_id = uuid.UUID(state["tenant_id"])
@@ -102,7 +109,7 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
         return "output_guard" if state.get("blocked") else "recall_memories"
 
     async def recall_memories(state: SupervisorState) -> dict[str, Any]:
-        if deps.memory is None:
+        if deps.memory is None or state.get("anonymous"):
             return {"memories": []}
         try:
             notes = await recall(

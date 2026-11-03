@@ -15,6 +15,7 @@ class SupervisorState(TypedDict, total=False):
     # Identity comes from the verified session, never from the model.
     tenant_id: str
     customer_id: str
+    anonymous: bool
     conversation_id: str
     company: str
     today: str

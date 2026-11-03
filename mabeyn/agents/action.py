@@ -7,9 +7,11 @@ from langgraph.types import interrupt
 from mabeyn.agents import prompts
 from mabeyn.agents.state import SupervisorState
 from mabeyn.core.config import get_settings
-from mabeyn.db.models import Approval, ApprovalStatus, RiskLevel
+from mabeyn.db.models import Approval, ApprovalStatus, RiskLevel, SecurityAction
 from mabeyn.db.session import tenant_session
 from mabeyn.guard.canary import canary_for
+from mabeyn.guard.events import record_event
+from mabeyn.guard.policies import ToolGuard
 from mabeyn.llm.client import LLM, ChatMessage
 from mabeyn.tools.executor import ToolContext, ToolResult
 from mabeyn.tools.service import (
@@ -45,16 +47,30 @@ def _summary(name: str, arguments: dict[str, Any]) -> str:
 class ActionAgent:
     """ReAct loop over the tenant's tools, built from graph nodes so it can pause for approval."""
 
-    def __init__(self, llm: LLM, runner: ToolRunner, canary_guard: bool = False) -> None:
+    def __init__(
+        self,
+        llm: LLM,
+        runner: ToolRunner,
+        canary_guard: bool = False,
+        guard: ToolGuard | None = None,
+    ) -> None:
         self.llm = llm
         self.runner = runner
         self.canary_guard = canary_guard
+        self.guard = guard
 
     def _context(self, state: SupervisorState) -> ToolContext:
-        return ToolContext(uuid.UUID(state["tenant_id"]), state["customer_id"])
+        return ToolContext(
+            uuid.UUID(state["tenant_id"]), state["customer_id"], bool(state.get("anonymous"))
+        )
 
     async def _tools(self, state: SupervisorState) -> dict[str, LoadedTool]:
-        tools = await load_tools(uuid.UUID(state["tenant_id"]), AGENT_RISKS["action"])
+        tenant_id = uuid.UUID(state["tenant_id"])
+        tools = await load_tools(tenant_id, AGENT_RISKS["action"])
+        if state.get("anonymous"):
+            tools = [t for t in tools if not t.requires_identity]
+        if self.guard is not None and (allowed := await self.guard.allowed_names(tenant_id)):
+            tools = [t for t in tools if t.name in allowed]
         return {t.name: t for t in tools}
 
     async def start(self, state: SupervisorState) -> dict[str, Any]:
@@ -130,9 +146,11 @@ class ActionAgent:
         trace = list(state.get("tool_trace", []))
         tool = (await self._tools(state)).get(name)
 
-        def failed(reason: str, arguments: dict[str, Any] | None = None) -> dict[str, Any]:
+        def failed(
+            reason: str, arguments: dict[str, Any] | None = None, status: str = "invalid"
+        ) -> dict[str, Any]:
             messages.append(_tool_message(first["id"], {"ok": False, "error": reason}))
-            trace.append({"name": name, "arguments": arguments or {}, "status": "invalid"})
+            trace.append({"name": name, "arguments": arguments or {}, "status": status})
             return self._after_call(messages, used, errors + 1, trace)
 
         if tool is None:
@@ -140,6 +158,20 @@ class ActionAgent:
         arguments = parse_arguments(tool, first["function"]["arguments"])
         if isinstance(arguments, str):
             return failed(arguments)
+
+        if self.guard is not None:
+            context = self._context(state)
+            conversation_id = uuid.UUID(state["conversation_id"])
+            if violation := await self.guard.check(context, conversation_id, tool, arguments):
+                await record_event(
+                    context.tenant_id,
+                    conversation_id,
+                    "tool",
+                    violation.policy,
+                    SecurityAction.BLOCKED,
+                    {"tool": name, "arguments": arguments, "reason": violation.reason},
+                )
+                return failed(f"policy: {violation.reason}", arguments, "blocked")
 
         if tool.risk is RiskLevel.SENSITIVE:
             pending = {
@@ -249,9 +281,23 @@ class ActionAgent:
 
         if decision.get("decision") == "approved":
             tool = (await self._tools(state)).get(pending["name"])
+            violation = None
+            if tool is not None and self.guard is not None:
+                violation = await self.guard.check(
+                    self._context(state),
+                    uuid.UUID(state["conversation_id"]),
+                    tool,
+                    pending["arguments"],
+                    include_rate=False,
+                )
             if tool is None:
                 outcome: ToolResult | dict[str, Any] = {"ok": False, "error": "tool was removed"}
                 status = "error"
+            elif violation is not None:
+                reason = f"policy: {violation.reason}"
+                await reject_call(tenant_id, uuid.UUID(pending["call_id"]), reason)
+                outcome = {"ok": False, "error": reason}
+                status = "blocked"
             else:
                 result = await self.runner.run(
                     self._context(state),
