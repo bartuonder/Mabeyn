@@ -253,7 +253,7 @@ Why it is built this way: [ADR-0006](adr/0006-customer-memory.md). How it is mea
 <!-- generated:facts -->
 | Setting | Value |
 | --- | --- |
-| Prompt versions | `rag-v5`, `agents-v11`, `memory-v3` |
+| Prompt versions | `rag-v5`, `agents-v11`, `memory-v3`, `guard-v1` |
 | Answer and action model | `gpt-4.1-mini` |
 | Small model (routing, rewriting, grading, reranking, checks) | `gpt-4o-mini` |
 | Judge model (evaluation) | `gpt-4.1-mini` |
