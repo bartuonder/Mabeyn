@@ -11,6 +11,8 @@ from apps.kargoshop_mock.main import Store, create_app
 from mabeyn.agents.service import SupervisorService, TurnContext
 from mabeyn.db import models as m
 from mabeyn.db.session import tenant_session
+from mabeyn.guard.classifier import LlmInjectionClassifier
+from mabeyn.guard.firewall import Firewall, FirewallConfig
 from mabeyn.llm.client import ChatMessage, ToolChatResult
 from mabeyn.memory.store import MemoryStore
 from mabeyn.rag.service import Final, RagEvent, Token
@@ -56,9 +58,11 @@ class Brain:
     tool_turns: list[ToolChatResult] = field(default_factory=list)
     replies: dict[str, str] = field(default_factory=dict)
     seen: list[str] = field(default_factory=list)
+    guard_score: float = 0.0
 
     MARKERS = {
         "You route customer messages": "route",
+        "security filter in front of": "guard",
         "needs a review by a human colleague": "pending",
         "earlier request is still being reviewed": "reminder",
         "human colleague will take over": "escalate",
@@ -93,6 +97,8 @@ class Brain:
                     "language": self.language,
                 }
             )
+        if kind == "guard":
+            return json.dumps({"score": self.guard_score, "category": "override"})
         return self.replies.get(kind, self.DEFAULTS.get(kind, "ok"))
 
     def tools(self, messages: Sequence[ChatMessage], tools: Any, model: str) -> ToolChatResult:
@@ -154,6 +160,7 @@ async def build_env(
     rag: StubRag | None = None,
     customer_id: str = "customer-1",
     memory: MemoryStore | None = None,
+    firewall: bool | FirewallConfig = False,
 ) -> Env:
     brain = brain or Brain()
     rag = rag or StubRag()
@@ -167,5 +174,9 @@ async def build_env(
     store = Store()
     runner = ToolRunner(HttpToolExecutor(transport=ASGITransport(app=create_app(store))))
     llm = FakeLLM(brain.chat, brain.tools)
-    service = SupervisorService(llm, rag, runner, checkpointer, memory)
+    guard = None
+    if firewall:
+        config = firewall if isinstance(firewall, FirewallConfig) else FirewallConfig()
+        guard = Firewall(LlmInjectionClassifier(llm), config)
+    service = SupervisorService(llm, rag, runner, checkpointer, memory, guard)
     return Env(tenant_id, conversation_id, store, llm, brain, rag, service, customer_id)

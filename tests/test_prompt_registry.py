@@ -14,7 +14,7 @@ def test_the_fingerprint_changes_when_a_prompt_changes(monkeypatch):
     from mabeyn.agents import prompts
 
     before = prompt_registry.fingerprint(prompts)
-    monkeypatch.setattr(prompts, "BLOCKED_SYSTEM", prompts.BLOCKED_SYSTEM + " extra")
+    monkeypatch.setattr(prompts, "BLOCKED_REPLY", prompts.BLOCKED_REPLY + " extra")
     assert prompt_registry.fingerprint(prompts) != before
 
 

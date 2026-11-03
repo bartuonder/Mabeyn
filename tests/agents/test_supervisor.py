@@ -1,6 +1,7 @@
 import contextlib
 
 from mabeyn.agents.action import AGENT_RISKS, MAX_TOOL_CALLS
+from mabeyn.agents.prompts import BLOCKED_REPLY
 from mabeyn.agents.service import SupervisorService
 from mabeyn.db import models as m
 from mabeyn.rag.service import Retract, Token
@@ -238,7 +239,7 @@ async def test_repeated_tool_failures_hand_over_to_a_human(fresh_tenant, checkpo
 async def test_empty_messages_are_blocked_before_routing(fresh_tenant, checkpointer):
     env = await build_env(fresh_tenant, checkpointer)
     _, final = await env.ask("   ​  ")
-    assert final.status == "blocked" and final.answer == "Please rephrase your message."
+    assert final.status == "blocked" and final.answer == BLOCKED_REPLY
     assert "route" not in env.brain.seen
 
 

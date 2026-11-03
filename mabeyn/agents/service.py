@@ -14,6 +14,7 @@ from mabeyn.agents.supervisor import AgentDeps, build_supervisor_graph
 from mabeyn.core.config import get_settings
 from mabeyn.db.models import Approval, ApprovalStatus
 from mabeyn.db.session import tenant_session
+from mabeyn.guard.firewall import Firewall
 from mabeyn.llm.client import LLM, ChatMessage
 from mabeyn.memory.store import MemoryStore
 from mabeyn.rag.service import Final, RagEvent, RagService, Retract, Token
@@ -67,11 +68,12 @@ class SupervisorService:
         runner: ToolRunner,
         checkpointer: BaseCheckpointSaver[Any],
         memory: MemoryStore | None = None,
+        firewall: Firewall | None = None,
     ) -> None:
         self.llm = llm
-        self.graph: Any = build_supervisor_graph(AgentDeps(llm, rag, runner, memory)).compile(
-            checkpointer=checkpointer
-        )
+        self.graph: Any = build_supervisor_graph(
+            AgentDeps(llm, rag, runner, memory, firewall)
+        ).compile(checkpointer=checkpointer)
 
     @staticmethod
     def _config(turn: TurnContext) -> dict[str, Any]:

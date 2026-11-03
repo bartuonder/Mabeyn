@@ -144,7 +144,7 @@ graph TD;
 
 | Node | What it does |
 | --- | --- |
-| `input_guard` | Normalises the text (invisible and control characters, length). An unusable message skips routing and gets a short "please rephrase" reply. Also resets the per-turn part of the state. |
+| `input_guard` | Normalises the text (invisible and control characters, length), then runs the firewall's input layer: rules for override phrases, hidden characters and encoded payloads, then a small-model rating compared with the tenant's threshold. A blocked message skips routing and gets a fixed reply; the attempt is written to the security events. Also resets the per-turn part of the state and decides whether replies are held back for checking. |
 | `recall_memories` | Loads the saved notes about this customer from the long-term store (newest first, at most ten, screened again before use). A failing store is logged and the conversation goes on without notes. |
 | `supervisor` | One small-model call returns the route (`knowledge`, `action`, both, or `escalate`), the customer's language by name, and, for mixed requests, a clean policy question without order details. |
 | `dispatch` | Picks the next step of the plan; a pending `needs_human` flag always wins and goes to `escalate`. |
@@ -156,7 +156,7 @@ graph TD;
 | `action_await_approval` | Calls LangGraph `interrupt` first, so the graph pauses here. On resume it runs the tool (approved) or records the rejection, then returns to `action_plan`. |
 | `escalate` | Marks the conversation `escalated` with a reason and tells the customer that a human colleague will take over. |
 | `compose` | A single answer passes through. When both agents answered, a model merges them: outcome of the order request first, only the relevant policy facts after it. |
-| `output_guard` | Hook for output checks; today it trims the text. |
+| `output_guard` | Trims the text, replaces a reply that contains the tenant's canary token and masks validated personal data (IBAN, card, national id, e-mail, phone). While the output layer is active the reply is released only here, as one token event, so nothing leaks before the check. |
 
 Routing and privilege rules:
 
@@ -253,7 +253,7 @@ Why it is built this way: [ADR-0006](adr/0006-customer-memory.md). How it is mea
 <!-- generated:facts -->
 | Setting | Value |
 | --- | --- |
-| Prompt versions | `rag-v5`, `agents-v11`, `memory-v3`, `guard-v1` |
+| Prompt versions | `rag-v6`, `agents-v12`, `memory-v3`, `guard-v1` |
 | Answer and action model | `gpt-4.1-mini` |
 | Small model (routing, rewriting, grading, reranking, checks) | `gpt-4o-mini` |
 | Judge model (evaluation) | `gpt-4.1-mini` |

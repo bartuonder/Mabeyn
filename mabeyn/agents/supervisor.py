@@ -13,6 +13,7 @@ from mabeyn.core.config import get_settings
 from mabeyn.db.models import Conversation, ConversationStatus
 from mabeyn.db.session import tenant_session
 from mabeyn.guard.basic import check_input, check_output
+from mabeyn.guard.firewall import Firewall
 from mabeyn.llm.client import LLM, ChatMessage, LLMError, chat_json
 from mabeyn.memory.recall import recall
 from mabeyn.memory.store import MemoryStore
@@ -38,6 +39,7 @@ class AgentDeps:
     rag: RagService
     runner: ToolRunner
     memory: MemoryStore | None = None
+    firewall: Firewall | None = None
 
 
 def _history_text(history: list[ChatMessage]) -> str:
@@ -68,15 +70,32 @@ async def _short_reply(llm: LLM, system: str, question: str) -> str:
 
 def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
     llm = deps.llm
-    action = ActionAgent(llm, deps.runner)
+    firewall = deps.firewall
+    action = ActionAgent(llm, deps.runner, canary_guard=bool(firewall and firewall.config.output))
 
     async def input_guard(state: SupervisorState) -> dict[str, Any]:
+        tenant_id = uuid.UUID(state["tenant_id"])
         decision = check_input(state["question"])
         update: dict[str, Any] = {**fresh_turn(), "question": decision.text}
-        if not decision.allowed:
-            system = prompts.BLOCKED_SYSTEM.format(language_rule=prompts.language_rule(None))
-            reply = await _short_reply(llm, system, state["question"] or "?")
-            update.update(blocked=True, answer=reply, status="blocked")
+        category = "" if decision.allowed else "invalid_input"
+        if decision.allowed and firewall is not None:
+            verdict = await firewall.inspect_input(
+                tenant_id,
+                uuid.UUID(state["conversation_id"]),
+                state["question"],
+                decision.text,
+            )
+            category = "" if verdict.allowed else (verdict.category or "blocked")
+        if category:
+            update.update(
+                blocked=True,
+                block_category=category,
+                answer=prompts.BLOCKED_REPLY,
+                status="blocked",
+            )
+        if firewall is not None:
+            # Replies are checked before the customer sees them, so nothing streams ahead of it.
+            update["hold_stream"] = await firewall.active(tenant_id, "output")
         return update
 
     def after_input_guard(state: SupervisorState) -> str:
@@ -146,7 +165,7 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
         return NEXT_NODE[plan[step]] if step < len(plan) else "compose"
 
     async def knowledge_agent(state: SupervisorState) -> dict[str, Any]:
-        live = state.get("plan") == ["knowledge"]
+        live = state.get("plan") == ["knowledge"] and not state.get("hold_stream")
         writer = get_stream_writer()
         final: Final | None = None
         mixed = len(state.get("plan", [])) > 1
@@ -188,7 +207,8 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
             if conversation is not None:
                 conversation.status = ConversationStatus.ESCALATED
                 conversation.escalation_reason = reason[:500]
-        get_stream_writer()({"type": "token", "text": message})
+        if not state.get("hold_stream"):
+            get_stream_writer()({"type": "token", "text": message})
         return {"answer": message, "status": "escalated", "escalation_reason": reason}
 
     async def compose(state: SupervisorState) -> dict[str, Any]:
@@ -215,17 +235,29 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
                 model=get_settings().llm_model,
             ):
                 pieces.append(piece)
-                writer({"type": "token", "text": piece})
+                if not state.get("hold_stream"):
+                    writer({"type": "token", "text": piece})
             return {"answer": "".join(pieces).strip()}
         answer = acted or knowledge
         if not answer:
             answer = await safe_fallback(llm, state["question"])
-        if not state.get("streamed"):
+        if not state.get("streamed") and not state.get("hold_stream"):
             writer({"type": "token", "text": answer})
         return {"answer": answer}
 
     async def output_guard(state: SupervisorState) -> dict[str, Any]:
-        return {"answer": check_output(state.get("answer", "")).text}
+        text = check_output(state.get("answer", "")).text
+        if firewall is not None and not state.get("blocked"):
+            decision = await firewall.filter_output(
+                uuid.UUID(state["tenant_id"]),
+                uuid.UUID(state["conversation_id"]),
+                text,
+                prompts.LEAK_REPLY,
+            )
+            text = decision.text
+        if state.get("hold_stream") and text:
+            get_stream_writer()({"type": "token", "text": text})
+        return {"answer": text}
 
     graph = StateGraph(SupervisorState)
     for name, node in {

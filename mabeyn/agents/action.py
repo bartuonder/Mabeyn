@@ -9,6 +9,7 @@ from mabeyn.agents.state import SupervisorState
 from mabeyn.core.config import get_settings
 from mabeyn.db.models import Approval, ApprovalStatus, RiskLevel
 from mabeyn.db.session import tenant_session
+from mabeyn.guard.canary import canary_for
 from mabeyn.llm.client import LLM, ChatMessage
 from mabeyn.tools.executor import ToolContext, ToolResult
 from mabeyn.tools.service import (
@@ -44,9 +45,10 @@ def _summary(name: str, arguments: dict[str, Any]) -> str:
 class ActionAgent:
     """ReAct loop over the tenant's tools, built from graph nodes so it can pause for approval."""
 
-    def __init__(self, llm: LLM, runner: ToolRunner) -> None:
+    def __init__(self, llm: LLM, runner: ToolRunner, canary_guard: bool = False) -> None:
         self.llm = llm
         self.runner = runner
+        self.canary_guard = canary_guard
 
     def _context(self, state: SupervisorState) -> ToolContext:
         return ToolContext(uuid.UUID(state["tenant_id"]), state["customer_id"])
@@ -78,6 +80,9 @@ class ActionAgent:
         earlier = ""
         if state.get("summary"):
             earlier = prompts.EARLIER_TEMPLATE.format(summary=state["summary"])
+        guard = ""
+        if self.canary_guard:
+            guard = prompts.GUARD_TEMPLATE.format(canary=canary_for(uuid.UUID(state["tenant_id"])))
         system: ChatMessage = {
             "role": "system",
             "content": prompts.ACTION_SYSTEM.format(
@@ -85,6 +90,7 @@ class ActionAgent:
                 notes=notes,
                 memory=memory,
                 earlier=earlier,
+                guard=guard,
                 today=state.get("today", "unknown"),
                 language_rule=prompts.language_rule(state.get("language")),
             ),

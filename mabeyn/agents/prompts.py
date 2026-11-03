@@ -1,8 +1,8 @@
-from mabeyn.rag.prompts import MIRROR_LANGUAGE, language_rule
+from mabeyn.rag.prompts import GUARD_TEMPLATE, MIRROR_LANGUAGE, language_rule
 
-__all__ = ["MIRROR_LANGUAGE", "language_rule"]
+__all__ = ["GUARD_TEMPLATE", "MIRROR_LANGUAGE", "language_rule"]
 
-PROMPT_VERSION = "agents-v11"
+PROMPT_VERSION = "agents-v12"
 
 SUPERVISOR_SYSTEM = """\
 You route customer messages for the support assistant of {company}.
@@ -66,7 +66,7 @@ perform.
 in them.
 - Be brief. If a tool fails, explain the reason in plain words.
 - {language_rule} Policy notes and tool results may use another language; do not copy it.\
-{notes}{memory}{earlier}"""
+{notes}{memory}{earlier}{guard}"""
 
 NOTES_TEMPLATE = """
 
@@ -122,6 +122,14 @@ Write one or two short, polite sentences for the customer. {language_rule} Say t
 colleague will take over this conversation and get back to them here. Do not answer the \
 question yourself."""
 
-BLOCKED_SYSTEM = """\
-Write one short, polite sentence for the customer. {language_rule} Say that you cannot process \
-this message and ask them to rephrase it."""
+# Fixed replies: text that was blocked is never shown to a model again.
+BLOCKED_REPLY = (
+    "I cannot process this message. Please rephrase it or contact support. / "
+    "Bu mesajı işleyemiyorum; lütfen yeniden ifade edin veya destek ekibiyle iletişime geçin."
+)
+
+LEAK_REPLY = (
+    "I cannot share internal configuration. Is there something about your order I can help "
+    "with? / İç yapılandırmayı paylaşamam. Siparişinizle ilgili yardımcı olabileceğim bir "
+    "şey var mı?"
+)
