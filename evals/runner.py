@@ -21,6 +21,7 @@ from evals.metrics import (
 )
 from mabeyn.db.models import Tenant
 from mabeyn.db.provisioning import create_tenant
+from mabeyn.guard.firewall import Firewall
 from mabeyn.ingestion.chunk import ChunkConfig
 from mabeyn.llm import usage
 from mabeyn.llm.client import LLM
@@ -66,6 +67,7 @@ async def prepare_tenant(
     chunk_config: ChunkConfig,
     embedding_model: str | None,
     label: str,
+    firewall: Firewall | None = None,
 ) -> uuid.UUID:
     """Create a throwaway tenant holding the full demo corpus under the given settings."""
     suffix = uuid.uuid4().hex[:8]
@@ -77,7 +79,7 @@ async def prepare_tenant(
         "eval-password-1",
     )
     await ingest_seed_documents(
-        tenant_id, load_seed_documents(), llm, chunk_config, embedding_model
+        tenant_id, load_seed_documents(), llm, chunk_config, embedding_model, firewall
     )
     return tenant_id
 
