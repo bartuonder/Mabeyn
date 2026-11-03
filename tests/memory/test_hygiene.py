@@ -1,6 +1,7 @@
 import pytest
 
-from mabeyn.memory.hygiene import fold, screen
+from mabeyn.core.text import fold
+from mabeyn.memory.hygiene import screen
 from mabeyn.memory.schema import MemoryCategory, MemoryRecord
 
 

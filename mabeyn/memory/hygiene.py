@@ -1,10 +1,8 @@
 import re
-import unicodedata
 from dataclasses import dataclass
 
+from mabeyn.core.text import fold
 from mabeyn.memory.schema import MemoryRecord
-
-_FOLD = str.maketrans("ışğüöç", "isguoc")
 
 # Patterns run on text that is lower-cased and stripped of Turkish diacritics.
 INSTRUCTION_PATTERNS = [
@@ -52,7 +50,6 @@ PII_PATTERNS = {
 _INSTRUCTION = [re.compile(p) for p in INSTRUCTION_PATTERNS]
 _PII = {name: re.compile(p) for name, p in PII_PATTERNS.items()}
 MIN_PHONE_DIGITS = 10
-INVISIBLE_CATEGORIES = frozenset({"Cf", "Cc", "Co", "Cn"})
 _MARKUP = re.compile(r"[<>{}\[\]`]|\\n|\n")
 
 
@@ -60,13 +57,6 @@ _MARKUP = re.compile(r"[<>{}\[\]`]|\\n|\n")
 class Rejection:
     reason: str
     detail: str
-
-
-def fold(text: str) -> str:
-    """Lower-case, drop Turkish diacritics and compatibility forms so patterns stay simple."""
-    text = unicodedata.normalize("NFKC", text).lower().replace("\u0307", "")
-    text = "".join(c for c in text if unicodedata.category(c) not in INVISIBLE_CATEGORIES)
-    return text.translate(_FOLD)
 
 
 def screen(record: MemoryRecord) -> Rejection | None:
