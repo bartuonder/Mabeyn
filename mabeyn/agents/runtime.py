@@ -2,6 +2,9 @@ from contextlib import AsyncExitStack
 
 from mabeyn.agents.checkpoint import open_checkpointer
 from mabeyn.agents.service import AgentService, SupervisorService
+from mabeyn.guard.classifier import LlmInjectionClassifier
+from mabeyn.guard.firewall import Firewall
+from mabeyn.guard.policies import ToolGuard
 from mabeyn.llm.client import get_llm
 from mabeyn.memory.service import MemoryService
 from mabeyn.memory.store import open_memory_store
@@ -21,8 +24,15 @@ class AgentRuntime:
         saver = await self._stack.enter_async_context(open_checkpointer())
         store = await self._stack.enter_async_context(open_memory_store())
         llm = get_llm()
+        runner = ToolRunner()
         self.service = SupervisorService(
-            llm, GraphRag(llm, RagConfig()), ToolRunner(), saver, store
+            llm,
+            GraphRag(llm, RagConfig(canary_guard=True)),
+            runner,
+            saver,
+            store,
+            Firewall(LlmInjectionClassifier(llm)),
+            ToolGuard(runner),
         )
         self.memory = MemoryService(llm, store)
 

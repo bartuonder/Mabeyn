@@ -17,7 +17,7 @@ from apps.api.schemas import (
     ConversationOut,
     MessageOut,
 )
-from mabeyn.agents.persist import save_assistant_message
+from mabeyn.agents.persist import mark_blocked, save_assistant_message
 from mabeyn.agents.runtime import get_agent_service, get_memory_service
 from mabeyn.agents.service import AgentService, TurnContext
 from mabeyn.db.models import Conversation, ConversationStatus, Message, MessageRole, Tenant
@@ -39,7 +39,11 @@ def sse(event: str, data: Any) -> str:
 
 
 async def _open_conversation(
-    memory: MemoryService, tenant_id: uuid.UUID, customer_id: str, body: ChatRequest
+    memory: MemoryService,
+    tenant_id: uuid.UUID,
+    customer_id: str,
+    body: ChatRequest,
+    anonymous: bool = False,
 ) -> tuple[TurnContext, list[ChatMessage], bool]:
     summary, summarized = "", 0
     pending: list[ChatMessage] = []
@@ -91,7 +95,14 @@ async def _open_conversation(
                 content=body.message,
             )
         )
-    turn = TurnContext(tenant_id, customer_id, conversation_id, company, summary=compacted.summary)
+    turn = TurnContext(
+        tenant_id,
+        customer_id,
+        conversation_id,
+        company,
+        summary=compacted.summary,
+        anonymous=anonymous,
+    )
     return turn, compacted.history, escalated
 
 
@@ -100,7 +111,7 @@ async def chat(
     body: ChatRequest, customer: Customer, agents: Agents, memory: Memories
 ) -> StreamingResponse:
     turn, history, escalated = await _open_conversation(
-        memory, customer.tenant_id, customer.customer_id, body
+        memory, customer.tenant_id, customer.customer_id, body, customer.anonymous
     )
 
     async def events() -> AsyncIterator[str]:
@@ -121,6 +132,8 @@ async def chat(
                     final = event
             if final is None:
                 raise RuntimeError("the agent produced no answer")
+            if final.status == "blocked":
+                await mark_blocked(turn.tenant_id, turn.conversation_id)
             message_id = await save_assistant_message(turn.tenant_id, turn.conversation_id, final)
             citations = [
                 {k: v for k, v in asdict(c).items() if k != "chunk_ids"} for c in final.citations

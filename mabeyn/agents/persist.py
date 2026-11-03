@@ -1,5 +1,7 @@
 import uuid
 
+from sqlalchemy import select
+
 from mabeyn.db.models import Message, MessageRole
 from mabeyn.db.session import tenant_session
 from mabeyn.rag.service import Final
@@ -29,3 +31,16 @@ async def save_assistant_message(
         session.add(message)
         await session.flush()
         return message.id
+
+
+async def mark_blocked(tenant_id: uuid.UUID, conversation_id: uuid.UUID) -> None:
+    """Keep a blocked customer message for review but out of memory and summaries."""
+    async with tenant_session(tenant_id) as session:
+        latest = await session.scalar(
+            select(Message)
+            .where(Message.conversation_id == conversation_id, Message.role == MessageRole.USER)
+            .order_by(Message.created_at.desc())
+            .limit(1)
+        )
+        if latest is not None:
+            latest.blocked = True
