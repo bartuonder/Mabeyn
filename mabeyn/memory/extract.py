@@ -19,6 +19,7 @@ from mabeyn.memory.store import MemoryStore
 
 log = structlog.get_logger()
 
+ANONYMOUS_PREFIX = "anon:"
 MAX_MESSAGES = 20
 MAX_MESSAGE_CHARS = 500
 MAX_CANDIDATES = 12
@@ -76,7 +77,7 @@ async def _customer_messages(
         rows = await session.scalars(
             select(m.Message.content)
             .where(m.Message.conversation_id == conversation_id)
-            .where(m.Message.role == m.MessageRole.USER)
+            .where(m.Message.role == m.MessageRole.USER, m.Message.blocked.is_(False))
             .order_by(m.Message.created_at.desc())
             .limit(MAX_MESSAGES)
         )
@@ -119,6 +120,8 @@ async def extract_conversation(
     if loaded is None:
         return Extraction(0, 0)
     customer_id, messages = loaded
+    if customer_id.startswith(ANONYMOUS_PREFIX):
+        messages = []
     accepted: list[MemoryRecord] = []
     rejected: list[tuple[MemoryRecord, str, str]] = []
     if messages:
