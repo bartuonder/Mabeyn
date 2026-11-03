@@ -10,6 +10,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     Enum,
+    Float,
     ForeignKey,
     Integer,
     LargeBinary,
@@ -72,6 +73,11 @@ class ConversationStatus(enum.StrEnum):
     OPEN = "open"
     ESCALATED = "escalated"
     CLOSED = "closed"
+
+
+class ApiKeyKind(enum.StrEnum):
+    PUBLISHABLE = "publishable"
+    SECRET = "secret"  # noqa: S105
 
 
 class SecurityAction(enum.StrEnum):
@@ -141,6 +147,10 @@ class ApiKey(TenantModel):
     name: Mapped[str] = mapped_column(String(100))
     prefix: Mapped[str] = mapped_column(String(16))
     key_hash: Mapped[str] = mapped_column(String(64), unique=True)
+    kind: Mapped[ApiKeyKind] = mapped_column(
+        _enum(ApiKeyKind), server_default=ApiKeyKind.SECRET.value
+    )
+    allowed_origins: Mapped[list[str]] = mapped_column(JSONB, server_default=text("'[]'::jsonb"))
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
@@ -173,6 +183,8 @@ class Chunk(TenantModel):
     section: Mapped[str | None] = mapped_column(Text)
     page: Mapped[int | None] = mapped_column(Integer)
     token_count: Mapped[int] = mapped_column(Integer)
+    flagged: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
+    injection_score: Mapped[float | None] = mapped_column(Float)
     embedding: Mapped[list[float] | None] = mapped_column(Vector(EMBEDDING_DIMENSIONS))
     fts_config: Mapped[str] = mapped_column(REGCONFIG, server_default=text("'simple'::regconfig"))
     search_vector: Mapped[Any] = mapped_column(
@@ -202,6 +214,7 @@ class Message(TenantModel):
     )
     role: Mapped[MessageRole] = mapped_column(_enum(MessageRole))
     content: Mapped[str] = mapped_column(Text)
+    blocked: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
     citations: Mapped[list[dict[str, Any]]] = mapped_column(
         JSONB, server_default=text("'[]'::jsonb")
     )
@@ -217,6 +230,7 @@ class ToolDefinition(TenantModel):
     risk_level: Mapped[RiskLevel] = mapped_column(_enum(RiskLevel))
     http_method: Mapped[str] = mapped_column(String(10))
     url_template: Mapped[str] = mapped_column(String(2048))
+    requires_identity: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
 
 
 class ToolCall(TenantModel):
@@ -262,3 +276,19 @@ class SecurityEvent(TenantModel):
     category: Mapped[str] = mapped_column(String(64))
     action: Mapped[SecurityAction] = mapped_column(_enum(SecurityAction))
     detail: Mapped[dict[str, Any]] = mapped_column(JSONB, server_default=text("'{}'::jsonb"))
+
+
+class TenantSettings(Base):
+    __tablename__ = "tenant_settings"
+
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("tenants.id", ondelete="CASCADE"), primary_key=True
+    )
+    firewall_enabled: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
+    injection_threshold: Mapped[float] = mapped_column(Float, server_default=text("0.7"))
+    write_rate_limit: Mapped[int] = mapped_column(Integer, server_default=text("5"))
+    write_rate_window_minutes: Mapped[int] = mapped_column(Integer, server_default=text("60"))
+    tool_allowlist: Mapped[list[str] | None] = mapped_column(JSONB)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
