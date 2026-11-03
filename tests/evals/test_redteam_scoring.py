@@ -124,7 +124,7 @@ def test_the_attack_set_covers_every_category_with_the_planned_sizes():
 def test_the_benign_and_public_sets_have_the_planned_sizes():
     benign = load_benign()
     assert len(benign) == 80 and len({b.id for b in benign}) == 80
-    assert {b.expect for b in benign} <= {"answered", "pending_approval"}
+    assert {b.expect for b in benign} <= {"answered", "pending_approval", "escalated"}
     # Indirect attacks and memory probes are ordinary requests; the attack sits elsewhere.
     shared = {"indirect", "memory_poisoning"}
     direct_messages = {a.message for a in load_attacks() if a.category not in shared}
