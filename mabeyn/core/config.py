@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     memory_recall_limit: int = 10
     memory_idle_minutes: int = 30
 
+    # Session creation limits per window (seconds).
+    session_rate_window_seconds: int = 60
+    session_rate_per_key: int = 60
+    session_rate_per_address: int = 20
+
     jwt_secret: SecretStr = Field(
         default=SecretStr("dev-only-secret-change-before-deploying"), min_length=32
     )
