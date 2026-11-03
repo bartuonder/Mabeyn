@@ -5,7 +5,7 @@ from mabeyn.core.config import get_settings
 from mabeyn.llm.usage import ledger_total
 
 LEDGER_PATH = Path(__file__).resolve().parent / ".ledger.jsonl"
-DEFAULT_LIMIT_USD = 4.0
+DEFAULT_LIMIT_USD = 5.0
 
 
 class BudgetExceededError(Exception):

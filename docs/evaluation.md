@@ -47,7 +47,7 @@ Configurations are defined in `evals/configs.py`:
 ## Cost control
 
 - Deterministic model calls and embeddings are cached under `evals/.cache/` (not committed).
-- Every real call is appended to `evals/.ledger.jsonl`. A run stops when the total reaches `EVAL_BUDGET_USD` (default 4).
+- Every real call is appended to `evals/.ledger.jsonl`. A run stops when the total reaches `EVAL_BUDGET_USD` (default 5).
 - Small models handle rewriting, grading, reranking and faithfulness checks; the judge and the answer generator use the larger model (`LLM_MODEL`, `JUDGE_MODEL`, `LLM_MODEL_SMALL`).
 
 ## Experiment tracking
