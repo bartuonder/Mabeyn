@@ -40,6 +40,7 @@ class RefreshClaims:
 class CustomerClaims:
     tenant_id: uuid.UUID
     customer_id: str
+    anonymous: bool = False
 
 
 def _encode(token_type: TokenType, ttl: timedelta, claims: dict[str, Any]) -> str:
@@ -111,10 +112,12 @@ def decode_refresh_token(token: str) -> RefreshClaims:
 
 
 def create_customer_token(
-    tenant_id: uuid.UUID, customer_id: str, ttl: timedelta | None = None
+    tenant_id: uuid.UUID, customer_id: str, ttl: timedelta | None = None, anonymous: bool = False
 ) -> str:
     ttl = ttl or timedelta(minutes=get_settings().customer_token_ttl_minutes)
-    return _encode(TokenType.CUSTOMER, ttl, {"tid": str(tenant_id), "cid": customer_id})
+    return _encode(
+        TokenType.CUSTOMER, ttl, {"tid": str(tenant_id), "cid": customer_id, "anon": anonymous}
+    )
 
 
 def decode_customer_token(token: str) -> CustomerClaims:
@@ -122,4 +125,8 @@ def decode_customer_token(token: str) -> CustomerClaims:
     customer_id = payload.get("cid")
     if not isinstance(customer_id, str) or not customer_id:
         raise TokenError("invalid claim: cid")
-    return CustomerClaims(tenant_id=_uuid(payload, "tid"), customer_id=customer_id)
+    return CustomerClaims(
+        tenant_id=_uuid(payload, "tid"),
+        customer_id=customer_id,
+        anonymous=payload.get("anon") is True,
+    )

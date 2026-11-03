@@ -14,12 +14,14 @@ router = APIRouter(prefix="/api-keys", tags=["api-keys"])
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_api_key(body: ApiKeyCreate, admin: Admin, db: TenantDb) -> ApiKeyCreated:
-    generated = generate_api_key()
+    generated = generate_api_key(body.kind.value)
     record = ApiKey(
         tenant_id=admin.tenant_id,
         name=body.name,
         prefix=generated.prefix,
         key_hash=generated.key_hash,
+        kind=body.kind,
+        allowed_origins=body.allowed_origins,
     )
     db.add(record)
     await db.flush()

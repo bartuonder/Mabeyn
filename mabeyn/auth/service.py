@@ -1,3 +1,4 @@
+import secrets
 import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -9,8 +10,10 @@ from mabeyn.auth import tokens
 from mabeyn.auth.api_keys import hash_api_key
 from mabeyn.auth.passwords import verify_dummy, verify_password
 from mabeyn.core.config import get_settings
-from mabeyn.db.models import AdminUser, ApiKey, RefreshToken
+from mabeyn.db.models import AdminUser, ApiKey, ApiKeyKind, RefreshToken
 from mabeyn.db.session import anonymous_session, tenant_session
+
+ANONYMOUS_PREFIX = "anon:"
 
 
 class AuthenticationError(Exception):
@@ -106,9 +109,35 @@ async def resolve_api_key(raw_key: str) -> ApiKey | None:
         return (await session.scalars(statement)).one_or_none()
 
 
-async def create_customer_session(raw_key: str, customer_id: str) -> tuple[str, int]:
+class SessionRefused(Exception):
+    """The key is valid but may not open this kind of session."""
+
+
+@dataclass(frozen=True)
+class CustomerSession:
+    token: str
+    expires_in: int
+    key_id: uuid.UUID
+    anonymous: bool
+
+
+async def create_customer_session(
+    raw_key: str, customer_id: str | None, origin: str | None = None
+) -> CustomerSession:
+    """Secret keys vouch for a named customer; publishable keys only open anonymous sessions."""
     api_key = await resolve_api_key(raw_key)
     if api_key is None:
         raise AuthenticationError("invalid api key")
     ttl_seconds = get_settings().customer_token_ttl_minutes * 60
-    return tokens.create_customer_token(api_key.tenant_id, customer_id), ttl_seconds
+    if api_key.kind is ApiKeyKind.PUBLISHABLE:
+        if customer_id is not None:
+            raise SessionRefused("publishable keys cannot name a customer")
+        if api_key.allowed_origins and origin not in api_key.allowed_origins:
+            raise SessionRefused("this origin may not use the key")
+        anonymous_id = f"{ANONYMOUS_PREFIX}{secrets.token_urlsafe(12)}"
+        token = tokens.create_customer_token(api_key.tenant_id, anonymous_id, anonymous=True)
+        return CustomerSession(token, ttl_seconds, api_key.id, True)
+    if not customer_id:
+        raise SessionRefused("secret keys need a customer_id")
+    token = tokens.create_customer_token(api_key.tenant_id, customer_id)
+    return CustomerSession(token, ttl_seconds, api_key.id, False)

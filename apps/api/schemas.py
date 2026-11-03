@@ -5,12 +5,14 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from mabeyn.db.models import (
+    ApiKeyKind,
     ApprovalStatus,
     ConversationStatus,
     DocumentSource,
     DocumentStatus,
     MessageRole,
     RiskLevel,
+    SecurityAction,
 )
 from mabeyn.memory.schema import MemoryCategory
 
@@ -41,12 +43,16 @@ class TokenResponse(Response):
 
 class ApiKeyCreate(StrictRequest):
     name: str = Field(min_length=1, max_length=100)
+    kind: ApiKeyKind = ApiKeyKind.SECRET
+    allowed_origins: list[str] = Field(default_factory=list, max_length=20)
 
 
 class ApiKeyOut(Response):
     id: uuid.UUID
     name: str
     prefix: str
+    kind: ApiKeyKind
+    allowed_origins: list[str]
     created_at: datetime
     revoked_at: datetime | None
 
@@ -56,7 +62,7 @@ class ApiKeyCreated(ApiKeyOut):
 
 
 class SessionRequest(StrictRequest):
-    customer_id: str = Field(min_length=1, max_length=128)
+    customer_id: str | None = Field(default=None, min_length=1, max_length=128)
 
 
 class SessionResponse(Response):
@@ -127,6 +133,7 @@ class ToolCreate(StrictRequest):
     risk_level: RiskLevel
     http_method: str = Field(pattern="^(GET|POST|PUT|PATCH|DELETE)$")
     url_template: str = Field(min_length=8, max_length=2048)
+    requires_identity: bool = True
 
 
 class ToolOut(Response):
@@ -137,6 +144,7 @@ class ToolOut(Response):
     risk_level: RiskLevel
     http_method: str
     url_template: str
+    requires_identity: bool
     created_at: datetime
 
 
@@ -163,3 +171,29 @@ class ApprovalOut(Response):
 
 class ApprovalResolved(ApprovalOut):
     answer: str
+
+
+class FirewallSettingsOut(Response):
+    firewall_enabled: bool
+    injection_threshold: float
+    write_rate_limit: int
+    write_rate_window_minutes: int
+    tool_allowlist: list[str] | None
+
+
+class FirewallSettingsUpdate(StrictRequest):
+    firewall_enabled: bool | None = None
+    injection_threshold: float | None = Field(default=None, ge=0.05, le=1.0)
+    write_rate_limit: int | None = Field(default=None, ge=0, le=1000)
+    write_rate_window_minutes: int | None = Field(default=None, ge=1, le=1440)
+    tool_allowlist: list[str] | None = Field(default=None, max_length=100)
+
+
+class SecurityEventOut(Response):
+    id: uuid.UUID
+    created_at: datetime
+    conversation_id: uuid.UUID | None
+    layer: str
+    category: str
+    action: SecurityAction
+    detail: dict[str, Any]

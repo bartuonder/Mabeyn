@@ -28,6 +28,7 @@ async def create_tool(body: ToolCreate, admin: Admin, db: TenantDb) -> ToolOut:
         risk_level=body.risk_level,
         http_method=body.http_method,
         url_template=body.url_template,
+        requires_identity=body.requires_identity,
     )
     db.add(tool)
     try:

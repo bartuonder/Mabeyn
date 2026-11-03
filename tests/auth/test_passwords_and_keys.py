@@ -1,4 +1,4 @@
-from mabeyn.auth.api_keys import KEY_PREFIX, generate_api_key, hash_api_key
+from mabeyn.auth.api_keys import PREFIXES, generate_api_key, hash_api_key
 from mabeyn.auth.passwords import hash_password, verify_dummy, verify_password
 
 
@@ -23,7 +23,7 @@ def test_dummy_verify_does_not_raise():
 
 def test_api_key_shape_and_hash():
     key = generate_api_key()
-    assert key.plain.startswith(KEY_PREFIX)
+    assert key.plain.startswith(PREFIXES["secret"])
     assert key.plain.startswith(key.prefix)
     assert key.key_hash == hash_api_key(key.plain)
     assert key.plain not in key.key_hash
@@ -31,3 +31,8 @@ def test_api_key_shape_and_hash():
 
 def test_api_keys_are_unique():
     assert generate_api_key().plain != generate_api_key().plain
+
+
+def test_the_prefix_shows_what_a_key_may_do():
+    assert generate_api_key("publishable").plain.startswith("mbn_pub_")
+    assert generate_api_key("secret").prefix.startswith("mbn_sec_")
