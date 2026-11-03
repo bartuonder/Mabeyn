@@ -11,14 +11,22 @@ MAX_ANSWER_TOKENS = 700
 TAG_RE = re.compile(r"\[([^\[\]]+:[^\[\]]+)\]")
 
 
+FORGED_TAG = re.compile(r"<(/?\s*sources?\b)", re.IGNORECASE)
+
+
+def neutralise(text: str) -> str:
+    """Spotlighting: retrieved text may not close or reopen the data block it sits in."""
+    return FORGED_TAG.sub(lambda m: "\u2039" + m.group(1), text).replace('"', "'")
+
+
 def format_sources(chunks: Sequence[RetrievedChunk]) -> str:
     parts = []
     for chunk in chunks:
         date_attr = f' effective_date="{chunk.effective_date}"' if chunk.effective_date else ""
         tags = " ".join(f"[{tag}]" for tag in chunk.cites)
         parts.append(
-            f'<source document="{chunk.document_title}"{date_attr} tags="{tags}">\n'
-            f"{chunk.content}\n</source>"
+            f'<source document="{neutralise(chunk.document_title)}"{date_attr} tags="{tags}">\n'
+            f"{FORGED_TAG.sub(lambda m: chr(0x2039) + m.group(1), chunk.content)}\n</source>"
         )
     return "\n\n".join(parts) if parts else "(no sources)"
 
@@ -30,9 +38,10 @@ def build_messages(
     history: Sequence[ChatMessage] = (),
     strict: bool = False,
     language: str | None = None,
+    guard: str = "",
 ) -> list[ChatMessage]:
     system = prompts.ANSWER_SYSTEM.format(
-        company=company, language_rule=prompts.language_rule(language)
+        company=company, language_rule=prompts.language_rule(language), guard=guard
     )
     if strict:
         system += "\n" + prompts.STRICT_RULE
@@ -54,8 +63,9 @@ def stream_answer(
     model: str | None = None,
     strict: bool = False,
     language: str | None = None,
+    guard: str = "",
 ) -> AsyncIterator[str]:
-    messages = build_messages(company, question, chunks, history, strict, language)
+    messages = build_messages(company, question, chunks, history, strict, language, guard)
     return llm.stream(
         messages, model=model or get_settings().llm_model, max_tokens=MAX_ANSWER_TOKENS
     )

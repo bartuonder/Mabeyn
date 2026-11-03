@@ -8,6 +8,7 @@ from langgraph.graph import END, START, StateGraph
 
 from mabeyn.core.config import get_settings
 from mabeyn.db.session import tenant_session
+from mabeyn.guard.canary import canary_for
 from mabeyn.llm.client import LLM, ChatMessage, LLMError, chat_json
 from mabeyn.rag import prompts
 from mabeyn.rag.generate import (
@@ -39,6 +40,7 @@ class RagConfig:
     max_regenerations: int = 1
     embedding_model: str | None = None
     generate: bool = True
+    canary_guard: bool = False
 
 
 class RagState(TypedDict, total=False):
@@ -152,6 +154,9 @@ def build_rag_graph(llm: LLM, config: RagConfig, reranker: Reranker | None = Non
         writer = get_stream_writer()
         strict = state.get("regenerations", 0) > 0
         pieces: list[str] = []
+        guard = ""
+        if config.canary_guard:
+            guard = prompts.GUARD_TEMPLATE.format(canary=canary_for(state["tenant_id"]))
         async for piece in stream_answer(
             llm,
             state["company"],
@@ -160,6 +165,7 @@ def build_rag_graph(llm: LLM, config: RagConfig, reranker: Reranker | None = Non
             state.get("history", []),
             strict=strict,
             language=state.get("language"),
+            guard=guard,
         ):
             pieces.append(piece)
             writer({"type": "token", "text": piece})
