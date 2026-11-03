@@ -13,10 +13,10 @@ upload ──> API ──> Redis queue ──> worker: parse → chunk → embed
                                     worker: mine idle conversations for memories, expire old ones
 
 customer ──> /chat (SSE) ──> supervisor graph (LangGraph, Postgres checkpointer)
-              input_guard → recall_memories → supervisor ──> knowledge agent: RAG subgraph (documents only, no tools)
+              input_guard (firewall) → recall_memories → supervisor ──> knowledge agent: RAG subgraph (documents only, no tools)
                                        ──> action agent: ReAct over tenant tools (never sees documents)
                                        ──> escalate: hand over to a human
-              → compose → output_guard
+              → compose → output_guard (canary, PII masking)
 
 action agent ── read / write tool ──> executes, audits in tool_calls
               └─ sensitive tool ──> Approval record + interrupt ... admin POST /approvals/{id} resumes
@@ -28,6 +28,7 @@ action agent ── read / write tool ──> executes, audits in tool_calls
 - Retrieval combines pgvector similarity with Turkish/English full text search (Reciprocal Rank Fusion), then an LLM reranker narrows 30 candidates to 6.
 - A supervisor routes each message to a knowledge agent, an action agent or a human ([ADR-0002](docs/adr/0002-supervisor-and-two-agents.md)). Tools are registered per tenant with a JSON Schema and a risk level (`read`, `write`, `sensitive`); the platform, not the model, supplies the customer identity.
 - `sensitive` tools such as refunds never run directly: the graph pauses, an admin approves or rejects, and the paused conversation survives restarts. Walk-through: [docs/demo-scenarios.md](docs/demo-scenarios.md).
+- An LLM firewall guards four places ([ADR-0003](docs/adr/0003-defense-layers.md)): customer messages (rules and a small-model rating), uploaded documents (flagged passages never reach retrieval), tool calls (allowlist, refund checked against the real order, rate limit) and replies (canary token, personal data masking). Every block is a security event the admin can read.
 - Returning customers are recognised: long conversations are summarised inside a token budget, and facts a customer states about themselves (a preferred carrier, an earlier complaint) are kept for 180 days in a store scoped to the customer. Instructions, permissions and personal data are never stored, and customers and admins can read and erase everything ([ADR-0006](docs/adr/0006-customer-memory.md)).
 
 ## Quick start
@@ -63,7 +64,7 @@ curl localhost:8000/me/memory -H "Authorization: Bearer $SESSION"
 curl -X DELETE localhost:8000/me/memory -H "Authorization: Bearer $SESSION"
 ```
 
-Treat API keys as secrets: until [ADR-0005](docs/adr/0005-customer-session-trust.md) is implemented, anyone holding a key can open a session as any customer.
+API keys come in two kinds ([ADR-0005](docs/adr/0005-customer-session-trust.md)). Secret keys (`"kind": "secret"`, the default) stay on the tenant's server and open sessions for a named customer, as above. Publishable keys (`"kind": "publishable"`, optionally with `allowed_origins`) are safe in a browser but only open anonymous sessions: `POST /sessions` with `{}` returns a token for `anon:<random>` that gets no memory and no customer tools.
 
 Admins use `GET` and `DELETE /customers/{customer_id}/memory` for the same, for example to answer a deletion request.
 
