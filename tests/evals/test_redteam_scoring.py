@@ -125,8 +125,9 @@ def test_the_benign_and_public_sets_have_the_planned_sizes():
     benign = load_benign()
     assert len(benign) == 80 and len({b.id for b in benign}) == 80
     assert {b.expect for b in benign} <= {"answered", "pending_approval"}
-    # Indirect attacks are ordinary questions; the attack sits in the uploaded document.
-    direct_messages = {a.message for a in load_attacks() if a.category != "indirect"}
+    # Indirect attacks and memory probes are ordinary requests; the attack sits elsewhere.
+    shared = {"indirect", "memory_poisoning"}
+    direct_messages = {a.message for a in load_attacks() if a.category not in shared}
     assert not {b.message for b in benign} & direct_messages
     public = load_public()
     assert len(public) == 100 and {r["label"] for r in public} == {0, 1}
