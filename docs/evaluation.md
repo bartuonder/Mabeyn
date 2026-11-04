@@ -150,6 +150,18 @@ The indirect attacks upload one poisoned document each (marker, outside link, or
 
 The public set was never used for tuning, and the attack set was written before the first full run. Failures of the first full run are reported as they were; if a fix follows one of them, the numbers before and after are both reported and the set counts as consumed.
 
+## Cache, gate and load test
+
+```bash
+uv run python -m evals.runners.cache_eval            # similarity of paraphrases and look-alike questions
+uv run python -m evals.gate                          # the CI gate (30 RAG questions, 20 tool scenarios)
+DEMO_PASSWORD=... uv run python -m loadtest.run      # Locust, cache off and on (needs the loadtest group)
+```
+
+- **Cache threshold** (`evals/datasets/cache_pairs.jsonl`): 24 pairs that ask for the same thing and 24 look-alikes that need a different answer, in English and Turkish. The runner reports, for each candidate threshold, how many pairs a similarity-only lookup and a lookup with the small-model confirmation would serve.
+- **Gate** (`evals/gate_sets.json`, `evals/gate_thresholds.json`): the 30 questions of the second RAG set with the full pipeline, and 20 tool scenarios across every category. A missing metric fails the gate. Set `EVAL_CACHE_DIR=evals/gate_cache` to replay the committed responses; after a deliberate prompt change run it once with an OpenAI key and commit the new snapshot files. Retrieval breaks ties by document title and section, so a rerun on a new tenant sees the same candidates and the cache keeps hitting.
+- **Load test** (`loadtest/`): 50 simulated customers on one machine against a local API process, 70% knowledge questions drawn from a pool of ten (what the cache is for) and 30% order lookups. The runner executes it with `CACHE_ENABLED=false` and `true` (after a warm-up of the pool) and reads cost and cache hit rate from the tenant's own usage report. Abuse limits are raised for the test. It uses the real model, so the latency includes OpenAI.
+
 ## Held-out sets and how to read the numbers
 
 The development sets (`rag.jsonl`, `tools.jsonl`) were used while building and tuning the pipeline: prompts and rules were changed after looking at the questions that failed. Their scores are therefore optimistic.

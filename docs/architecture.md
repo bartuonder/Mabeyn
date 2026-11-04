@@ -262,7 +262,17 @@ Tenant settings (`GET` and `PUT /settings/firewall`): master switch, injection t
 
 Secret API keys (`mbn_sec_…`) stay on the tenant's server and open sessions for a named customer. Publishable keys (`mbn_pub_…`) are safe in a browser: they only open anonymous sessions (`anon:<random>`), may be limited to a list of origins, and cannot name a customer. Anonymous sessions get no memory, and the action agent sees only tools registered with `requires_identity: false`. Session creation is rate limited per client address and per key.
 
-## 9. State and tenancy
+## 9. Cost, cache and limits
+
+Rationale and measurements: [ADR-0007](adr/0007-cost-cache-and-eval-gate.md).
+
+- **Cost per message.** `SupervisorService` measures every run and the reply is stored with its input and output tokens, model calls, estimated cost (USD per million tokens from a price table), latency and a `cached` flag. `GET /usage?days=7` returns one row per day for the tenant. Summaries of long conversations and memory extraction are not part of it.
+- **Answer cache.** `cache_lookup` and `cache_store` surround the graph (see the node table). Exact entries live in Redis under a key made of tenant, an invalidation counter, the prompt versions and the normalised question; semantic candidates live in the `answer_cache` table (pgvector, row-level security) and a small model confirms that the cached question needs the same answer. Entries expire after a day, change with every prompt version, and are dropped when a document is added, changed or deleted. Only first questions that the knowledge agent answered alone, without personal data or order numbers, are stored, and the firewall checks run on both sides of the cache.
+- **Rate limits.** Sliding windows in Redis: chat per customer (20 per minute), per API key (300) and per tenant (600), session creation per address and per key. A limited request gets `429` and `Retry-After`.
+- **Traces.** Every traced run is tagged `tenant:<id>`, `model:<name>` and `prompt:<version>` for each prompt module.
+- **Evaluation gate.** `python -m evals.gate` runs 30 RAG questions and 20 tool scenarios and compares the result with `evals/gate_thresholds.json`; the CI job `eval-gate` runs it on pull requests from the same repository, with the responses of its 50 items committed in `evals/gate_cache`.
+
+## 10. State and tenancy
 
 | Data | Where | Protection |
 | --- | --- | --- |
@@ -270,11 +280,12 @@ Secret API keys (`mbn_sec_…`) stay on the tenant's server and open sessions fo
 | Graph checkpoints | `checkpoints*` tables | Thread id carries the tenant; tables have no RLS, resuming requires an approval row that is itself protected |
 | Customer memory | `store` table | Namespace `(tenant_id, customer_id)` built from the verified identity; no RLS ([ADR-0006](adr/0006-customer-memory.md)) |
 | Firewall settings and security events | `tenant_settings`, `security_events` | `tenant_id` column and Row-Level Security |
+| Cached answers | `answer_cache` table, Redis keys | Table under Row-Level Security; Redis keys carry the tenant id and are dropped with a counter |
 | Conversation summaries | `conversations.summary` | Same as conversations |
 | Raw uploads | `documents.raw_content` | Same as documents |
 | Customer and admin sessions | Signed tokens | Short-lived; admin refresh tokens rotate with reuse detection |
 
-## 10. Settings and versions
+## 11. Settings and versions
 
 <!-- generated:facts -->
 | Setting | Value |
@@ -313,11 +324,11 @@ Secret API keys (`mbn_sec_…`) stay on the tenant's server and open sessions fo
 | Session requests per window (address, key) | 20, 60 per 60 s |
 <!-- /generated -->
 
-## 11. Evaluation
+## 12. Evaluation
 
 See [evaluation.md](evaluation.md) for the datasets, metrics and how to run them. Prompt edits must come with a new `PROMPT_VERSION`; `tests/test_prompt_registry.py` enforces it.
 
-## 12. Known limitations
+## 13. Known limitations
 
 - Questions asked in a language the documents do not use retrieve poorly.
 - Time to the first streamed token is about four seconds on the knowledge path (routing, query handling, reranking and grading run before generation).
@@ -325,7 +336,8 @@ See [evaluation.md](evaluation.md) for the datasets, metrics and how to run them
 - Argument policies exist for the KargoShop tools (`request_refund`, `change_address`); a tenant without a `get_order_status` tool is not checked.
 - Small sections are merged into one passage, so one poisoned sentence withholds its whole passage from retrieval.
 - The firewall adds a small-model call to every message and a call per passage at ingestion.
-- Rate limits for requests in general and for the chat endpoint arrive with the LLMOps phase; only session creation is limited today.
+- Cached answers can be stale for up to a day when documents change outside the API; the semantic match relies on a small model and was checked on a small pair set.
+- Usage numbers cover the answer path only, and the price table is an estimate.
 - A pending approval never expires, nobody is notified, and a human colleague has no endpoint to answer an escalated conversation yet.
 - Two simultaneous messages in one conversation are not serialised.
 - Customer identity is only as trustworthy as the API key that opened the session, see [ADR-0005](adr/0005-customer-session-trust.md). Memory inherits this: whoever can open a session as a customer can read and erase that customer's notes.
