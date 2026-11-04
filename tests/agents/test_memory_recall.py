@@ -116,3 +116,16 @@ async def test_the_summary_reaches_the_router_and_the_action_agent(fresh_tenant,
         router_input(env)
     )
     assert "Summary of the earlier part of this conversation" in env.llm.tool_turns[0][0]["content"]
+
+
+async def test_the_notes_come_before_the_rules_so_the_rules_stay_last(
+    fresh_tenant, checkpointer, memory_store: MemoryStore
+):
+    await memory_store.save(fresh_tenant, "customer-1", [NOTE])
+    env = await build_env(fresh_tenant, checkpointer, action_brain(), memory=memory_store)
+    await env.ask("Refund KS-1001")
+
+    system = env.llm.tool_turns[0][0]["content"]
+    assert system.index("<customer_notes>") < system.index("Rules:")
+    assert "call request_refund right away in the same turn" in system
+    await memory_store.forget(fresh_tenant, "customer-1")
