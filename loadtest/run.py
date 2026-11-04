@@ -2,9 +2,9 @@
 
     uv run python -m loadtest.run --users 50 --run-time 40
 
-The API runs as a local process so the cache setting can change between runs; the docker `api`
-container is stopped first. Needs the demo tenant (`mabeyn.cli seed-kargoshop`) and real OpenAI
-credentials. Cost and hit rate come from the tenant's own usage report.
+The compose `api` container is recreated with the cache off and then on, and with the abuse
+limits raised; it is recreated with the default settings at the end. Needs the demo tenant
+(`mabeyn.cli seed-kargoshop`) and real OpenAI credentials. Cost and hit rate come from the tenant's own usage report.
 """
 
 import argparse
@@ -93,9 +93,20 @@ def read_stats(directory: str) -> dict[str, dict[str, float]]:
     return rows
 
 
+def start_api(env: dict[str, str]) -> None:
+    """(Re)start the compose `api` container with these settings."""
+    subprocess.run(  # noqa: S603
+        ["docker", "compose", "up", "-d", "--force-recreate", "api"],  # noqa: S607
+        cwd=ROOT,
+        env={**os.environ, **env},
+        check=True,
+        capture_output=True,
+    )
+    wait_for_api()
+
+
 def run_mode(mode: str, args: argparse.Namespace) -> dict[str, Any]:
     env = {
-        **os.environ,
         "CACHE_ENABLED": "true" if mode == "on" else "false",
         # The test is about latency, so the abuse limits must not interfere.
         "CHAT_RATE_PER_CUSTOMER": "100000",
@@ -103,57 +114,44 @@ def run_mode(mode: str, args: argparse.Namespace) -> dict[str, Any]:
         "CHAT_RATE_PER_TENANT": "100000",
         "SESSION_RATE_PER_ADDRESS": "100000",
         "SESSION_RATE_PER_KEY": "100000",
-        "LANGSMITH_TRACING": "false",
-        "LANGCHAIN_TRACING_V2": "false",
     }
-    api = subprocess.Popen(  # noqa: S603
-        ["uv", "run", "python", "-m", "apps.api"],  # noqa: S607
-        cwd=ROOT,
-        env=env,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    try:
-        wait_for_api()
-        headers = admin_headers(args.email, args.password)
-        key = httpx.post(f"{HOST}/api-keys", json={"name": f"load-{mode}"}, headers=headers).json()[
-            "key"
-        ]
-        if mode == "on":
-            warm_up(key)
-        before = usage_totals(headers)
-        with tempfile.TemporaryDirectory() as directory:
-            subprocess.run(  # noqa: S603
-                [  # noqa: S607
-                    "uv",
-                    "run",
-                    "--group",
-                    "loadtest",
-                    "locust",
-                    "-f",
-                    "loadtest/locustfile.py",
-                    "--headless",
-                    "-u",
-                    str(args.users),
-                    "-r",
-                    str(args.spawn_rate),
-                    "-t",
-                    f"{args.run_time}s",
-                    "--host",
-                    HOST,
-                    "--csv",
-                    f"{directory}/run",
-                    "--only-summary",
-                ],
-                cwd=ROOT,
-                env={**env, "LOAD_API_KEY": key},
-                check=True,
-            )
-            stats = read_stats(directory)
-        after = usage_totals(headers)
-    finally:
-        api.terminate()
-        api.wait(timeout=30)
+    start_api(env)
+    headers = admin_headers(args.email, args.password)
+    key = httpx.post(f"{HOST}/api-keys", json={"name": f"load-{mode}"}, headers=headers).json()[
+        "key"
+    ]
+    if mode == "on":
+        warm_up(key)
+    before = usage_totals(headers)
+    with tempfile.TemporaryDirectory() as directory:
+        subprocess.run(  # noqa: S603
+            [  # noqa: S607
+                "uv",
+                "run",
+                "--group",
+                "loadtest",
+                "locust",
+                "-f",
+                "loadtest/locustfile.py",
+                "--headless",
+                "-u",
+                str(args.users),
+                "-r",
+                str(args.spawn_rate),
+                "-t",
+                f"{args.run_time}s",
+                "--host",
+                HOST,
+                "--csv",
+                f"{directory}/run",
+                "--only-summary",
+            ],
+            cwd=ROOT,
+            env={**os.environ, "LOAD_API_KEY": key},
+            check=True,
+        )
+        stats = read_stats(directory)
+    after = usage_totals(headers)
     delta = {k: after[k] - before[k] for k in after}
     served = max(delta["messages"], 1.0)
     return {
@@ -178,8 +176,10 @@ def main() -> None:
     if not args.password:
         sys.exit("pass --password or set DEMO_PASSWORD (the demo tenant admin password)")
 
-    subprocess.run(["docker", "compose", "stop", "api"], cwd=ROOT, check=False)  # noqa: S603, S607
-    results = [run_mode(mode, args) for mode in ("off", "on")]
+    try:
+        results = [run_mode(mode, args) for mode in ("off", "on")]
+    finally:
+        start_api({})  # back to the default settings
 
     summary = {
         "name": args.name,

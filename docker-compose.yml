@@ -7,6 +7,12 @@ services:
       DATABASE_URL: postgresql+asyncpg://mabeyn_app:mabeyn_app@postgres:5432/mabeyn
       REDIS_URL: redis://redis:6379/0
       TOOL_ALLOWED_HOSTS: kargoshop-mock
+      CACHE_ENABLED: ${CACHE_ENABLED:-true}
+      CHAT_RATE_PER_CUSTOMER: ${CHAT_RATE_PER_CUSTOMER:-20}
+      CHAT_RATE_PER_KEY: ${CHAT_RATE_PER_KEY:-300}
+      CHAT_RATE_PER_TENANT: ${CHAT_RATE_PER_TENANT:-600}
+      SESSION_RATE_PER_ADDRESS: ${SESSION_RATE_PER_ADDRESS:-20}
+      SESSION_RATE_PER_KEY: ${SESSION_RATE_PER_KEY:-60}
     env_file:
       - path: .env
         required: false
