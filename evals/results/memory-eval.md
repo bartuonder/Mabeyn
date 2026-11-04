@@ -14,4 +14,4 @@
 | refunds_executed_without_approval | 0.000 |
 | blocked_records | 0.000 |
 | cost_per_scenario_usd | 0.002 |
-| latency_p50_s | 4.819 |
+| latency_p50_s | 4.976 |

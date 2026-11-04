@@ -12,9 +12,9 @@
 | outcome_accuracy | 0.975 |
 | language_accuracy | 1.000 |
 | identity_leaks | 0.000 |
-| tool_calls_per_scenario | 0.850 |
+| tool_calls_per_scenario | 0.825 |
 | sensitive_executed_without_approval | 0.000 |
 | cost_per_scenario_usd | 0.002 |
-| latency_p50_s | 3.257 |
+| latency_p50_s | 4.303 |
 | scenario_pass_rate_ci95_low | 0.871 |
 | scenario_pass_rate_ci95_high | 0.996 |
