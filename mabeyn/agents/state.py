@@ -27,6 +27,7 @@ class SupervisorState(TypedDict, total=False):
     memories: list[dict[str, str]]
 
     blocked: bool
+    cached: bool
     block_category: str
     hold_stream: bool
     plan: list[str]
@@ -59,6 +60,7 @@ def fresh_turn() -> SupervisorState:
     """Values that reset at the start of every customer message."""
     return {
         "blocked": False,
+        "cached": False,
         "block_category": "",
         "hold_stream": False,
         "memories": [],

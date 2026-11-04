@@ -2,6 +2,7 @@ from contextlib import AsyncExitStack
 
 from mabeyn.agents.checkpoint import open_checkpointer
 from mabeyn.agents.service import AgentService, SupervisorService
+from mabeyn.cache.answers import AnswerCache, get_kv
 from mabeyn.guard.classifier import LlmInjectionClassifier
 from mabeyn.guard.firewall import Firewall
 from mabeyn.guard.policies import ToolGuard
@@ -33,6 +34,7 @@ class AgentRuntime:
             store,
             Firewall(LlmInjectionClassifier(llm)),
             ToolGuard(runner),
+            AnswerCache(llm, get_kv()),
         )
         self.memory = MemoryService(llm, store)
 

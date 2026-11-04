@@ -7,6 +7,7 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import undefer
 
+from mabeyn.cache.answers import invalidate_answers
 from mabeyn.db.models import Chunk, Document, DocumentSource, DocumentStatus, SecurityAction
 from mabeyn.db.session import tenant_session
 from mabeyn.guard.classifier import Verdict
@@ -167,5 +168,6 @@ async def ingest_document(
                     "text": snippet(chunk.content),
                 },
             )
+    await invalidate_answers(tenant_id)
     log.info("ingestion_done", document_id=str(document_id), chunks=len(chunks))
     return DocumentStatus.READY

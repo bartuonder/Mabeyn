@@ -9,6 +9,7 @@ from langgraph.graph import END, START, StateGraph
 from mabeyn.agents import prompts
 from mabeyn.agents.action import ActionAgent
 from mabeyn.agents.state import SupervisorState, fresh_turn
+from mabeyn.cache.answers import AnswerCache
 from mabeyn.core.config import get_settings
 from mabeyn.db.models import Conversation, ConversationStatus
 from mabeyn.db.session import tenant_session
@@ -42,6 +43,7 @@ class AgentDeps:
     memory: MemoryStore | None = None
     firewall: Firewall | None = None
     tool_guard: ToolGuard | None = None
+    cache: AnswerCache | None = None
 
 
 def _history_text(history: list[ChatMessage]) -> str:
@@ -106,7 +108,62 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
         return update
 
     def after_input_guard(state: SupervisorState) -> str:
-        return "output_guard" if state.get("blocked") else "recall_memories"
+        return "output_guard" if state.get("blocked") else "cache_lookup"
+
+    def first_turn(state: SupervisorState) -> bool:
+        return not state.get("history") and not state.get("summary")
+
+    async def cache_lookup(state: SupervisorState) -> dict[str, Any]:
+        """Answer a repeated first question from the cache, after the input checks passed."""
+        if deps.cache is None or not get_settings().cache_enabled or not first_turn(state):
+            return {}
+        try:
+            hit = await deps.cache.lookup(uuid.UUID(state["tenant_id"]), state["question"])
+        except Exception:
+            # The cache only saves money; a failing one must never stop the conversation.
+            log.exception("cache_lookup_failed")
+            return {}
+        if hit is None:
+            return {}
+        if not state.get("hold_stream"):
+            get_stream_writer()({"type": "token", "text": hit.answer})
+        return {
+            "cached": True,
+            "plan": ["knowledge"],
+            "answer": hit.answer,
+            "knowledge_answer": hit.answer,
+            "knowledge_citations": hit.citations,
+            "status": "answered",
+        }
+
+    def after_cache_lookup(state: SupervisorState) -> str:
+        return "output_guard" if state.get("cached") else "recall_memories"
+
+    async def cache_store(state: SupervisorState) -> dict[str, Any]:
+        """Keep a plain knowledge answer; personal or tool related replies are never kept."""
+        eligible = (
+            deps.cache is not None
+            and get_settings().cache_enabled
+            and first_turn(state)
+            and not state.get("cached")
+            and not state.get("blocked")
+            and state.get("status") == "answered"
+            and state.get("plan") == ["knowledge"]
+            and not state.get("knowledge_abstained")
+            and state.get("answer")
+            and state.get("answer") == state.get("knowledge_answer")
+        )
+        if eligible and deps.cache is not None:
+            try:
+                await deps.cache.store(
+                    uuid.UUID(state["tenant_id"]),
+                    state["question"],
+                    state["answer"],
+                    state.get("knowledge_citations", []),
+                )
+            except Exception:
+                log.exception("cache_store_failed")
+        return {}
 
     async def recall_memories(state: SupervisorState) -> dict[str, Any]:
         if deps.memory is None or state.get("anonymous"):
@@ -269,6 +326,7 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
     graph = StateGraph(SupervisorState)
     for name, node in {
         "input_guard": input_guard,
+        "cache_lookup": cache_lookup,
         "recall_memories": recall_memories,
         "supervisor": supervisor,
         "dispatch": dispatch,
@@ -281,6 +339,7 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
         "escalate": escalate,
         "compose": compose,
         "output_guard": output_guard,
+        "cache_store": cache_store,
     }.items():
         graph.add_node(name, node)
 
@@ -288,6 +347,11 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
     graph.add_conditional_edges(
         "input_guard",
         after_input_guard,
+        {"cache_lookup": "cache_lookup", "output_guard": "output_guard"},
+    )
+    graph.add_conditional_edges(
+        "cache_lookup",
+        after_cache_lookup,
         {"recall_memories": "recall_memories", "output_guard": "output_guard"},
     )
     graph.add_edge("recall_memories", "supervisor")
@@ -316,5 +380,6 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
     graph.add_edge("action_await_approval", "action_plan")
     graph.add_edge("escalate", "output_guard")
     graph.add_edge("compose", "output_guard")
-    graph.add_edge("output_guard", END)
+    graph.add_edge("output_guard", "cache_store")
+    graph.add_edge("cache_store", END)
     return graph

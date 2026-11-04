@@ -12,6 +12,7 @@ from sqlalchemy import select
 from mabeyn.agents import prompts
 from mabeyn.agents.state import SupervisorState
 from mabeyn.agents.supervisor import AgentDeps, build_supervisor_graph
+from mabeyn.cache.answers import AnswerCache
 from mabeyn.core.config import get_settings
 from mabeyn.db.models import Approval, ApprovalStatus
 from mabeyn.db.session import tenant_session
@@ -85,10 +86,11 @@ class SupervisorService:
         memory: MemoryStore | None = None,
         firewall: Firewall | None = None,
         tool_guard: ToolGuard | None = None,
+        cache: AnswerCache | None = None,
     ) -> None:
         self.llm = llm
         self.graph: Any = build_supervisor_graph(
-            AgentDeps(llm, rag, runner, memory, firewall, tool_guard)
+            AgentDeps(llm, rag, runner, memory, firewall, tool_guard, cache)
         ).compile(checkpointer=checkpointer)
 
     @staticmethod
@@ -171,7 +173,9 @@ class SupervisorService:
                 if mode == "custom":
                     yield Token(payload["text"]) if payload["type"] == "token" else Retract()
             final = await self._final(config)
-        yield replace(final, usage=_usage(meter, started))
+        yield replace(
+            final, usage={**_usage(meter, started), "cached": bool(final.trace.get("cached"))}
+        )
 
     async def resume(self, turn: TurnContext, approved: bool, note: str | None) -> Final:
         config = self._config(turn)
@@ -192,6 +196,7 @@ class SupervisorService:
         values: SupervisorState = snapshot.values
         paused = bool(snapshot.next)
         trace = {
+            "cached": bool(values.get("cached")),
             "route": values.get("plan", []),
             "tool_trace": values.get("tool_trace", []),
             "tool_calls_used": values.get("tool_calls_used", 0),

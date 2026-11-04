@@ -8,6 +8,7 @@ from sqlalchemy import select
 
 from apps.api.deps import Admin, TenantDb
 from apps.api.schemas import DocumentOut, UrlDocumentCreate
+from mabeyn.cache.answers import invalidate_answers
 from mabeyn.core.config import get_settings
 from mabeyn.db.models import Document, DocumentSource, DocumentStatus
 from mabeyn.db.session import tenant_session
@@ -127,9 +128,12 @@ async def get_document(document_id: uuid.UUID, db: TenantDb) -> DocumentOut:
 
 
 @router.delete("/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_document(document_id: uuid.UUID, db: TenantDb) -> Response:
+async def delete_document(document_id: uuid.UUID, admin: Admin, db: TenantDb) -> Response:
     document = await db.get(Document, document_id)
     if document is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Document not found")
     await db.delete(document)
+    await db.commit()
+    # Answers built from the removed document must not be served any longer.
+    await invalidate_answers(admin.tenant_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
