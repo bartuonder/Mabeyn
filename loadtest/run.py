@@ -93,9 +93,7 @@ def read_stats(directory: str) -> dict[str, dict[str, float]]:
     return rows
 
 
-def run_mode(
-    mode: str, args: argparse.Namespace, key: str, headers: dict[str, str]
-) -> dict[str, Any]:
+def run_mode(mode: str, args: argparse.Namespace) -> dict[str, Any]:
     env = {
         **os.environ,
         "CACHE_ENABLED": "true" if mode == "on" else "false",
