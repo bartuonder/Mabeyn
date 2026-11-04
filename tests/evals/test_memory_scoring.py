@@ -105,7 +105,10 @@ def test_summary_reports_the_rates():
     assert summary["blocked_records"] == 2.0
 
 
-@pytest.mark.parametrize(("name", "size"), [("memory.jsonl", 15), ("memory_heldout.jsonl", 12)])
+@pytest.mark.parametrize(
+    ("name", "size"),
+    [("memory.jsonl", 15), ("memory_heldout.jsonl", 12), ("memory_heldout_v2.jsonl", 12)],
+)
 def test_memory_sets_are_well_formed(name, size):
     scenarios = load_memory_scenarios(name)
     assert len(scenarios) == size
@@ -121,7 +124,9 @@ def test_memory_sets_are_well_formed(name, size):
 
 def test_development_set_covers_each_kind_and_the_sets_do_not_overlap():
     dev = load_memory_scenarios("memory.jsonl")
-    held = load_memory_scenarios("memory_heldout.jsonl")
+    held = load_memory_scenarios("memory_heldout.jsonl") + load_memory_scenarios(
+        "memory_heldout_v2.jsonl"
+    )
     counts = Counter(s.kind for s in dev)
     assert all(counts[kind] >= 1 for kind in KINDS)
     assert counts["poisoned"] >= 3
