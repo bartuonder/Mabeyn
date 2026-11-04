@@ -43,6 +43,9 @@ dev = [
     "pytest-cov>=7.1.0",
     "ruff>=0.17.3",
 ]
+loadtest = [
+    "locust>=2.47.0",
+]
 
 [build-system]
 requires = ["hatchling"]
