@@ -41,3 +41,15 @@ def test_the_committed_thresholds_name_metrics_the_runners_produce():
     for group, names in GATE_RESULT_KEYS.items():
         for kind in ("min", "max"):
             assert set(bounds[group].get(kind, {})) <= names
+
+
+def test_the_gate_catches_a_prompt_that_lets_the_model_invent_answers():
+    """Recorded run with the answer prompt changed to allow general knowledge (see README)."""
+    from pathlib import Path
+
+    recorded = json.loads(
+        Path("evals/results/20261104-225631_gate-broken-attempt1.json").read_text(encoding="utf-8")
+    )
+    bounds = json.loads(THRESHOLDS.read_text(encoding="utf-8"))
+    broken = [c.metric for c in failed(evaluate_thresholds(recorded["metrics"], bounds))]
+    assert broken == ["rag.accuracy_unanswerable"]
