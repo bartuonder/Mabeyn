@@ -193,3 +193,14 @@ async def test_contact_details_the_tenant_publishes_do_not_block_caching(fresh_t
     assert await store.store(fresh_tenant, "How can I contact customer service?", published, [])
     other = "Write to someone.else@example.com instead."
     assert not await store.store(fresh_tenant, "Who can I write to about a complaint?", other, [])
+
+
+async def test_a_redis_outage_does_not_stop_the_table_from_being_emptied(fresh_tenant):
+    class DownKV(MemoryKV):
+        async def incr(self, key: str) -> int:
+            raise ConnectionError("redis is down")
+
+    store, kv, llm = cache()
+    await store.store(fresh_tenant, QUESTION, ANSWER, CITATIONS)
+    await invalidate_answers(fresh_tenant, DownKV())
+    assert await rows(fresh_tenant) == 0
