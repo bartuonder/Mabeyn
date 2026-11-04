@@ -102,6 +102,7 @@ config:
 graph TD;
 	__start__([<p>__start__</p>]):::first
 	input_guard(input_guard)
+	cache_lookup(cache_lookup)
 	recall_memories(recall_memories)
 	supervisor(supervisor)
 	dispatch(dispatch)
@@ -114,6 +115,7 @@ graph TD;
 	escalate(escalate)
 	compose(compose)
 	output_guard(output_guard)
+	cache_store(cache_store)
 	__end__([<p>__end__</p>]):::last
 	__start__ --> input_guard;
 	action_await_approval --> action_plan;
@@ -124,18 +126,21 @@ graph TD;
 	action_tools -. &nbsp;plan&nbsp; .-> action_plan;
 	action_tools -. &nbsp;approval&nbsp; .-> action_request_approval;
 	action_tools -. &nbsp;done&nbsp; .-> dispatch;
+	cache_lookup -.-> output_guard;
+	cache_lookup -.-> recall_memories;
 	compose --> output_guard;
 	dispatch -.-> action_start;
 	dispatch -.-> compose;
 	dispatch -.-> escalate;
 	dispatch -.-> knowledge_agent;
 	escalate --> output_guard;
+	input_guard -.-> cache_lookup;
 	input_guard -.-> output_guard;
-	input_guard -.-> recall_memories;
 	knowledge_agent --> dispatch;
+	output_guard --> cache_store;
 	recall_memories --> supervisor;
 	supervisor --> dispatch;
-	output_guard --> __end__;
+	cache_store --> __end__;
 	classDef default fill:#f2f0ff,line-height:1.2
 	classDef first fill-opacity:0
 	classDef last fill:#bfb6fc
@@ -145,6 +150,7 @@ graph TD;
 | Node | What it does |
 | --- | --- |
 | `input_guard` | Normalises the text (invisible and control characters, length), then runs the firewall's input layer: rules for override phrases, hidden characters and encoded payloads, then a small-model rating compared with the tenant's threshold. A blocked message skips routing and gets a fixed reply; the attempt is written to the security events. Also resets the per-turn part of the state and decides whether replies are held back for checking. |
+| `cache_lookup` | For the first question of a conversation only, after the input checks: an exact match in Redis, then a semantic match in pgvector above the similarity threshold (tenant scoped, same prompt versions, not expired). A hit becomes the answer and skips routing, retrieval and generation. Questions with order numbers or personal data are never looked up. A failing cache is logged and ignored. |
 | `recall_memories` | Loads the saved notes about this customer from the long-term store (newest first, at most ten, screened again before use). Anonymous sessions skip it. A failing store is logged and the conversation goes on without notes. |
 | `supervisor` | One small-model call returns the route (`knowledge`, `action`, both, or `escalate`), the customer's language by name, and, for mixed requests, a clean policy question without order details. |
 | `dispatch` | Picks the next step of the plan; a pending `needs_human` flag always wins and goes to `escalate`. |
@@ -157,6 +163,7 @@ graph TD;
 | `escalate` | Marks the conversation `escalated` with a reason and tells the customer that a human colleague will take over. |
 | `compose` | A single answer passes through. When both agents answered, a model merges them: outcome of the order request first, only the relevant policy facts after it. |
 | `output_guard` | Trims the text, replaces a reply that contains the tenant's canary token and masks validated personal data (IBAN, card, national id, e-mail, phone). While the output layer is active the reply is released only here, as one token event, so nothing leaks before the check. |
+| `cache_store` | After the output checks, keeps the answer of a first question that was answered by the knowledge agent alone, did not abstain, was not changed by the output layer and holds no personal data. Document changes drop a tenant's entries. |
 
 Routing and privilege rules:
 

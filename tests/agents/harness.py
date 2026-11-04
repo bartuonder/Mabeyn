@@ -9,6 +9,7 @@ from sqlalchemy import select
 
 from apps.kargoshop_mock.main import Store, create_app
 from mabeyn.agents.service import SupervisorService, TurnContext
+from mabeyn.cache.answers import AnswerCache
 from mabeyn.db import models as m
 from mabeyn.db.session import tenant_session
 from mabeyn.guard.classifier import LlmInjectionClassifier
@@ -166,6 +167,7 @@ async def build_env(
     firewall: bool | FirewallConfig = False,
     tool_guard: bool = False,
     anonymous: bool = False,
+    cache: AnswerCache | None = None,
 ) -> Env:
     brain = brain or Brain()
     rag = rag or StubRag()
@@ -184,6 +186,13 @@ async def build_env(
         config = firewall if isinstance(firewall, FirewallConfig) else FirewallConfig()
         guard = Firewall(LlmInjectionClassifier(llm), config)
     service = SupervisorService(
-        llm, rag, runner, checkpointer, memory, guard, ToolGuard(runner) if tool_guard else None
+        llm,
+        rag,
+        runner,
+        checkpointer,
+        memory,
+        guard,
+        ToolGuard(runner) if tool_guard else None,
+        cache,
     )
     return Env(tenant_id, conversation_id, store, llm, brain, rag, service, customer_id, anonymous)
