@@ -121,6 +121,7 @@ def run_mode(mode: str, args: argparse.Namespace) -> dict[str, Any]:
     key = httpx.post(f"{HOST}/api-keys", json={"name": f"load-{mode}"}, headers=headers).json()[
         "key"
     ]
+    httpx.delete(f"{HOST}/cache", headers=headers).raise_for_status()
     if mode == "on":
         warm_up(key)
     before = usage_totals(headers)
