@@ -135,9 +135,11 @@ async def create_customer_session(
         if api_key.allowed_origins and origin not in api_key.allowed_origins:
             raise SessionRefused("this origin may not use the key")
         anonymous_id = f"{ANONYMOUS_PREFIX}{secrets.token_urlsafe(12)}"
-        token = tokens.create_customer_token(api_key.tenant_id, anonymous_id, anonymous=True)
+        token = tokens.create_customer_token(
+            api_key.tenant_id, anonymous_id, anonymous=True, key_id=api_key.id
+        )
         return CustomerSession(token, ttl_seconds, api_key.id, True)
     if not customer_id:
         raise SessionRefused("secret keys need a customer_id")
-    token = tokens.create_customer_token(api_key.tenant_id, customer_id)
+    token = tokens.create_customer_token(api_key.tenant_id, customer_id, key_id=api_key.id)
     return CustomerSession(token, ttl_seconds, api_key.id, False)

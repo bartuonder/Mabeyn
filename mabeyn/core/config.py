@@ -46,6 +46,12 @@ class Settings(BaseSettings):
     session_rate_per_key: int = 60
     session_rate_per_address: int = 20
 
+    # Chat requests per window (seconds), per customer, per API key and per tenant.
+    chat_rate_window_seconds: int = 60
+    chat_rate_per_customer: int = 20
+    chat_rate_per_key: int = 300
+    chat_rate_per_tenant: int = 600
+
     jwt_secret: SecretStr = Field(
         default=SecretStr("dev-only-secret-change-before-deploying"), min_length=32
     )

@@ -41,6 +41,7 @@ class CustomerClaims:
     tenant_id: uuid.UUID
     customer_id: str
     anonymous: bool = False
+    key_id: uuid.UUID | None = None
 
 
 def _encode(token_type: TokenType, ttl: timedelta, claims: dict[str, Any]) -> str:
@@ -112,12 +113,17 @@ def decode_refresh_token(token: str) -> RefreshClaims:
 
 
 def create_customer_token(
-    tenant_id: uuid.UUID, customer_id: str, ttl: timedelta | None = None, anonymous: bool = False
+    tenant_id: uuid.UUID,
+    customer_id: str,
+    ttl: timedelta | None = None,
+    anonymous: bool = False,
+    key_id: uuid.UUID | None = None,
 ) -> str:
     ttl = ttl or timedelta(minutes=get_settings().customer_token_ttl_minutes)
-    return _encode(
-        TokenType.CUSTOMER, ttl, {"tid": str(tenant_id), "cid": customer_id, "anon": anonymous}
-    )
+    claims: dict[str, Any] = {"tid": str(tenant_id), "cid": customer_id, "anon": anonymous}
+    if key_id is not None:
+        claims["kid"] = str(key_id)
+    return _encode(TokenType.CUSTOMER, ttl, claims)
 
 
 def decode_customer_token(token: str) -> CustomerClaims:
@@ -129,4 +135,5 @@ def decode_customer_token(token: str) -> CustomerClaims:
         tenant_id=_uuid(payload, "tid"),
         customer_id=customer_id,
         anonymous=payload.get("anon") is True,
+        key_id=_uuid(payload, "kid") if "kid" in payload else None,
     )
