@@ -1,6 +1,7 @@
 import enum
 import uuid
 from datetime import date, datetime
+from decimal import Decimal
 from typing import Any
 
 from pgvector.sqlalchemy import Vector
@@ -14,6 +15,7 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     LargeBinary,
+    Numeric,
     String,
     Text,
     UniqueConstraint,
@@ -215,6 +217,12 @@ class Message(TenantModel):
     role: Mapped[MessageRole] = mapped_column(_enum(MessageRole))
     content: Mapped[str] = mapped_column(Text)
     blocked: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
+    input_tokens: Mapped[int] = mapped_column(Integer, server_default=text("0"))
+    output_tokens: Mapped[int] = mapped_column(Integer, server_default=text("0"))
+    llm_calls: Mapped[int] = mapped_column(Integer, server_default=text("0"))
+    cost_usd: Mapped[Decimal] = mapped_column(Numeric(12, 6), server_default=text("0"))
+    cached: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
+    latency_ms: Mapped[int | None] = mapped_column(Integer)
     citations: Mapped[list[dict[str, Any]]] = mapped_column(
         JSONB, server_default=text("'[]'::jsonb")
     )
