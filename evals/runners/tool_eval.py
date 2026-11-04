@@ -140,6 +140,8 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
     scenarios = load_scenarios(args.dataset)
     if args.categories:
         scenarios = [s for s in scenarios if s.category in args.categories]
+    if args.ids:
+        scenarios = [s for s in scenarios if s.id in set(args.ids)]
     if args.limit:
         scenarios = scenarios[: args.limit]
 
@@ -225,6 +227,7 @@ def main() -> None:
     parser.add_argument("--dataset", default="tools.jsonl")
     parser.add_argument("--limit", type=int)
     parser.add_argument("--categories", nargs="*")
+    parser.add_argument("--ids", nargs="*")
     args = parser.parse_args()
     use_selector_loop_on_windows()
     asyncio.run(run(args))

@@ -1,0 +1,4 @@
+{
+  "rag": {"min": {"faithfulness": 0.0, "accuracy": 0.0}},
+  "tools": {"min": {"scenario_pass_rate": 0.0}}
+}

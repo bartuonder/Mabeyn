@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 import time
 from collections.abc import AsyncIterator, Sequence
 from pathlib import Path
@@ -10,7 +11,7 @@ from mabeyn.ingestion.chunk import count_tokens
 from mabeyn.llm import usage
 from mabeyn.llm.client import LLM, ChatMessage, ChatResult, ToolCallRequest, ToolChatResult
 
-CACHE_DIR = Path(__file__).resolve().parent / ".cache"
+CACHE_DIR = Path(os.environ.get("EVAL_CACHE_DIR") or Path(__file__).resolve().parent / ".cache")
 
 
 class CachingLLM:

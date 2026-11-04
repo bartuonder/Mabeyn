@@ -1,0 +1,34 @@
+{
+  "rag": {
+    "dataset": "rag.jsonl",
+    "sets": [
+      "v1"
+    ],
+    "config": "full"
+  },
+  "tools": {
+    "dataset": "tools.jsonl",
+    "ids": [
+      "tool-001",
+      "tool-002",
+      "tool-003",
+      "tool-005",
+      "tool-009",
+      "tool-012",
+      "tool-013",
+      "tool-016",
+      "tool-017",
+      "tool-020",
+      "tool-021",
+      "tool-022",
+      "tool-024",
+      "tool-025",
+      "tool-026",
+      "tool-027",
+      "tool-028",
+      "tool-034",
+      "tool-035",
+      "tool-037"
+    ]
+  }
+}
