@@ -1,0 +1,48 @@
+{"id": "pair-s01", "same": true, "a": "How many days do I have to return a product?", "b": "What is the time limit for returning an item?"}
+{"id": "pair-s02", "same": true, "a": "How long does delivery to KKTC take?", "b": "How many days until my parcel reaches Northern Cyprus?"}
+{"id": "pair-s03", "same": true, "a": "Can I pay in instalments?", "b": "Is it possible to split the payment into instalments?"}
+{"id": "pair-s04", "same": true, "a": "How do I track my parcel?", "b": "Where can I follow my shipment?"}
+{"id": "pair-s05", "same": true, "a": "How do I delete my account?", "b": "What do I have to do to close my account?"}
+{"id": "pair-s06", "same": true, "a": "Do you ship to Germany?", "b": "Is delivery to Germany available?"}
+{"id": "pair-s07", "same": true, "a": "What does the warranty cover?", "b": "Which problems are covered by the warranty?"}
+{"id": "pair-s08", "same": true, "a": "Can I change the delivery address?", "b": "Is it possible to update my shipping address?"}
+{"id": "pair-s09", "same": true, "a": "How can I contact customer service?", "b": "What is the way to reach customer support?"}
+{"id": "pair-s10", "same": true, "a": "How do gift cards work?", "b": "How can I use a gift card?"}
+{"id": "pair-s11", "same": true, "a": "Do you offer invoices for companies?", "b": "Can I get a company invoice for my order?"}
+{"id": "pair-s12", "same": true, "a": "When are loyalty points added?", "b": "How soon do I receive loyalty points?"}
+{"id": "pair-s13", "same": true, "a": "İade süresi kaç gün?", "b": "Ürünü kaç gün içinde iade edebilirim?"}
+{"id": "pair-s14", "same": true, "a": "KKTC'ye teslimat kaç gün sürer?", "b": "Kuzey Kıbrıs'a kargo ne kadar sürede gelir?"}
+{"id": "pair-s15", "same": true, "a": "Taksit yapabiliyor muyum?", "b": "Ödemeyi taksitlendirmek mümkün mü?"}
+{"id": "pair-s16", "same": true, "a": "Kargomu nasıl takip ederim?", "b": "Gönderimi nereden izleyebilirim?"}
+{"id": "pair-s17", "same": true, "a": "Hesabımı nasıl silerim?", "b": "Üyeliğimi kapatmak için ne yapmalıyım?"}
+{"id": "pair-s18", "same": true, "a": "Garanti neleri kapsıyor?", "b": "Garanti hangi arızaları karşılıyor?"}
+{"id": "pair-s19", "same": true, "a": "Teslimat adresini değiştirebilir miyim?", "b": "Gönderim adresimi güncellemek mümkün mü?"}
+{"id": "pair-s20", "same": true, "a": "Müşteri hizmetlerine nasıl ulaşırım?", "b": "Destek ekibiyle nasıl iletişime geçerim?"}
+{"id": "pair-s21", "same": true, "a": "Hediye çeki nasıl kullanılır?", "b": "Hediye çekimi nasıl harcarım?"}
+{"id": "pair-s22", "same": true, "a": "Kurumsal fatura alabilir miyim?", "b": "Şirket adına fatura çıkarılıyor mu?"}
+{"id": "pair-s23", "same": true, "a": "Sadakat puanları ne zaman yüklenir?", "b": "Puanlarım ne zaman hesabıma geçer?"}
+{"id": "pair-s24", "same": true, "a": "Siparişimi iptal edebilir miyim?", "b": "Verdiğim siparişi iptal etmek mümkün mü?"}
+{"id": "pair-d01", "same": false, "a": "How long does delivery to Istanbul take?", "b": "How long does delivery to KKTC take?"}
+{"id": "pair-d02", "same": false, "a": "What is the return policy for opened items?", "b": "What is the return policy for unopened items?"}
+{"id": "pair-d03", "same": false, "a": "Can I cancel my order before it ships?", "b": "Can I cancel my order after it has shipped?"}
+{"id": "pair-d04", "same": false, "a": "What is the warranty period of the Smart Watch X2?", "b": "What is the warranty period of the Air Fryer F6?"}
+{"id": "pair-d05", "same": false, "a": "How do I return a product?", "b": "How do I exchange a product?"}
+{"id": "pair-d06", "same": false, "a": "Can I pay by credit card?", "b": "Can I pay by bank transfer?"}
+{"id": "pair-d07", "same": false, "a": "How do I change my password?", "b": "How do I change my delivery address?"}
+{"id": "pair-d08", "same": false, "a": "What is the shipping fee for domestic orders?", "b": "What is the shipping fee for international orders?"}
+{"id": "pair-d09", "same": false, "a": "How do I redeem a gift card?", "b": "How do I buy a gift card?"}
+{"id": "pair-d10", "same": false, "a": "When do loyalty points expire?", "b": "When are loyalty points added?"}
+{"id": "pair-d11", "same": false, "a": "Do you deliver on Sundays?", "b": "Do you deliver on public holidays?"}
+{"id": "pair-d12", "same": false, "a": "How do I get a refund for a damaged item?", "b": "How do I get a refund for a missing item?"}
+{"id": "pair-d13", "same": false, "a": "İade süresi kaç gün?", "b": "Değişim süresi kaç gün?"}
+{"id": "pair-d14", "same": false, "a": "İstanbul'a teslimat kaç gün sürer?", "b": "KKTC'ye teslimat kaç gün sürer?"}
+{"id": "pair-d15", "same": false, "a": "Açılmış ürünü iade edebilir miyim?", "b": "Açılmamış ürünü iade edebilir miyim?"}
+{"id": "pair-d16", "same": false, "a": "Siparişimi kargoya verilmeden iptal edebilir miyim?", "b": "Siparişimi kargoya verildikten sonra iptal edebilir miyim?"}
+{"id": "pair-d17", "same": false, "a": "Akıllı saatin garanti süresi nedir?", "b": "Hava fritözünün garanti süresi nedir?"}
+{"id": "pair-d18", "same": false, "a": "Kredi kartıyla ödeyebilir miyim?", "b": "Havale ile ödeyebilir miyim?"}
+{"id": "pair-d19", "same": false, "a": "Şifremi nasıl değiştiririm?", "b": "Teslimat adresimi nasıl değiştiririm?"}
+{"id": "pair-d20", "same": false, "a": "Yurt içi kargo ücreti nedir?", "b": "Yurt dışı kargo ücreti nedir?"}
+{"id": "pair-d21", "same": false, "a": "Hediye çeki nasıl kullanılır?", "b": "Hediye çeki nasıl satın alınır?"}
+{"id": "pair-d22", "same": false, "a": "Hasarlı ürün için nasıl iade alırım?", "b": "Eksik ürün için nasıl iade alırım?"}
+{"id": "pair-d23", "same": false, "a": "Pazar günü teslimat yapıyor musunuz?", "b": "Resmi tatillerde teslimat yapıyor musunuz?"}
+{"id": "pair-d24", "same": false, "a": "Sadakat puanları ne zaman yüklenir?", "b": "Sadakat puanları ne zaman sona erer?"}

@@ -1,0 +1,477 @@
+{
+  "name": "cache-threshold",
+  "created_at": "2026-11-04T22:42:35",
+  "provenance": {
+    "commit": "1ab55f00da84fd48ec0db55d9d3bc37db6f0f5cf",
+    "dirty": true,
+    "prompt_versions": {
+      "rag": "rag-v6",
+      "agents": "agents-v14",
+      "memory": "memory-v3",
+      "guard": "guard-v1",
+      "cache": "cache-v1"
+    },
+    "models": {
+      "generation": "gpt-4.1-mini",
+      "small": "gpt-4o-mini",
+      "judge": "gpt-4.1-mini",
+      "embedding": "text-embedding-3-small"
+    }
+  },
+  "config": {
+    "embedding_model": "text-embedding-3-small"
+  },
+  "metrics": {
+    "paraphrases": 24.0,
+    "different_questions": 24.0,
+    "paraphrase_similarity_min": 0.39586311716688455,
+    "paraphrase_similarity_median": 0.6900345021054515,
+    "different_similarity_max": 0.9663641017988307,
+    "different_similarity_median": 0.7557383217654775,
+    "configured_threshold": 0.6
+  },
+  "thresholds": [
+    {
+      "threshold": 0.5,
+      "similarity_only_paraphrase_hit_rate": 0.7916666666666666,
+      "similarity_only_false_hit_rate": 1.0,
+      "confirmed_paraphrase_hit_rate": 0.7083333333333334,
+      "confirmed_false_hit_rate": 0.0
+    },
+    {
+      "threshold": 0.6,
+      "similarity_only_paraphrase_hit_rate": 0.7083333333333334,
+      "similarity_only_false_hit_rate": 0.75,
+      "confirmed_paraphrase_hit_rate": 0.625,
+      "confirmed_false_hit_rate": 0.0
+    },
+    {
+      "threshold": 0.7,
+      "similarity_only_paraphrase_hit_rate": 0.3333333333333333,
+      "similarity_only_false_hit_rate": 0.6666666666666666,
+      "confirmed_paraphrase_hit_rate": 0.2916666666666667,
+      "confirmed_false_hit_rate": 0.0
+    },
+    {
+      "threshold": 0.8,
+      "similarity_only_paraphrase_hit_rate": 0.16666666666666666,
+      "similarity_only_false_hit_rate": 0.3333333333333333,
+      "confirmed_paraphrase_hit_rate": 0.16666666666666666,
+      "confirmed_false_hit_rate": 0.0
+    },
+    {
+      "threshold": 0.9,
+      "similarity_only_paraphrase_hit_rate": 0.0,
+      "similarity_only_false_hit_rate": 0.20833333333333334,
+      "confirmed_paraphrase_hit_rate": 0.0,
+      "confirmed_false_hit_rate": 0.0
+    },
+    {
+      "threshold": 0.93,
+      "similarity_only_paraphrase_hit_rate": 0.0,
+      "similarity_only_false_hit_rate": 0.125,
+      "confirmed_paraphrase_hit_rate": 0.0,
+      "confirmed_false_hit_rate": 0.0
+    },
+    {
+      "threshold": 0.96,
+      "similarity_only_paraphrase_hit_rate": 0.0,
+      "similarity_only_false_hit_rate": 0.041666666666666664,
+      "confirmed_paraphrase_hit_rate": 0.0,
+      "confirmed_false_hit_rate": 0.0
+    },
+    {
+      "threshold": 0.98,
+      "similarity_only_paraphrase_hit_rate": 0.0,
+      "similarity_only_false_hit_rate": 0.0,
+      "confirmed_paraphrase_hit_rate": 0.0,
+      "confirmed_false_hit_rate": 0.0
+    }
+  ],
+  "pairs": [
+    {
+      "id": "pair-s01",
+      "same": true,
+      "a": "How many days do I have to return a product?",
+      "b": "What is the time limit for returning an item?",
+      "similarity": 0.6335786473641096,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s02",
+      "same": true,
+      "a": "How long does delivery to KKTC take?",
+      "b": "How many days until my parcel reaches Northern Cyprus?",
+      "similarity": 0.39586311716688455,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s03",
+      "same": true,
+      "a": "Can I pay in instalments?",
+      "b": "Is it possible to split the payment into instalments?",
+      "similarity": 0.8206259342892243,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s04",
+      "same": true,
+      "a": "How do I track my parcel?",
+      "b": "Where can I follow my shipment?",
+      "similarity": 0.6733691268533468,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s05",
+      "same": true,
+      "a": "How do I delete my account?",
+      "b": "What do I have to do to close my account?",
+      "similarity": 0.6900345021054515,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s06",
+      "same": true,
+      "a": "Do you ship to Germany?",
+      "b": "Is delivery to Germany available?",
+      "similarity": 0.7448691393673839,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s07",
+      "same": true,
+      "a": "What does the warranty cover?",
+      "b": "Which problems are covered by the warranty?",
+      "similarity": 0.8227151493360021,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s08",
+      "same": true,
+      "a": "Can I change the delivery address?",
+      "b": "Is it possible to update my shipping address?",
+      "similarity": 0.7377096400694252,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s09",
+      "same": true,
+      "a": "How can I contact customer service?",
+      "b": "What is the way to reach customer support?",
+      "similarity": 0.6979012196185362,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s10",
+      "same": true,
+      "a": "How do gift cards work?",
+      "b": "How can I use a gift card?",
+      "similarity": 0.7994967323307947,
+      "confirmed": false
+    },
+    {
+      "id": "pair-s11",
+      "same": true,
+      "a": "Do you offer invoices for companies?",
+      "b": "Can I get a company invoice for my order?",
+      "similarity": 0.6953843820196646,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s12",
+      "same": true,
+      "a": "When are loyalty points added?",
+      "b": "How soon do I receive loyalty points?",
+      "similarity": 0.8120512527685919,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s13",
+      "same": true,
+      "a": "İade süresi kaç gün?",
+      "b": "Ürünü kaç gün içinde iade edebilirim?",
+      "similarity": 0.4550817301773967,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s14",
+      "same": true,
+      "a": "KKTC'ye teslimat kaç gün sürer?",
+      "b": "Kuzey Kıbrıs'a kargo ne kadar sürede gelir?",
+      "similarity": 0.527190196339967,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s15",
+      "same": true,
+      "a": "Taksit yapabiliyor muyum?",
+      "b": "Ödemeyi taksitlendirmek mümkün mü?",
+      "similarity": 0.7432340145677858,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s16",
+      "same": true,
+      "a": "Kargomu nasıl takip ederim?",
+      "b": "Gönderimi nereden izleyebilirim?",
+      "similarity": 0.4632067886455042,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s17",
+      "same": true,
+      "a": "Hesabımı nasıl silerim?",
+      "b": "Üyeliğimi kapatmak için ne yapmalıyım?",
+      "similarity": 0.43278607806026076,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s18",
+      "same": true,
+      "a": "Garanti neleri kapsıyor?",
+      "b": "Garanti hangi arızaları karşılıyor?",
+      "similarity": 0.69245332827268,
+      "confirmed": false
+    },
+    {
+      "id": "pair-s19",
+      "same": true,
+      "a": "Teslimat adresini değiştirebilir miyim?",
+      "b": "Gönderim adresimi güncellemek mümkün mü?",
+      "similarity": 0.618189986835242,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s20",
+      "same": true,
+      "a": "Müşteri hizmetlerine nasıl ulaşırım?",
+      "b": "Destek ekibiyle nasıl iletişime geçerim?",
+      "similarity": 0.5075818146163841,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s21",
+      "same": true,
+      "a": "Hediye çeki nasıl kullanılır?",
+      "b": "Hediye çekimi nasıl harcarım?",
+      "similarity": 0.8098569635062021,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s22",
+      "same": true,
+      "a": "Kurumsal fatura alabilir miyim?",
+      "b": "Şirket adına fatura çıkarılıyor mu?",
+      "similarity": 0.6047027731306694,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s23",
+      "same": true,
+      "a": "Sadakat puanları ne zaman yüklenir?",
+      "b": "Puanlarım ne zaman hesabıma geçer?",
+      "similarity": 0.44658266589707746,
+      "confirmed": true
+    },
+    {
+      "id": "pair-s24",
+      "same": true,
+      "a": "Siparişimi iptal edebilir miyim?",
+      "b": "Verdiğim siparişi iptal etmek mümkün mü?",
+      "similarity": 0.620547471478549,
+      "confirmed": true
+    },
+    {
+      "id": "pair-d01",
+      "same": false,
+      "a": "How long does delivery to Istanbul take?",
+      "b": "How long does delivery to KKTC take?",
+      "similarity": 0.5740249145912383,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d02",
+      "same": false,
+      "a": "What is the return policy for opened items?",
+      "b": "What is the return policy for unopened items?",
+      "similarity": 0.9335246514173146,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d03",
+      "same": false,
+      "a": "Can I cancel my order before it ships?",
+      "b": "Can I cancel my order after it has shipped?",
+      "similarity": 0.9243622443997479,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d04",
+      "same": false,
+      "a": "What is the warranty period of the Smart Watch X2?",
+      "b": "What is the warranty period of the Air Fryer F6?",
+      "similarity": 0.5818734894120682,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d05",
+      "same": false,
+      "a": "How do I return a product?",
+      "b": "How do I exchange a product?",
+      "similarity": 0.7195603312327148,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d06",
+      "same": false,
+      "a": "Can I pay by credit card?",
+      "b": "Can I pay by bank transfer?",
+      "similarity": 0.667695787106646,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d07",
+      "same": false,
+      "a": "How do I change my password?",
+      "b": "How do I change my delivery address?",
+      "similarity": 0.5282749830027168,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d08",
+      "same": false,
+      "a": "What is the shipping fee for domestic orders?",
+      "b": "What is the shipping fee for international orders?",
+      "similarity": 0.8309717045059615,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d09",
+      "same": false,
+      "a": "How do I redeem a gift card?",
+      "b": "How do I buy a gift card?",
+      "similarity": 0.7748732072837539,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d10",
+      "same": false,
+      "a": "When do loyalty points expire?",
+      "b": "When are loyalty points added?",
+      "similarity": 0.785926231670592,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d11",
+      "same": false,
+      "a": "Do you deliver on Sundays?",
+      "b": "Do you deliver on public holidays?",
+      "similarity": 0.7557383217654775,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d12",
+      "same": false,
+      "a": "How do I get a refund for a damaged item?",
+      "b": "How do I get a refund for a missing item?",
+      "similarity": 0.7854228799584774,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d13",
+      "same": false,
+      "a": "İade süresi kaç gün?",
+      "b": "Değişim süresi kaç gün?",
+      "similarity": 0.6201512634467499,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d14",
+      "same": false,
+      "a": "İstanbul'a teslimat kaç gün sürer?",
+      "b": "KKTC'ye teslimat kaç gün sürer?",
+      "similarity": 0.7450358067178584,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d15",
+      "same": false,
+      "a": "Açılmış ürünü iade edebilir miyim?",
+      "b": "Açılmamış ürünü iade edebilir miyim?",
+      "similarity": 0.9663641017988307,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d16",
+      "same": false,
+      "a": "Siparişimi kargoya verilmeden iptal edebilir miyim?",
+      "b": "Siparişimi kargoya verildikten sonra iptal edebilir miyim?",
+      "similarity": 0.9375844232315893,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d17",
+      "same": false,
+      "a": "Akıllı saatin garanti süresi nedir?",
+      "b": "Hava fritözünün garanti süresi nedir?",
+      "similarity": 0.5637949654253508,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d18",
+      "same": false,
+      "a": "Kredi kartıyla ödeyebilir miyim?",
+      "b": "Havale ile ödeyebilir miyim?",
+      "similarity": 0.5518925490318795,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d19",
+      "same": false,
+      "a": "Şifremi nasıl değiştiririm?",
+      "b": "Teslimat adresimi nasıl değiştiririm?",
+      "similarity": 0.5721239692315043,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d20",
+      "same": false,
+      "a": "Yurt içi kargo ücreti nedir?",
+      "b": "Yurt dışı kargo ücreti nedir?",
+      "similarity": 0.8774223054172966,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d21",
+      "same": false,
+      "a": "Hediye çeki nasıl kullanılır?",
+      "b": "Hediye çeki nasıl satın alınır?",
+      "similarity": 0.8968628348202097,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d22",
+      "same": false,
+      "a": "Hasarlı ürün için nasıl iade alırım?",
+      "b": "Eksik ürün için nasıl iade alırım?",
+      "similarity": 0.707821473372756,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d23",
+      "same": false,
+      "a": "Pazar günü teslimat yapıyor musunuz?",
+      "b": "Resmi tatillerde teslimat yapıyor musunuz?",
+      "similarity": 0.7270154100720424,
+      "confirmed": false
+    },
+    {
+      "id": "pair-d24",
+      "same": false,
+      "a": "Sadakat puanları ne zaman yüklenir?",
+      "b": "Sadakat puanları ne zaman sona erer?",
+      "similarity": 0.9200974675726513,
+      "confirmed": false
+    }
+  ]
+}
