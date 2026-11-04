@@ -29,3 +29,21 @@ def test_the_version_tag_itself_is_not_part_of_the_fingerprint(monkeypatch):
 def test_every_prompt_module_has_a_version():
     versions = prompt_registry.current()
     assert len(versions) == len(prompt_registry.PROMPT_MODULES)
+
+
+def test_trace_tags_list_every_prompt_version():
+    versions = prompt_registry.prompt_versions()
+    assert {v.split("-")[0] for v in versions} == {"rag", "agents", "memory", "guard"}
+
+
+def test_a_run_is_tagged_with_tenant_prompts_and_model(fresh_tenant):
+    import uuid
+
+    from mabeyn.agents.service import SupervisorService, TurnContext
+
+    turn = TurnContext(fresh_tenant, "c", uuid.uuid4(), "Shop")
+    config = SupervisorService._config(turn)
+    assert f"tenant:{fresh_tenant}" in config["tags"]
+    assert any(tag.startswith("model:") for tag in config["tags"])
+    assert all(f"prompt:{v}" in config["tags"] for v in prompt_registry.prompt_versions())
+    assert config["metadata"]["tenant_id"] == str(fresh_tenant)

@@ -3,6 +3,7 @@
 import hashlib
 import importlib
 import json
+from functools import lru_cache
 from pathlib import Path
 from types import ModuleType
 
@@ -32,6 +33,12 @@ def current() -> dict[str, str]:
         module = importlib.import_module(name)
         versions[module.PROMPT_VERSION] = fingerprint(module)
     return versions
+
+
+@lru_cache
+def prompt_versions() -> tuple[str, ...]:
+    """The version tag of every prompt module, for trace tags."""
+    return tuple(sorted(current()))
 
 
 def recorded() -> dict[str, str]:

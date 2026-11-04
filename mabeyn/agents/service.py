@@ -20,6 +20,7 @@ from mabeyn.guard.policies import ToolGuard
 from mabeyn.llm import usage
 from mabeyn.llm.client import LLM, ChatMessage
 from mabeyn.memory.store import MemoryStore
+from mabeyn.prompt_registry import prompt_versions
 from mabeyn.rag.service import Final, RagEvent, RagService, Retract, Token
 from mabeyn.rag.types import Citation
 from mabeyn.tools.service import ToolRunner
@@ -95,10 +96,16 @@ class SupervisorService:
         return {
             "configurable": {"thread_id": turn.thread_id},
             "run_name": "mabeyn-supervisor",
-            "tags": ["mabeyn-agents"],
+            "tags": [
+                "mabeyn-agents",
+                f"tenant:{turn.tenant_id}",
+                f"model:{get_settings().llm_model}",
+                *[f"prompt:{version}" for version in prompt_versions()],
+            ],
             "metadata": {
                 "tenant_id": str(turn.tenant_id),
                 "prompt_version": prompts.PROMPT_VERSION,
+                "prompt_versions": list(prompt_versions()),
                 "model": get_settings().llm_model,
             },
         }
