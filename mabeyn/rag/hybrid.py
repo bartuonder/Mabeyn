@@ -37,7 +37,7 @@ FTS_SQL = text(
           (c.fts_config = 'turkish'::regconfig AND c.search_vector @@ q.tr)
           OR (c.fts_config = 'english'::regconfig AND c.search_vector @@ q.en)
       )
-    ORDER BY rank DESC
+    ORDER BY rank DESC, d.title, c.position
     LIMIT :limit
     """
 )
@@ -74,7 +74,12 @@ async def _load(
     loaded = [
         to_retrieved(row, scores[row[0].id]) for row in (await session.execute(statement)).all()
     ]
-    return sorted(loaded, key=lambda c: c.score, reverse=True)
+    return sorted(loaded, key=_by_score)
+
+
+def _by_score(chunk: RetrievedChunk) -> tuple[float, str, str]:
+    """Best first; equal scores fall back to names so reruns on a new tenant agree."""
+    return (-chunk.score, chunk.document_title, chunk.section)
 
 
 def reciprocal_rank_fusion(
@@ -88,7 +93,7 @@ def reciprocal_rank_fusion(
             scores[chunk.chunk_id] = scores.get(chunk.chunk_id, 0.0) + 1.0 / (k + position)
             chunks.setdefault(chunk.chunk_id, chunk)
     fused = [replace(chunks[cid], score=score) for cid, score in scores.items()]
-    return sorted(fused, key=lambda c: c.score, reverse=True)
+    return sorted(fused, key=_by_score)
 
 
 async def hybrid_search(

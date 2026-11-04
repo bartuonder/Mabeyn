@@ -43,7 +43,7 @@ async def vector_search(
             Chunk.flagged.is_(False),
             Document.status == DocumentStatus.READY,
         )
-        .order_by(distance)
+        .order_by(distance, Document.title, Chunk.position)
         .limit(k)
     )
     rows = (await session.execute(statement)).all()

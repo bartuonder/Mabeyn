@@ -78,3 +78,13 @@ def test_rrf_with_one_empty_ranking_keeps_the_other_order():
     a, b = make("a"), make("b")
     assert [x.document_title for x in reciprocal_rank_fusion([[a, b], []])] == ["a", "b"]
     assert reciprocal_rank_fusion([[], []]) == []
+
+
+def test_equal_scores_are_ordered_by_name_whatever_the_input_order():
+    a, b, c = (make(x) for x in "abc")
+    first = reciprocal_rank_fusion([[c, a, b]])
+    second = reciprocal_rank_fusion([[b, c, a]])
+    tied = reciprocal_rank_fusion([[a], [b], [c]])
+    assert [x.document_title for x in tied] == ["a", "b", "c"]
+    assert [x.document_title for x in first] == ["c", "a", "b"]
+    assert [x.document_title for x in second] == ["b", "c", "a"]
