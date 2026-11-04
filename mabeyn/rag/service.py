@@ -1,7 +1,7 @@
 import uuid
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass, field
-from typing import Protocol
+from typing import Any, Protocol
 
 from mabeyn.llm.client import LLM, ChatMessage
 from mabeyn.rag.generate import extract_citations, safe_fallback, stream_answer
@@ -29,6 +29,7 @@ class Final:
     trace: dict[str, object] = field(default_factory=dict)
     status: str = "answered"
     approval_id: uuid.UUID | None = None
+    usage: dict[str, Any] = field(default_factory=dict)
 
 
 RagEvent = Token | Retract | Final

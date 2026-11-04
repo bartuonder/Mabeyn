@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 
 from sqlalchemy import select
 
@@ -27,6 +28,12 @@ async def save_assistant_message(
             role=MessageRole.ASSISTANT,
             content=final.answer,
             citations=citations,
+            input_tokens=int(final.usage.get("input_tokens", 0)),
+            output_tokens=int(final.usage.get("output_tokens", 0)),
+            llm_calls=int(final.usage.get("llm_calls", 0)),
+            cost_usd=Decimal(str(final.usage.get("cost_usd", 0))),
+            cached=bool(final.usage.get("cached", False)),
+            latency_ms=final.usage.get("latency_ms"),
         )
         session.add(message)
         await session.flush()

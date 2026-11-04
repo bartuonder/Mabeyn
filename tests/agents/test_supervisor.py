@@ -323,3 +323,12 @@ async def test_resuming_twice_does_not_refund_twice(fresh_tenant, checkpointer):
         await env.service.resume(env.turn(), approved=True, note=None)
     assert len(env.store.refunds) == 1
     assert len([c for c in await env.tool_calls() if c.tool_name == "request_refund"]) == 1
+
+
+async def test_every_run_reports_tokens_cost_and_latency(fresh_tenant, checkpointer):
+    env = await build_env(fresh_tenant, checkpointer)
+    _, final = await env.ask("What is the return policy?")
+
+    usage = final.usage
+    assert usage["llm_calls"] >= 1 and usage["input_tokens"] > 0 and usage["output_tokens"] > 0
+    assert usage["cost_usd"] > 0 and usage["latency_ms"] >= 0

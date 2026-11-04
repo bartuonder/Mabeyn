@@ -1,6 +1,7 @@
+import time
 import uuid
 from collections.abc import AsyncIterator, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 from typing import Any, Protocol
 
@@ -16,6 +17,7 @@ from mabeyn.db.models import Approval, ApprovalStatus
 from mabeyn.db.session import tenant_session
 from mabeyn.guard.firewall import Firewall
 from mabeyn.guard.policies import ToolGuard
+from mabeyn.llm import usage
 from mabeyn.llm.client import LLM, ChatMessage
 from mabeyn.memory.store import MemoryStore
 from mabeyn.rag.service import Final, RagEvent, RagService, Retract, Token
@@ -44,6 +46,16 @@ class AgentService(Protocol):
     ) -> AsyncIterator[RagEvent]: ...
 
     async def resume(self, turn: TurnContext, approved: bool, note: str | None) -> Final: ...
+
+
+def _usage(meter: usage.UsageMeter, started: float) -> dict[str, Any]:
+    return {
+        "input_tokens": meter.input_tokens,
+        "output_tokens": meter.output_tokens,
+        "llm_calls": meter.calls,
+        "cost_usd": round(meter.cost_usd, 6),
+        "latency_ms": int((time.perf_counter() - started) * 1000),
+    }
 
 
 def _citations(items: list[dict[str, Any]]) -> list[Citation]:
@@ -142,25 +154,31 @@ class SupervisorService:
             "summary": turn.summary,
         }
         config = self._config(turn)
-        async for mode, payload in self.graph.astream(
-            initial,
-            config,
-            stream_mode=["custom", "values"],
-        ):
-            if mode == "custom":
-                yield Token(payload["text"]) if payload["type"] == "token" else Retract()
-        yield await self._final(config)
+        started = time.perf_counter()
+        with usage.measure() as meter:
+            async for mode, payload in self.graph.astream(
+                initial,
+                config,
+                stream_mode=["custom", "values"],
+            ):
+                if mode == "custom":
+                    yield Token(payload["text"]) if payload["type"] == "token" else Retract()
+            final = await self._final(config)
+        yield replace(final, usage=_usage(meter, started))
 
     async def resume(self, turn: TurnContext, approved: bool, note: str | None) -> Final:
         config = self._config(turn)
         decision = {"decision": "approved" if approved else "rejected", "note": note}
-        async for _ in self.graph.astream(
-            Command(resume=decision),
-            config,
-            stream_mode=["values"],
-        ):
-            pass
-        return await self._final(config)
+        started = time.perf_counter()
+        with usage.measure() as meter:
+            async for _ in self.graph.astream(
+                Command(resume=decision),
+                config,
+                stream_mode=["values"],
+            ):
+                pass
+            final = await self._final(config)
+        return replace(final, usage=_usage(meter, started))
 
     async def _final(self, config: dict[str, Any]) -> Final:
         snapshot = await self.graph.aget_state(config)
