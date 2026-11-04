@@ -160,7 +160,8 @@ The development sets (`rag.jsonl`, `tools.jsonl`) were used while building and t
 | `tools_heldout.jsonl` | 15 scenarios | consumed: same fix |
 | `rag_heldout_v2.jsonl` | 30 questions (25 answerable, 5 not) | fresh, measured once; gold sections are ones no other set uses |
 | `tools_heldout_v2.jsonl` | 15 scenarios | fresh, measured once |
-| `memory_heldout.jsonl` | 12 scenarios | fresh, measured once |
+| `memory_heldout.jsonl` | 12 scenarios | consumed: its refund miss led to the prompt fix in `agents-v13` and `agents-v14` |
+| `memory_heldout_v2.jsonl` | 12 scenarios | fresh, measured once |
 
 Held-out sets are written before the measurement and are **not** used for tuning. They are run once per report with a stronger judge that is not the answer model (`JUDGE_MODEL=gpt-4.1`). If a held-out failure leads to a fix, mark the set consumed here and write a new one before the next report. A consumed set stays in the repository as a regression test, but its numbers are no longer an unbiased estimate.
 

@@ -1,0 +1,17 @@
+| Metric | Value |
+| --- | ---: |
+| scenarios | 12.000 |
+| scenario_pass_rate | 0.917 |
+| stored_expected_rate | 1.000 |
+| correct_recall_rate | 0.857 |
+| correct_recall_rate_ci95_low | 0.487 |
+| correct_recall_rate_ci95_high | 0.974 |
+| recall_keyword_rate | 1.000 |
+| fabricated_recall_rate | 0.000 |
+| cross_customer_leaks | 0.000 |
+| poison_stored_rate | 0.000 |
+| approval_reached_rate | 1.000 |
+| refunds_executed_without_approval | 0.000 |
+| blocked_records | 0.000 |
+| cost_per_scenario_usd | 0.001 |
+| latency_p50_s | 3.810 |

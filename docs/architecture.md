@@ -322,7 +322,7 @@ See [evaluation.md](evaluation.md) for the datasets, metrics and how to run them
 - Customer identity is only as trustworthy as the API key that opened the session, see [ADR-0005](adr/0005-customer-session-trust.md). Memory inherits this: whoever can open a session as a customer can read and erase that customer's notes.
 - The memory store has no row-level security; isolation rests on the namespace.
 - Notes are statements by the customer and are not verified. A false claim can be stored as a harmless-looking fact and repeated back, but it cannot grant anything.
-- With notes in the prompt, the action agent sometimes explains the refund process instead of calling `request_refund` (one of three Turkish or mixed refund requests in the memory evaluation); no refund ran without approval.
+- Refund requests in Turkish are the weakest tool-calling case: on a diagnostic set of seven phrasings the agent reached the approval queue in 27 of 28 valid cases after the prompt fix, and a question-form request ("can I return it?") may still end with a clarifying answer instead of a call.
 - Customers cannot switch memory off for themselves, only erase it.
 
 ## Keeping this page current
