@@ -1,0 +1,1 @@
+{"text": "", "calls": [{"id": "call_wzCGghPIXBNGJYUQwBGhaz3s", "name": "create_ticket", "arguments": "{\"subject\":\"KS-2002 siparişimdeki robot süpürge çalışmıyor\",\"description\":\"KS-2002 siparişimdeki robot süpürge çalışmıyor, yardım istiyorum.\"}"}], "in": 955, "out": 55, "latency": 0.9709944170317613}

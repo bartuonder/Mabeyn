@@ -1,0 +1,1 @@
+{"text": "", "calls": [{"id": "call_HhBT303oAoTm3XbVc6Keq5hI", "name": "change_address", "arguments": "{\"order_id\":\"KS-1003\",\"line\":\"Bahçe Sk. 7\",\"city\":\"Izmir\",\"postal_code\":\"35000\"}"}], "in": 956, "out": 38, "latency": 0.8819513749913312}

@@ -1,0 +1,1 @@
+{"text": "{\"correct\": true, \"reason\": \"The assistant's answer matches the reference by stating the shipping cost to KKTC is 149.90 TL regardless of basket amount and adds relevant extra detail without contradiction.\"}", "in": 199, "out": 43, "latency": 1.1743487089988776}

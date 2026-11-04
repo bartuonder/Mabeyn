@@ -1,0 +1,1 @@
+{"text": "Standard shipping takes 2 to 4 business days. I will now check the status and location of your order KS-3002.", "calls": [{"id": "call_O8iyqHDOQrIlDgXzdAyylIwQ", "name": "get_order_status", "arguments": "{\"order_id\":\"KS-3002\"}"}], "in": 990, "out": 47, "latency": 1.061209167004563}

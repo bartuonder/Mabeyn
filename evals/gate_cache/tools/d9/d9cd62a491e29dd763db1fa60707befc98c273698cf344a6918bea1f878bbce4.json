@@ -1,0 +1,1 @@
+{"text": "", "calls": [{"id": "call_UAya6KkQRJWTTE6YErSPNDXk", "name": "list_orders", "arguments": "{\"status\":\"shipped\"}"}], "in": 936, "out": 15, "latency": 0.6605062499875203}

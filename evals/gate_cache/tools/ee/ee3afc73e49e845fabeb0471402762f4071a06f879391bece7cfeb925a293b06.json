@@ -1,0 +1,1 @@
+{"text": "", "calls": [{"id": "call_EkbvKOgS12yqhEk7nYRYWFzS", "name": "change_address", "arguments": "{\"order_id\":\"KS-2003\",\"city\":\"Ankara\",\"line\":\"Mimar Sk. 3\",\"postal_code\":\"06500\"}"}], "in": 959, "out": 38, "latency": 0.843623791995924}

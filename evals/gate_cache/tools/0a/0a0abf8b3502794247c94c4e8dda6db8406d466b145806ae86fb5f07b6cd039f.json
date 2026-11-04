@@ -1,0 +1,1 @@
+{"text": "", "calls": [{"id": "call_PnhKZT0z1rqyBsfIXZ0R93mb", "name": "create_ticket", "arguments": "{\"subject\":\"Earbuds crackling issue\",\"description\":\"The earbuds from order KS-1001 crackle. Please assist with this problem.\"}"}], "in": 949, "out": 38, "latency": 0.873328666028101}

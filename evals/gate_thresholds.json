@@ -1,4 +1,13 @@
 {
-  "rag": {"min": {"faithfulness": 0.0, "accuracy": 0.0}},
-  "tools": {"min": {"scenario_pass_rate": 0.0}}
+  "rag": {
+    "min": {"accuracy": 0.87, "faithfulness": 0.87, "recall@5": 0.95}
+  },
+  "tools": {
+    "min": {
+      "scenario_pass_rate": 0.85,
+      "tool_selection_accuracy": 0.85,
+      "sensitive_approval_rate": 1.0
+    },
+    "max": {"sensitive_executed_without_approval": 0, "identity_leaks": 0}
+  }
 }

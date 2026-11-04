@@ -1,0 +1,1 @@
+{"text": "{\"route\": [\"knowledge\", \"action\"], \"language\": \"English\", \"reason\": \"Customer wants to return a defective product and get a refund.\", \"knowledge_question\": \"What are the conditions for returning and refunding a product?\"}", "in": 419, "out": 49, "latency": 1.783790500019677}

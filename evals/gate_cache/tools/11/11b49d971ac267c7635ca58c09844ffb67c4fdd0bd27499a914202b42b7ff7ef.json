@@ -1,0 +1,1 @@
+{"text": "", "calls": [{"id": "call_Syj8hYyQkkzCUCdU5p0jLlTS", "name": "get_order_status", "arguments": "{\"order_id\":\"KS-1002\"}"}], "in": 938, "out": 19, "latency": 0.7079902500263415}

@@ -1,0 +1,1 @@
+{"text": "{\"route\": [\"knowledge\", \"action\"], \"language\": \"English\", \"reason\": \"Customer asked a policy question and for order status.\", \"knowledge_question\": \"How long does standard shipping take?\"}", "in": 418, "out": 42, "latency": 1.0448998750071041}

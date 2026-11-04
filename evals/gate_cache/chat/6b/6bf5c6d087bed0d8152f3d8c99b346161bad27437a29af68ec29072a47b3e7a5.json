@@ -1,0 +1,1 @@
+{"text": "{\"route\": [\"knowledge\", \"action\"], \"language\": \"English\", \"reason\": \"Customer wants to return an order based on policy.\", \"knowledge_question\": \"What are the conditions for returning and refunding a product?\"}", "in": 416, "out": 47, "latency": 1.128297624993138}

@@ -1,0 +1,1 @@
+{"text": "{\"correct\": false, \"reason\": \"The reference states the information is not available, but the assistant provides detailed effectiveness information, which contradicts the reference.\"}", "in": 305, "out": 33, "latency": 0.9884243329870515}

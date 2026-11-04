@@ -1,0 +1,1 @@
+{"text": "", "calls": [{"id": "call_hcLqcSeU15B7rXS2735XmjAz", "name": "request_refund", "arguments": "{\"order_id\":\"KS-2002\",\"amount\":8999,\"reason\":\"Ürün kapalı ambalajında, tam iade istiyorum.\"}"}], "in": 1421, "out": 42, "latency": 0.9902009590296075}

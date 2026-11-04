@@ -1,0 +1,1 @@
+{"text": "{\"route\": [\"knowledge\", \"action\"], \"language\": \"Turkish\", \"reason\": \"İade ve geri ödeme koşulları hakkında bilgi gerekiyor.\", \"knowledge_question\": \"Ürünün iade ve geri ödeme koşulları nelerdir?\"}", "in": 424, "out": 53, "latency": 1.3221992500475608}

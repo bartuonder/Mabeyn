@@ -1,0 +1,1 @@
+{"text": "", "calls": [{"id": "call_5BDhZIjTbTqupN9me4UkvUvp", "name": "request_refund", "arguments": "{\"order_id\":\"KS-2001\",\"amount\":1999,\"reason\":\"Customer requested refund\"}"}], "in": 1373, "out": 30, "latency": 1.5389267920400016}
