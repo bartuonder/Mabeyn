@@ -197,3 +197,20 @@ class SecurityEventOut(Response):
     category: str
     action: SecurityAction
     detail: dict[str, Any]
+
+
+class UsageDay(Response):
+    day: date
+    messages: int
+    input_tokens: int
+    output_tokens: int
+    llm_calls: int
+    cost_usd: float
+    cached_messages: int
+    average_latency_ms: float | None
+
+
+class UsageReport(Response):
+    days: list[UsageDay]
+    total_cost_usd: float
+    total_messages: int

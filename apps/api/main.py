@@ -15,6 +15,7 @@ from apps.api.routers import (
     security,
     sessions,
     tools,
+    usage,
 )
 from mabeyn.agents.runtime import runtime
 from mabeyn.core.config import get_settings
@@ -50,6 +51,7 @@ def create_app() -> FastAPI:
     app.include_router(approvals.router)
     app.include_router(memory.router)
     app.include_router(security.router)
+    app.include_router(usage.router)
     return app
 
 
