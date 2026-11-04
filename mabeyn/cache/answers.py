@@ -230,10 +230,16 @@ class AnswerCache:
 
 
 async def invalidate_answers(tenant_id: uuid.UUID, kv: KeyValueStore | None = None) -> None:
-    """Drop every cached answer of a tenant, for example after its documents changed."""
+    """Drop every cached answer of a tenant, for example after its documents changed.
+
+    The two layers are cleared independently, so a Redis outage still empties the table.
+    """
     try:
         await (kv or get_kv()).incr(f"cache:epoch:{tenant_id}")
+    except Exception:
+        log.exception("cache_invalidation_failed", tenant_id=str(tenant_id), layer="exact")
+    try:
         async with tenant_session(tenant_id) as session:
             await session.execute(delete(AnswerCacheEntry))
     except Exception:
-        log.exception("cache_invalidation_failed", tenant_id=str(tenant_id))
+        log.exception("cache_invalidation_failed", tenant_id=str(tenant_id), layer="semantic")

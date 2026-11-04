@@ -15,8 +15,11 @@ async def rows(tenant_id) -> int:
 
 
 async def test_admins_can_clear_the_cache_of_their_tenant_only(
-    client: AsyncClient, tenant_x, tenant_y
+    client: AsyncClient, tenant_x, tenant_y, monkeypatch
 ):
+    import mabeyn.cache.answers as module
+
+    monkeypatch.setattr(module, "get_kv", lambda: MemoryKV())
     store = AnswerCache(FakeLLM(), MemoryKV())
     await store.store(tenant_x.id, "How many days to return?", "Thirty days.", [])
     await store.store(tenant_y.id, "How many days to return?", "Thirty days.", [])
