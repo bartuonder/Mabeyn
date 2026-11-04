@@ -52,6 +52,12 @@ class Settings(BaseSettings):
     chat_rate_per_key: int = 300
     chat_rate_per_tenant: int = 600
 
+    # Answer cache for knowledge questions.
+    cache_enabled: bool = True
+    cache_ttl_seconds: int = 86400
+    cache_semantic_threshold: float = 0.93
+    cache_max_entries: int = 500
+
     jwt_secret: SecretStr = Field(
         default=SecretStr("dev-only-secret-change-before-deploying"), min_length=32
     )
