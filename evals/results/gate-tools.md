@@ -15,6 +15,6 @@
 | tool_calls_per_scenario | 1.000 |
 | sensitive_executed_without_approval | 0.000 |
 | cost_per_scenario_usd | 0.000 |
-| latency_p50_s | 0.042 |
+| latency_p50_s | 0.031 |
 | scenario_pass_rate_ci95_low | 0.764 |
 | scenario_pass_rate_ci95_high | 0.991 |

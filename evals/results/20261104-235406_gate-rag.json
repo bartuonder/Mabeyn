@@ -1,8 +1,8 @@
 {
   "name": "gate-rag",
-  "created_at": "2026-11-04T22:54:08",
+  "created_at": "2026-11-04T23:54:06",
   "provenance": {
-    "commit": "2975f9c61412154c5515cd9f5f5ceccd00516d02",
+    "commit": "d003955b72b818cf8a6e52234410a23ca67f0776",
     "dirty": true,
     "prompt_versions": {
       "rag": "rag-v6",
@@ -47,8 +47,8 @@
     "accuracy_ci95_high": 0.9940915620051425,
     "faithfulness_ci95_low": 0.8864829086095221,
     "faithfulness_ci95_high": 1.0,
-    "latency_p50_s": 4.432635959004983,
-    "latency_p95_s": 8.076706123887561,
+    "latency_p50_s": 4.429277666960843,
+    "latency_p95_s": 8.089980832883157,
     "cost_per_query_usd": 0.001977738666666667,
     "llm_calls_per_query": 5.766666666666667
   },
@@ -111,7 +111,7 @@
       "judge_reason": "The assistant's answer matches the reference's key fact about the 2 business days inspection period and adds relevant extra detail without contradiction.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.361473374941852,
+      "latency_s": 4.362544625008013,
       "cost_usd": 0.0017262,
       "llm_calls": 5
     },
@@ -166,7 +166,7 @@
       "judge_reason": "The assistant's answer matches the reference answer's key information about the cutoff time for same-day shipping.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.8036427910556085,
+      "latency_s": 4.804632584040519,
       "cost_usd": 0.0016937599999999999,
       "llm_calls": 5
     },
@@ -221,7 +221,7 @@
       "judge_reason": "The assistant's answer matches the reference by stating the tracking number becomes active within 24 hours after shipment and adds extra correct detail about notification methods.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.388690166932065,
+      "latency_s": 4.3888174999156035,
       "cost_usd": 0.0016595299999999998,
       "llm_calls": 5
     },
@@ -276,7 +276,7 @@
       "judge_reason": "The assistant correctly declines to answer due to lack of information, matching the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 7.45740166597534,
+      "latency_s": 7.458671832981054,
       "cost_usd": 0.0038765199999999996,
       "llm_calls": 12
     },
@@ -331,7 +331,7 @@
       "judge_reason": "The assistant's answer correctly states the 6-month warranty period for accessories as given in the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.627659626014065,
+      "latency_s": 4.630275793024339,
       "cost_usd": 0.00168464,
       "llm_calls": 5
     },
@@ -386,7 +386,7 @@
       "judge_reason": "The assistant correctly states that the invoice is valid instead of the warranty certificate and that it can be re-downloaded from the account, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.822918209072668,
+      "latency_s": 3.824779250076972,
       "cost_usd": 0.00199071,
       "llm_calls": 5
     },
@@ -441,7 +441,7 @@
       "judge_reason": "The assistant's answer matches the reference answer by stating the total usage time as 30 hours.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.145613208995201,
+      "latency_s": 4.145166875969153,
       "cost_usd": 0.0018338,
       "llm_calls": 5
     },
@@ -496,7 +496,7 @@
       "judge_reason": "The assistant correctly states that the information is not available and does not invent facts.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.084249917068519,
+      "latency_s": 4.083870333037339,
       "cost_usd": 0.0016582200000000002,
       "llm_calls": 5
     },
@@ -551,7 +551,7 @@
       "judge_reason": "Assistant's answer matches the reference's key fact about 120 minutes of operation per charge.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.426778414985165,
+      "latency_s": 4.434611040982418,
       "cost_usd": 0.00182734,
       "llm_calls": 5
     },
@@ -606,7 +606,7 @@
       "judge_reason": "The assistant correctly states that the HEPA filter should be changed every 3 months, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.438224331999663,
+      "latency_s": 4.430805416079238,
       "cost_usd": 0.0018288500000000001,
       "llm_calls": 5
     },
@@ -661,7 +661,7 @@
       "judge_reason": "The assistant's answer matches the reference answer with the same temperature range.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.925108000054024,
+      "latency_s": 3.9302375420811586,
       "cost_usd": 0.00178106,
       "llm_calls": 5
     },
@@ -716,7 +716,7 @@
       "judge_reason": "Assistant correctly declines to provide information not available in the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 8.076706123887561,
+      "latency_s": 8.089980832883157,
       "cost_usd": 0.00377862,
       "llm_calls": 12
     },
@@ -771,7 +771,7 @@
       "judge_reason": "The assistant correctly states the reset link is valid for 30 minutes, matching the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.432635959004983,
+      "latency_s": 4.429277666960843,
       "cost_usd": 0.00173067,
       "llm_calls": 5
     },
@@ -826,7 +826,7 @@
       "judge_reason": "The assistant correctly states that membership cannot be deleted while there is an open order, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.000541624962352,
+      "latency_s": 3.9957946250215173,
       "cost_usd": 0.0016717400000000001,
       "llm_calls": 5
     },
@@ -881,7 +881,7 @@
       "judge_reason": "The assistant answer correctly states the 7-day period from the delivery date and the need to contact customer service, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.836531500041019,
+      "latency_s": 4.8316352080437355,
       "cost_usd": 0.0017052100000000002,
       "llm_calls": 5
     },
@@ -936,7 +936,7 @@
       "judge_reason": "The reference states the information is not available, but the assistant provides detailed effectiveness information, which contradicts the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 5.168516750971321,
+      "latency_s": 5.160102250985801,
       "cost_usd": 0.0020486000000000002,
       "llm_calls": 5
     },
@@ -991,7 +991,7 @@
       "judge_reason": "The assistant correctly states that requests are answered within 30 days, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.846180498949252,
+      "latency_s": 3.853968540963251,
       "cost_usd": 0.0017457499999999997,
       "llm_calls": 5
     },
@@ -1046,7 +1046,7 @@
       "judge_reason": "The assistant's answer matches the reference by stating invoices are kept for 10 years due to legal obligation.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.142622414976358,
+      "latency_s": 4.143982164969202,
       "cost_usd": 0.0016615499999999997,
       "llm_calls": 5
     },
@@ -1101,7 +1101,7 @@
       "judge_reason": "The assistant correctly states that gift vouchers cannot be converted to cash and adds relevant information about returns without contradicting the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 5.093344251043163,
+      "latency_s": 5.090510542097036,
       "cost_usd": 0.0017430899999999997,
       "llm_calls": 5
     },
@@ -1156,7 +1156,7 @@
       "judge_reason": "Assistant correctly declines to answer due to lack of information, matching the reference.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 10.629639332881197,
+      "latency_s": 10.640134665882215,
       "cost_usd": 0.0039037900000000003,
       "llm_calls": 12
     },
@@ -1211,7 +1211,7 @@
       "judge_reason": "The assistant's answer matches the reference answer in key facts and does not contradict it.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.765897709992714,
+      "latency_s": 4.767090834968258,
       "cost_usd": 0.00162175,
       "llm_calls": 5
     },
@@ -1266,7 +1266,7 @@
       "judge_reason": "The assistant's answer matches the reference's key fact about shipping within 15 business days after release and adds relevant extra detail.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.176617708988488,
+      "latency_s": 4.178937832999509,
       "cost_usd": 0.0016481700000000002,
       "llm_calls": 5
     },
@@ -1321,7 +1321,7 @@
       "judge_reason": "The assistant's answer matches the reference by stating only one coupon can be used per order.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.435667707992252,
+      "latency_s": 4.427763500018045,
       "cost_usd": 0.0016564499999999998,
       "llm_calls": 5
     },
@@ -1376,7 +1376,7 @@
       "judge_reason": "The assistant correctly states that the information is not available and advises contacting customer support.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.2671099989674985,
+      "latency_s": 3.2669348739436828,
       "cost_usd": 0.00183206,
       "llm_calls": 5
     },
@@ -1431,7 +1431,7 @@
       "judge_reason": "The assistant's answer matches the reference in key facts about the 7-day period and exceptions for campaign and flash discount products.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.0107091660029255,
+      "latency_s": 4.004768749990035,
       "cost_usd": 0.00171187,
       "llm_calls": 5
     },
@@ -1486,7 +1486,7 @@
       "judge_reason": "The assistant's answer matches the reference by stating the shipping cost to KKTC is 149.90 TL regardless of basket amount and adds relevant extra detail without contradiction.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 6.497047789976932,
+      "latency_s": 6.505126705975272,
       "cost_usd": 0.00167127,
       "llm_calls": 5
     },
@@ -1541,7 +1541,7 @@
       "judge_reason": "The assistant correctly states the 30-day return period and that shipping is free with Anadolu Kargo, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 5.213721082021948,
+      "latency_s": 5.214747249032371,
       "cost_usd": 0.00184264,
       "llm_calls": 5
     },
@@ -1596,7 +1596,7 @@
       "judge_reason": "The assistant answer correctly explains the application process and states that KargoShop covers the shipping cost, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 4.6687210409436375,
+      "latency_s": 4.673435831966344,
       "cost_usd": 0.00193133,
       "llm_calls": 5
     },
@@ -1651,7 +1651,7 @@
       "judge_reason": "The assistant's answer matches the reference by stating that unopened in-ear headphones can be returned, while opened ones cannot.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 3.7378606249694712,
+      "latency_s": 3.7431082500261255,
       "cost_usd": 0.0016918700000000003,
       "llm_calls": 5
     },
@@ -1706,7 +1706,7 @@
       "judge_reason": "The assistant correctly states the updated refund policy as 5 business days after warehouse inspection, matching the reference answer.",
       "faithful": true,
       "unsupported": [],
-      "latency_s": 6.501202665967867,
+      "latency_s": 6.505679706984665,
       "cost_usd": 0.0021750999999999997,
       "llm_calls": 7
     }
