@@ -12,12 +12,13 @@ from redis.asyncio import Redis
 from sqlalchemy import delete, select, update
 from sqlalchemy.dialects.postgresql import insert
 
+from mabeyn.cache import prompts
 from mabeyn.core.config import get_settings
 from mabeyn.core.text import fold
 from mabeyn.db.models import AnswerCacheEntry
 from mabeyn.db.session import tenant_session
 from mabeyn.guard.pii import mask_pii
-from mabeyn.llm.client import LLM
+from mabeyn.llm.client import LLM, LLMError, chat_json
 from mabeyn.prompt_registry import current
 
 log = structlog.get_logger()
@@ -96,6 +97,23 @@ def cacheable_answer(answer: str) -> bool:
     return bool(answer.strip()) and not mask_pii(answer).changed
 
 
+async def same_question(llm: LLM, asked: str, cached: str) -> bool:
+    """A small model confirms that two questions need the same answer; doubt counts as no."""
+    try:
+        data = await chat_json(
+            llm,
+            [
+                {"role": "system", "content": prompts.SAME_QUESTION_SYSTEM},
+                {"role": "user", "content": f"Question 1: {asked}\nQuestion 2: {cached}"},
+            ],
+            model=get_settings().llm_model_small,
+            max_tokens=20,
+        )
+        return data["same"] is True
+    except (LLMError, KeyError, TypeError):
+        return False
+
+
 def _digest(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()
 
@@ -146,6 +164,8 @@ class AnswerCache:
             entry, dist = row
             similarity = 1.0 - float(dist)
             if similarity < get_settings().cache_semantic_threshold:
+                return None
+            if not await same_question(self.llm, question, entry.question):
                 return None
             await session.execute(
                 update(AnswerCacheEntry)

@@ -1,3 +1,4 @@
+import json
 import uuid
 
 import pytest
@@ -21,8 +22,8 @@ QUESTION = "How many days do I have to return a product?"
 ANSWER = "You can return a product within 30 days. [Return Policy:Eligibility]"
 
 
-def cache() -> tuple[AnswerCache, MemoryKV, FakeLLM]:
-    llm, kv = FakeLLM(), MemoryKV()
+def cache(confirm: bool = True) -> tuple[AnswerCache, MemoryKV, FakeLLM]:
+    llm, kv = FakeLLM(lambda messages, model: json.dumps({"same": confirm})), MemoryKV()
     return AnswerCache(llm, kv), kv, llm
 
 
@@ -71,19 +72,32 @@ async def test_a_close_paraphrase_hits_the_semantic_layer_and_a_different_questi
     same = await store.lookup(fresh_tenant, QUESTION)
     assert same is not None and same.layer == "semantic" and same.similarity > 0.99
     near = await store.lookup(fresh_tenant, "How many days do I have to return a product please")
-    assert near is not None and near.layer == "semantic" and 0.93 <= near.similarity < 1.0
+    assert near is not None and near.layer == "semantic" and 0.6 <= near.similarity < 1.0
     assert await store.lookup(fresh_tenant, "What payment methods do you accept") is None
 
 
-async def test_the_threshold_decides_what_counts_as_similar(fresh_tenant, monkeypatch):
+async def test_a_similar_question_is_served_only_when_the_model_confirms_it(fresh_tenant):
+    store, kv, llm = cache(confirm=False)
+    await store.store(fresh_tenant, QUESTION, ANSWER, CITATIONS)
+    kv.data.clear()
+    similar = "How many days do I have to return a product please"
+    assert await store.lookup(fresh_tenant, similar) is None
+    asked = llm.chat_calls[-1][1][1]["content"]
+    assert QUESTION in asked and similar in asked
+
+
+async def test_the_candidate_threshold_decides_what_the_model_is_asked_about(
+    fresh_tenant, monkeypatch
+):
     store, kv, llm = cache()
     await store.store(fresh_tenant, QUESTION, ANSWER, CITATIONS)
     kv.data.clear()
-    question = "How many days do I have to return a product please"
     monkeypatch.setenv("CACHE_SEMANTIC_THRESHOLD", "0.999")
     get_settings.cache_clear()
     try:
-        assert await store.lookup(fresh_tenant, question) is None
+        similar = "How many days do I have to return a product please"
+        assert await store.lookup(fresh_tenant, similar) is None
+        assert llm.chat_calls == []
     finally:
         get_settings.cache_clear()
 

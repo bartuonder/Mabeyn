@@ -55,7 +55,8 @@ class Settings(BaseSettings):
     # Answer cache for knowledge questions.
     cache_enabled: bool = True
     cache_ttl_seconds: int = 86400
-    cache_semantic_threshold: float = 0.93
+    # Candidates must be this similar before a small model confirms the questions are the same.
+    cache_semantic_threshold: float = 0.60
     cache_max_entries: int = 500
 
     jwt_secret: SecretStr = Field(

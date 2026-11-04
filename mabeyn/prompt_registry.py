@@ -13,6 +13,7 @@ PROMPT_MODULES = (
     "mabeyn.agents.prompts",
     "mabeyn.memory.prompts",
     "mabeyn.guard.prompts",
+    "mabeyn.cache.prompts",
 )
 
 
