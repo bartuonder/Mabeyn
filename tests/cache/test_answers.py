@@ -170,3 +170,26 @@ async def test_invalidating_one_tenant_leaves_the_others(tenant_x, tenant_y):
     await invalidate_answers(tenant_x.id, kv)
     assert await store.lookup(tenant_x.id, QUESTION) is None
     assert await store.lookup(tenant_y.id, QUESTION) is not None
+
+
+async def test_contact_details_the_tenant_publishes_do_not_block_caching(fresh_tenant):
+    from mabeyn.db import models as m
+    from mabeyn.ingestion.pipeline import add_document, ingest_document
+
+    page = b"# Support\n\nWrite to destek@kargoshop.example or call 0850 123 45 67.\n"
+    async with tenant_session(fresh_tenant) as session:
+        document = await add_document(
+            session,
+            tenant_id=fresh_tenant,
+            title="Support",
+            source_type=m.DocumentSource.MARKDOWN,
+            data=page,
+        )
+        document_id = document.id
+    await ingest_document(fresh_tenant, document_id, llm=FakeLLM())
+
+    store, kv, llm = cache()
+    published = "Write to destek@kargoshop.example or call 0850 123 45 67."
+    assert await store.store(fresh_tenant, "How can I contact customer service?", published, [])
+    other = "Write to someone.else@example.com instead."
+    assert not await store.store(fresh_tenant, "Who can I write to about a complaint?", other, [])

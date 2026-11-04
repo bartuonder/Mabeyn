@@ -18,6 +18,7 @@ from mabeyn.core.text import fold
 from mabeyn.db.models import AnswerCacheEntry
 from mabeyn.db.session import tenant_session
 from mabeyn.guard.pii import mask_pii
+from mabeyn.guard.published import is_published
 from mabeyn.llm.client import LLM, LLMError, chat_json
 from mabeyn.prompt_registry import current
 
@@ -177,7 +178,7 @@ class AnswerCache:
     async def store(
         self, tenant_id: uuid.UUID, question: str, answer: str, citations: list[dict[str, Any]]
     ) -> bool:
-        if not (cacheable_question(question) and cacheable_answer(answer)):
+        if not (cacheable_question(question) and await self._safe_answer(tenant_id, answer)):
             return False
         settings = get_settings()
         ttl = settings.cache_ttl_seconds
@@ -208,6 +209,13 @@ class AnswerCache:
             )
             await self._trim(session)
         return True
+
+    async def _safe_answer(self, tenant_id: uuid.UUID, answer: str) -> bool:
+        """Personal data blocks caching, but the shop's own published contact details do not."""
+        if not answer.strip():
+            return False
+        found = mask_pii(answer)
+        return all([await is_published(tenant_id, value) for value in found.values])
 
     async def _trim(self, session: Any) -> None:
         keep = (
