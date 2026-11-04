@@ -38,3 +38,57 @@ jobs:
       - run: uv run python -m mabeyn.agents.checkpoint
       - run: uv run python -m mabeyn.memory.store
       - run: uv run pytest
+
+  eval-gate:
+    # Same-repository pull requests only: forks cannot read the OpenAI secret.
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    needs: check
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: mabeyn
+          POSTGRES_PASSWORD: mabeyn
+          POSTGRES_DB: mabeyn
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mabeyn"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql+asyncpg://mabeyn_app:mabeyn_app@localhost:5432/mabeyn
+      ADMIN_DATABASE_URL: postgresql+asyncpg://mabeyn:mabeyn@localhost:5432/mabeyn
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      EVAL_CACHE_DIR: evals/gate_cache
+      EVAL_BUDGET_USD: "0.75"
+      LANGSMITH_TRACING: "false"
+      LANGCHAIN_TRACING_V2: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check that the OpenAI secret is available
+        id: key
+        run: |
+          if [ -n "$OPENAI_API_KEY" ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else echo "::warning::OPENAI_API_KEY is not set, the eval gate is skipped"; fi
+      - uses: astral-sh/setup-uv@v6
+        if: steps.key.outputs.present == 'true'
+        with:
+          enable-cache: true
+      - if: steps.key.outputs.present == 'true'
+        run: uv sync --frozen
+      - if: steps.key.outputs.present == 'true'
+        run: |
+          uv run alembic upgrade head
+          uv run python -m mabeyn.agents.checkpoint
+          uv run python -m mabeyn.memory.store
+      - name: Run the eval gate
+        if: steps.key.outputs.present == 'true'
+        run: uv run python -m evals.gate
+      - name: Keep the gate results
+        if: always() && steps.key.outputs.present == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-gate
+          path: evals/results/*gate*
