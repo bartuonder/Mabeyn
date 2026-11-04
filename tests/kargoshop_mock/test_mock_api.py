@@ -135,3 +135,18 @@ async def test_idempotency_covers_tickets_and_address_changes(shop):
         "/orders/KS-1003/address", json=address, headers={"Idempotency-Key": "a1"}
     )
     assert first.status_code == again.status_code == 200
+
+
+async def test_tickets_and_refunds_are_numbered_from_one_so_evaluations_can_replay():
+    from httpx import ASGITransport, AsyncClient
+
+    from apps.kargoshop_mock.main import Store, create_app
+
+    async def create_two_tickets() -> list[str]:
+        app = create_app(Store())
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://shop") as client:
+            body = {"customer_id": "customer-1", "subject": "Help", "description": "Please help."}
+            return [(await client.post("/tickets", json=body)).json()["id"] for _ in range(2)]
+
+    assert await create_two_tickets() == ["T-0001", "T-0002"]
+    assert await create_two_tickets() == ["T-0001", "T-0002"]

@@ -16,8 +16,8 @@
       "accuracy_ci95_high": 0.9940915620051425,
       "faithfulness_ci95_low": 0.8864829086095221,
       "faithfulness_ci95_high": 1.0,
-      "latency_p50_s": 4.432635959004983,
-      "latency_p95_s": 8.076706123887561,
+      "latency_p50_s": 4.429277666960843,
+      "latency_p95_s": 8.089980832883157,
       "cost_per_query_usd": 0.001977738666666667,
       "llm_calls_per_query": 5.766666666666667
     },
@@ -37,7 +37,7 @@
       "tool_calls_per_scenario": 1.0,
       "sensitive_executed_without_approval": 0.0,
       "cost_per_scenario_usd": 0.0,
-      "latency_p50_s": 0.04246012499788776,
+      "latency_p50_s": 0.030667792016174644,
       "scenario_pass_rate_ci95_low": 0.7638641064874331,
       "scenario_pass_rate_ci95_high": 0.9911187805671268
     }
@@ -59,6 +59,12 @@
       "metric": "rag.recall@5",
       "value": 1.0,
       "bound": 0.95,
+      "kind": "min"
+    },
+    {
+      "metric": "rag.accuracy_unanswerable",
+      "value": 0.8333333333333334,
+      "bound": 0.65,
       "kind": "min"
     },
     {

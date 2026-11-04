@@ -1,6 +1,5 @@
 import copy
 import json
-import uuid
 from datetime import date
 from pathlib import Path
 from typing import Annotated, Any
@@ -104,7 +103,7 @@ def create_app(store: Store | None = None) -> FastAPI:
     async def create_ticket(body: TicketIn, idempotency_key: IdempotencyKey = None) -> Any:
         if (again := replayed(store, "ticket", idempotency_key)) is not None:
             return again
-        ticket = {"id": f"T-{uuid.uuid4().hex[:8].upper()}", "status": "open", **body.model_dump()}
+        ticket = {"id": f"T-{len(store.tickets) + 1:04d}", "status": "open", **body.model_dump()}
         store.tickets.append(ticket)
         return remember(store, "ticket", idempotency_key, 201, ticket)
 
@@ -125,7 +124,7 @@ def create_app(store: Store | None = None) -> FastAPI:
         if any(r["order_id"] == order_id for r in store.refunds):
             raise HTTPException(status.HTTP_409_CONFLICT, "A refund already exists for this order")
         refund = {
-            "id": f"R-{uuid.uuid4().hex[:8].upper()}",
+            "id": f"R-{len(store.refunds) + 1:04d}",
             "order_id": order_id,
             "amount": body.amount,
             "reason": body.reason,
