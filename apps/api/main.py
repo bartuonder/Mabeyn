@@ -7,6 +7,7 @@ from apps.api.routers import (
     api_keys,
     approvals,
     auth,
+    cache,
     chat,
     conversations,
     documents,
@@ -52,6 +53,7 @@ def create_app() -> FastAPI:
     app.include_router(memory.router)
     app.include_router(security.router)
     app.include_router(usage.router)
+    app.include_router(cache.router)
     return app
 
 
