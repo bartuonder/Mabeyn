@@ -150,7 +150,7 @@ graph TD;
 | Node | What it does |
 | --- | --- |
 | `input_guard` | Normalises the text (invisible and control characters, length), then runs the firewall's input layer: rules for override phrases, hidden characters and encoded payloads, then a small-model rating compared with the tenant's threshold. A blocked message skips routing and gets a fixed reply; the attempt is written to the security events. Also resets the per-turn part of the state and decides whether replies are held back for checking. |
-| `cache_lookup` | For the first question of a conversation only, after the input checks: an exact match in Redis, then a semantic match in pgvector above the similarity threshold (tenant scoped, same prompt versions, not expired). A hit becomes the answer and skips routing, retrieval and generation. Questions with order numbers or personal data are never looked up. A failing cache is logged and ignored. |
+| `cache_lookup` | For the first question of a conversation only, after the input checks: an exact match in Redis, then a semantic candidate in pgvector (tenant scoped, same prompt versions, not expired, similarity above 0.6) that a small model must confirm asks for the same information, because similarity alone cannot tell "how to redeem" from "how to buy" a gift card. A hit becomes the answer and skips routing, retrieval and generation. Questions with order numbers or personal data are never looked up. A failing cache is logged and ignored. |
 | `recall_memories` | Loads the saved notes about this customer from the long-term store (newest first, at most ten, screened again before use). Anonymous sessions skip it. A failing store is logged and the conversation goes on without notes. |
 | `supervisor` | One small-model call returns the route (`knowledge`, `action`, both, or `escalate`), the customer's language by name, and, for mixed requests, a clean policy question without order details. |
 | `dispatch` | Picks the next step of the plan; a pending `needs_human` flag always wins and goes to `escalate`. |
@@ -279,7 +279,7 @@ Secret API keys (`mbn_sec_…`) stay on the tenant's server and open sessions fo
 <!-- generated:facts -->
 | Setting | Value |
 | --- | --- |
-| Prompt versions | `rag-v6`, `agents-v14`, `memory-v3`, `guard-v1` |
+| Prompt versions | `rag-v6`, `agents-v14`, `memory-v3`, `guard-v1`, `cache-v1` |
 | Answer and action model | `gpt-4.1-mini` |
 | Small model (routing, rewriting, grading, reranking, checks) | `gpt-4o-mini` |
 | Judge model (evaluation) | `gpt-4.1-mini` |
@@ -307,6 +307,8 @@ Secret API keys (`mbn_sec_…`) stay on the tenant's server and open sessions fo
 | Notes recalled per message | 10 |
 | Idle minutes before a conversation is mined | 30 |
 | Injection threshold (tenant default) | 0.7 |
+| Answer cache lifetime (seconds) | 86400 |
+| Answer cache candidate similarity | 0.6 |
 | Write tool rate limit per customer (tenant default) | 5 per 60 minutes |
 | Session requests per window (address, key) | 20, 60 per 60 s |
 <!-- /generated -->

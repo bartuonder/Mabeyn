@@ -33,7 +33,7 @@ def test_every_prompt_module_has_a_version():
 
 def test_trace_tags_list_every_prompt_version():
     versions = prompt_registry.prompt_versions()
-    assert {v.split("-")[0] for v in versions} == {"rag", "agents", "memory", "guard"}
+    assert {v.split("-")[0] for v in versions} == {"rag", "agents", "memory", "guard", "cache"}
 
 
 def test_a_run_is_tagged_with_tenant_prompts_and_model(fresh_tenant):

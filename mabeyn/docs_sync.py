@@ -15,6 +15,7 @@ from typing import Any, cast
 from mabeyn.agents import action
 from mabeyn.agents import prompts as agent_prompts
 from mabeyn.agents.supervisor import AgentDeps, build_supervisor_graph
+from mabeyn.cache import prompts as cache_prompts
 from mabeyn.core.config import Settings
 from mabeyn.guard import prompts as guard_prompts
 from mabeyn.guard import settings as guard_settings
@@ -76,7 +77,8 @@ def facts() -> str:
         (
             "Prompt versions",
             f"`{rag_prompts.PROMPT_VERSION}`, `{agent_prompts.PROMPT_VERSION}`, "
-            f"`{memory_prompts.PROMPT_VERSION}`, `{guard_prompts.PROMPT_VERSION}`",
+            f"`{memory_prompts.PROMPT_VERSION}`, `{guard_prompts.PROMPT_VERSION}`, "
+            f"`{cache_prompts.PROMPT_VERSION}`",
         ),
         ("Answer and action model", f"`{_default('llm_model')}`"),
         (
@@ -114,6 +116,8 @@ def facts() -> str:
         ("Notes recalled per message", str(_default("memory_recall_limit"))),
         ("Idle minutes before a conversation is mined", str(_default("memory_idle_minutes"))),
         ("Injection threshold (tenant default)", str(guard_settings.DEFAULT_THRESHOLD)),
+        ("Answer cache lifetime (seconds)", str(_default("cache_ttl_seconds"))),
+        ("Answer cache candidate similarity", str(_default("cache_semantic_threshold"))),
         (
             "Write tool rate limit per customer (tenant default)",
             f"{guard_settings.DEFAULT_RATE_LIMIT} per "
