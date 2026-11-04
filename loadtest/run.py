@@ -4,7 +4,8 @@
 
 The compose `api` container is recreated with the cache off and then on, and with the abuse
 limits raised; it is recreated with the default settings at the end. Needs the demo tenant
-(`mabeyn.cli seed-kargoshop`) and real OpenAI credentials. Cost and hit rate come from the tenant's own usage report.
+(`mabeyn.cli seed-kargoshop`) and real OpenAI credentials. Cost and hit rate come from the
+tenant's own usage report.
 """
 
 import argparse
