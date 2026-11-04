@@ -220,6 +220,37 @@ Two-session scenarios ([how they are scored](docs/evaluation.md#memory-evaluatio
 - One Turkish refund request among the harmless messages did not reach the approval queue (nothing was executed). That is the weakness described under Memory; the red-team numbers were measured before its fix (prompt `agents-v12`) and were not rerun.
 - Not measured: the latency the firewall adds to a message.
 
+### Cost, cache, speed and the evaluation gate
+
+Every assistant message stores its tokens, model calls, estimated cost and latency, and `GET /usage` sums them per day for a tenant ([ADR-0007](docs/adr/0007-cost-cache-and-eval-gate.md)). Chat is rate limited per customer, API key and tenant. Raw runs: [`evals/results`](evals/results).
+
+**Answer cache.** Only plain knowledge answers to first questions are cached. Matching similar questions by embedding similarity alone does not work with `text-embedding-3-small`: on 24 paraphrase pairs and 24 look-alike pairs ("how do I redeem" versus "how do I buy" a gift card) paraphrases score a median of 0.69 and look-alikes reach 0.97, so no threshold separates them. A small model therefore confirms every semantic candidate:
+
+| Candidate similarity at least | Similarity only: paraphrases served | Similarity only: wrong answers served | With confirmation: paraphrases served | With confirmation: wrong answers served |
+| ---: | ---: | ---: | ---: | ---: |
+| 0.50 | 0.79 | 1.00 | 0.71 | 0.00 |
+| 0.60 (default) | 0.71 | 0.75 | 0.63 | 0.00 |
+| 0.80 | 0.17 | 0.33 | 0.17 | 0.00 |
+| 0.93 | 0.00 | 0.13 | 0.00 | 0.00 |
+
+**Load test.** 50 simulated customers for 40 seconds against the compose stack on one machine, real OpenAI calls, 70% knowledge questions from a pool of ten and 30% order lookups, abuse limits raised, cache off and then on after an empty start and a warm-up of the pool (`loadtest/`). No request failed.
+
+| | Cache off | Cache on |
+| --- | ---: | ---: |
+| Knowledge questions: p50 / p95 | 7.6 s / 16 s | 1.1 s / 14 s |
+| Order lookups (never cached): p50 / p95 | 4.3 s / 5.0 s | 4.1 s / 4.8 s |
+| Messages answered from the cache | 0% | 59% (82% of the knowledge questions) |
+| Cost per message | $0.00177 | $0.00075 |
+
+- The knowledge p95 hardly moves because the remaining 18% of the knowledge questions run the whole pipeline under load, mostly the English question about Germany, which finds nothing in the Turkish documents and is never cached. The median is what the cache changes.
+- The test ran on one machine against the real model, so the latency includes OpenAI and the load generator. It is a comparison between the two settings, not a capacity figure. Three runs were needed: the first showed that answers quoting the shop's own contact details were never cached (fixed), the second started with stale Redis entries (the test now clears the cache first).
+
+**Evaluation gate.** On every pull request from the same repository CI runs 30 RAG questions and 20 tool scenarios (`evals/gate.py`) against thresholds that sit about one failure below the baseline (accuracy 0.97, faithfulness 1.00, 19 of 20 scenarios; limits 0.87, 0.87 and 0.85, plus no sensitive action without approval and no identity leak). The responses of the 50 items are committed, so an unchanged prompt costs nothing.
+
+- To see whether the gate catches a real regression, the RAG answer prompt was changed on purpose to allow answers from general knowledge. The first attempt **slipped through**: accuracy 0.90 and faithfulness 0.93 stayed above their limits because the answerable questions were still answered correctly; only the accuracy on questions the documents cannot answer fell, from 0.83 to 0.50. A separate limit on that metric (0.65) was added, and the same broken prompt then failed the gate end to end (exit code 1, evidence in `evals/results/gate-broken.md`).
+- The gate found its own flaws too: reruns on a new tenant missed the cache because retrieval ordered equal scores by random ids (now by title and section), and the tool scenario for an expired refund window is flaky, so the limit leaves room for one miss.
+- The CI job has not run on GitHub yet; it needs the repository secret `OPENAI_API_KEY` and is skipped for forks.
+
 ## Status
 
 - Phase 1 — foundation, tenant isolation, auth: done
@@ -228,4 +259,5 @@ Two-session scenarios ([how they are scored](docs/evaluation.md#memory-evaluatio
 - Phase 4 — agentic layer, tools, human approval: done
 - Phase 5 — memory: done
 - Phase 6 — LLM firewall and red-team: done
-- Phases 7–8 — LLMOps, product polish: planned, see the roadmap
+- Phase 7 — LLMOps, cache, performance: done
+- Phase 8 — product polish: planned, see the roadmap

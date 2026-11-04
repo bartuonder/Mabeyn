@@ -14,7 +14,7 @@ Do not start a phase before the previous one meets its definition of done.
 | 4 Agentic layer | done | ADR-0002, [architecture.md](architecture.md) |
 | 5 Memory | done | ADR-0006, [architecture.md](architecture.md#7-memory) |
 | 6 LLM firewall and red-team | done | [ADR-0003](adr/0003-defense-layers.md), [ADR-0005](adr/0005-customer-session-trust.md) implemented; the memory store still has no RLS ([ADR-0006](adr/0006-customer-memory.md)) |
-| 7 LLMOps, cache, performance | planned | |
+| 7 LLMOps, cache, performance | done | [ADR-0007](adr/0007-cost-cache-and-eval-gate.md); no Weights & Biases report |
 | 8 Productization | planned | The widget uses publishable keys ([ADR-0005](adr/0005-customer-session-trust.md)) |
 
 Deliberate differences from the plan below:
@@ -23,6 +23,7 @@ Deliberate differences from the plan below:
 - The demo documents and the golden set are Turkish, with a small English set.
 - The plan's phases 0 and 1 are one phase here, and weeks are not tracked.
 - The classifier is a small OpenAI model instead of Llama Prompt Guard, and personal data is masked with validated regular expressions instead of Presidio ([ADR-0003](adr/0003-defense-layers.md)).
+- The semantic answer cache keeps its vectors in pgvector (per tenant, row-level security) next to a Redis exact-match layer, and a small model confirms each semantic candidate because similarity alone cannot separate look-alike questions ([ADR-0007](adr/0007-cost-cache-and-eval-gate.md)). The shareable Weights & Biases report was dropped, as the scope cuts allow.
 - Memory recall lists the newest notes of the verified customer instead of searching them, and extraction runs when a conversation is closed or idle instead of at an unspecified end.
 - Evaluation results are reported with 95% confidence intervals, and a held-out set that is never used for tuning backs the development numbers.
 
