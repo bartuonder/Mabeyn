@@ -127,5 +127,5 @@ async def test_the_notes_come_before_the_rules_so_the_rules_stay_last(
 
     system = env.llm.tool_turns[0][0]["content"]
     assert system.index("<customer_notes>") < system.index("Rules:")
-    assert "call request_refund right away in the same turn" in system
+    assert "call request_refund right away in" in system
     await memory_store.forget(fresh_tenant, "customer-1")

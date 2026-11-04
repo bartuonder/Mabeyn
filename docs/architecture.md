@@ -272,7 +272,7 @@ Secret API keys (`mbn_sec_…`) stay on the tenant's server and open sessions fo
 <!-- generated:facts -->
 | Setting | Value |
 | --- | --- |
-| Prompt versions | `rag-v6`, `agents-v12`, `memory-v3`, `guard-v1` |
+| Prompt versions | `rag-v6`, `agents-v14`, `memory-v3`, `guard-v1` |
 | Answer and action model | `gpt-4.1-mini` |
 | Small model (routing, rewriting, grading, reranking, checks) | `gpt-4o-mini` |
 | Judge model (evaluation) | `gpt-4.1-mini` |
