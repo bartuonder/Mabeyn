@@ -189,3 +189,4 @@ Reading the tables:
 - Accuracy and faithfulness show a 95% Wilson interval. With 80 questions a difference of six answers is about 7 points and the intervals of neighbouring rows overlap, so a single row is a hint, not proof.
 - Every result file records the git commit, whether the code was dirty, the prompt versions and the models. `tests/test_prompt_registry.py` fails when a prompt changes without a new `PROMPT_VERSION`; after bumping it, run `uv run python -m mabeyn.prompt_registry`.
 - Cached calls replay their original latency, so latency columns reflect the time of the first real call and vary between full reruns.
+
