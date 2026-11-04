@@ -10,6 +10,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 
 from apps.api.deps import Customer
+from apps.api.limits import ChatLimit
 from apps.api.schemas import (
     ChatRequest,
     ConversationClosed,
@@ -106,7 +107,7 @@ async def _open_conversation(
     return turn, compacted.history, escalated
 
 
-@router.post("")
+@router.post("", dependencies=[ChatLimit])
 async def chat(
     body: ChatRequest, customer: Customer, agents: Agents, memory: Memories
 ) -> StreamingResponse:
