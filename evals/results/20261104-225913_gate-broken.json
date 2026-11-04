@@ -1,0 +1,101 @@
+{
+  "metrics": {
+    "rag": {
+      "n": 30.0,
+      "n_answerable": 24.0,
+      "mrr": 1.0,
+      "recall@1": 1.0,
+      "recall@3": 1.0,
+      "recall@5": 1.0,
+      "recall@8": 1.0,
+      "accuracy": 0.9,
+      "accuracy_answerable": 1.0,
+      "accuracy_unanswerable": 0.5,
+      "faithfulness": 0.9666666666666667,
+      "accuracy_ci95_low": 0.7437855868473339,
+      "accuracy_ci95_high": 0.9654007400402839,
+      "faithfulness_ci95_low": 0.8332924860304112,
+      "faithfulness_ci95_high": 0.9940915620051425,
+      "latency_p50_s": 5.0208960410091095,
+      "latency_p95_s": 8.06462733290391,
+      "cost_per_query_usd": 0.0020133303333333334,
+      "llm_calls_per_query": 5.766666666666667
+    },
+    "tools": {
+      "scenarios": 20.0,
+      "scenario_pass_rate": 0.95,
+      "tool_selection_accuracy": 0.95,
+      "argument_accuracy": 1.0,
+      "unnecessary_call_rate": 0.05,
+      "sensitive_approval_rate": 1.0,
+      "route_accuracy": 1.0,
+      "status_accuracy": 0.95,
+      "approval_expectation_accuracy": 0.95,
+      "outcome_accuracy": 0.95,
+      "language_accuracy": 1.0,
+      "identity_leaks": 0.0,
+      "tool_calls_per_scenario": 1.0,
+      "sensitive_executed_without_approval": 0.0,
+      "cost_per_scenario_usd": 0.0,
+      "latency_p50_s": 1.8333073329995386,
+      "scenario_pass_rate_ci95_low": 0.7638641064874331,
+      "scenario_pass_rate_ci95_high": 0.9911187805671268
+    }
+  },
+  "checks": [
+    {
+      "metric": "rag.accuracy",
+      "value": 0.9,
+      "bound": 0.87,
+      "kind": "min"
+    },
+    {
+      "metric": "rag.faithfulness",
+      "value": 0.9666666666666667,
+      "bound": 0.87,
+      "kind": "min"
+    },
+    {
+      "metric": "rag.recall@5",
+      "value": 1.0,
+      "bound": 0.95,
+      "kind": "min"
+    },
+    {
+      "metric": "rag.accuracy_unanswerable",
+      "value": 0.5,
+      "bound": 0.65,
+      "kind": "min"
+    },
+    {
+      "metric": "tools.scenario_pass_rate",
+      "value": 0.95,
+      "bound": 0.85,
+      "kind": "min"
+    },
+    {
+      "metric": "tools.tool_selection_accuracy",
+      "value": 0.95,
+      "bound": 0.85,
+      "kind": "min"
+    },
+    {
+      "metric": "tools.sensitive_approval_rate",
+      "value": 1.0,
+      "bound": 1.0,
+      "kind": "min"
+    },
+    {
+      "metric": "tools.sensitive_executed_without_approval",
+      "value": 0.0,
+      "bound": 0,
+      "kind": "max"
+    },
+    {
+      "metric": "tools.identity_leaks",
+      "value": 0.0,
+      "bound": 0,
+      "kind": "max"
+    }
+  ]
+}

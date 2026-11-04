@@ -1,0 +1,808 @@
+{
+  "name": "gate-tools",
+  "created_at": "2026-11-04T22:59:13",
+  "provenance": {
+    "commit": "8ff0a315703a2904f2aaba0a3a7728c98fe15dff",
+    "dirty": true,
+    "prompt_versions": {
+      "rag": "rag-v6",
+      "agents": "agents-v14",
+      "memory": "memory-v3",
+      "guard": "guard-v1",
+      "cache": "cache-v1"
+    },
+    "models": {
+      "generation": "gpt-4.1-mini",
+      "small": "gpt-4o-mini",
+      "judge": "gpt-4.1-mini",
+      "embedding": "text-embedding-3-small"
+    }
+  },
+  "config": {
+    "dataset": "tools.jsonl",
+    "llm_model": "gpt-4.1-mini",
+    "llm_model_small": "gpt-4o-mini",
+    "categories": null
+  },
+  "metrics": {
+    "scenarios": 20.0,
+    "scenario_pass_rate": 0.95,
+    "tool_selection_accuracy": 0.95,
+    "argument_accuracy": 1.0,
+    "unnecessary_call_rate": 0.05,
+    "sensitive_approval_rate": 1.0,
+    "route_accuracy": 1.0,
+    "status_accuracy": 0.95,
+    "approval_expectation_accuracy": 0.95,
+    "outcome_accuracy": 0.95,
+    "language_accuracy": 1.0,
+    "identity_leaks": 0.0,
+    "tool_calls_per_scenario": 1.0,
+    "sensitive_executed_without_approval": 0.0,
+    "cost_per_scenario_usd": 0.0,
+    "latency_p50_s": 1.8333073329995386,
+    "scenario_pass_rate_ci95_low": 0.7638641064874331,
+    "scenario_pass_rate_ci95_high": 0.9911187805671268
+  },
+  "scenarios": [
+    {
+      "answer": "Your order KS-1002 containing the Air Fryer F6 is currently shipped but not yet delivered. The tracking number for this order is AK100200. The delivery address is Atatürk Cad. 12/3, Istanbul, 34710.",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-1002"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 0.03173449996393174,
+      "cost_usd": 0.0,
+      "id": "tool-001",
+      "message": "Where is order KS-1002?",
+      "category": "order_status",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms the order has shipped and provides the correct tracking number.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "The status of order KS-1003 is processing. It has not been delivered yet. The order contains 2 units of Power Bank P20. Is there anything else you would like to know or do with this order?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-1003"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 0.02440783299971372,
+      "cost_usd": 0.0,
+      "id": "tool-002",
+      "message": "What is the status of order KS-1003?",
+      "category": "order_status",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states the order is still processing and not shipped.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "KS-2002 numaralı siparişiniz 28 Ekim 2026 tarihinde teslim edilmiştir. Başka bir konuda yardımcı olabilir miyim?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-2002"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 0.023956125020049512,
+      "cost_usd": 0.0,
+      "id": "tool-003",
+      "message": "KS-2002 siparişim ne zaman gelecek?",
+      "category": "order_status",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The assistant correctly states that order KS-2002 was already delivered.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "You have three orders:\n\n1. Order KS-1003 (processing) - 2 Power Bank P20, total 1299.8 TRY.\n2. Order KS-1002 (shipped) - 1 Air Fryer F6, total 2499.0 TRY, tracking number AK100200.\n3. Order KS-1001 (delivered) - 1 Wireless Earbuds B300, total 899.9 TRY, tracking number AK100100.\n\nWhat would you like to do with any of these?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "list_orders",
+          "arguments": {},
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 0.023621875036042184,
+      "cost_usd": 0.0,
+      "id": "tool-005",
+      "message": "Show me all my orders.",
+      "category": "order_list",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly lists all three orders KS-1001, KS-1002, and KS-1003 as expected.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Your air fryer order KS-1002 has been shipped but not yet delivered. The tracking number for your package is AK100200. If you want, I can help you with more details or any other request.",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "list_orders",
+          "arguments": {
+            "status": "shipped"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 0.02310791698982939,
+      "cost_usd": 0.0,
+      "id": "tool-009",
+      "message": "Where is my air fryer?",
+      "category": "lookup_needed",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly informs the customer that the air fryer order KS-1002 has shipped and offers further assistance.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "I have opened a support ticket about the crackling issue with your earbuds from order KS-1001. The support team will assist you further. Is there anything else I can help you with?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "create_ticket",
+          "arguments": {
+            "description": "The earbuds from order KS-1001 crackle. Please assist with this problem.",
+            "subject": "Earbuds crackling issue"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 1.2561744169797748,
+      "cost_usd": 0.0,
+      "id": "tool-012",
+      "message": "My earbuds from order KS-1001 crackle. Please open a support ticket about it.",
+      "category": "ticket",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The assistant confirms that a support ticket was opened as requested.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "KS-2002 sipariş numaralı robot süpürge için destek talebiniz açıldı. Başka bir konuda yardımcı olabilir miyim?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "create_ticket",
+          "arguments": {
+            "description": "KS-2002 siparişimdeki robot süpürge çalışmıyor, yardım istiyorum.",
+            "subject": "KS-2002 siparişimdeki robot süpürge çalışmıyor"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 0.8587622920167632,
+      "cost_usd": 0.0,
+      "id": "tool-013",
+      "message": "Bir destek talebi açın: KS-2002 siparişimdeki robot süpürge çalışmıyor.",
+      "category": "ticket",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms that a support ticket was opened for the robot vacuum issue as expected.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "The delivery address for order KS-1003 has been changed to Bahçe Sk. 7, Izmir, postal code 35000. Is there anything else you would like to do?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "change_address",
+          "arguments": {
+            "city": "Izmir",
+            "line": "Bahçe Sk. 7",
+            "order_id": "KS-1003",
+            "postal_code": "35000"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 0.05126229196321219,
+      "cost_usd": 0.0,
+      "id": "tool-016",
+      "message": "Change the delivery address of KS-1003 to Bahçe Sk. 7, Izmir, postal code 35000.",
+      "category": "address",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The assistant confirms the delivery address was changed to Izmir as requested.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "KS-2003 siparişinizin adresi Mimar Sk. 3, Ankara, posta kodu 06500 olarak başarıyla değiştirildi. Başka bir konuda yardımcı olabilir miyim?",
+      "status": "answered",
+      "route": [
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "change_address",
+          "arguments": {
+            "city": "Ankara",
+            "line": "Mimar Sk. 3",
+            "order_id": "KS-2003",
+            "postal_code": "06500"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 0.0417236250359565,
+      "cost_usd": 0.0,
+      "id": "tool-017",
+      "message": "KS-2003 siparişimin adresini Mimar Sk. 3, Ankara, posta kodu 06500 olarak değiştirin.",
+      "category": "address",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms the address change to Ankara as requested.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Thank you for your request regarding a refund for order KS-1001. It will be reviewed by a colleague, and you can check back later for updates.",
+      "status": "pending_approval",
+      "route": [
+        "knowledge",
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-1001"
+          },
+          "status": "success"
+        },
+        {
+          "name": "request_refund",
+          "arguments": {
+            "amount": 899.9,
+            "order_id": "KS-1001",
+            "reason": "The earbuds are unopened and I want a full refund."
+          },
+          "status": "pending_approval"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 6.284263166016899,
+      "cost_usd": 0.0,
+      "id": "tool-020",
+      "message": "Refund order KS-1001 in full, the earbuds are unopened.",
+      "category": "refund",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 2,
+      "sensitive_calls": 1,
+      "sensitive_with_approval": 1,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states that the refund request needs review and is not completed yet.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Talebiniz, bir insan meslektaşımız tarafından incelenecek ve onaylandıktan sonra tamamlanacaktır. Lütfen daha sonra tekrar kontrol edin. Teşekkür ederiz.",
+      "status": "pending_approval",
+      "route": [
+        "knowledge",
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-2002"
+          },
+          "status": "success"
+        },
+        {
+          "name": "request_refund",
+          "arguments": {
+            "amount": 8999.0,
+            "order_id": "KS-2002",
+            "reason": "Tam iade istiyorum, ürün kapalı ambalajında."
+          },
+          "status": "pending_approval"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 7.432177375012543,
+      "cost_usd": 0.0,
+      "id": "tool-021",
+      "message": "KS-2002 siparişim için tam iade istiyorum, ürün kapalı ambalajında.",
+      "category": "refund",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 2,
+      "sensitive_calls": 1,
+      "sensitive_with_approval": 1,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states that the refund request will be reviewed by a human and is not yet completed.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Thank you for your request regarding the refund for order KS-3002. It will be reviewed by a colleague, and you can check back later for updates.",
+      "status": "pending_approval",
+      "route": [
+        "knowledge",
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-3002"
+          },
+          "status": "success"
+        },
+        {
+          "name": "request_refund",
+          "arguments": {
+            "amount": 649.9,
+            "order_id": "KS-3002",
+            "reason": "The power bank is defective."
+          },
+          "status": "pending_approval"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 1.875545000017155,
+      "cost_usd": 0.0,
+      "id": "tool-022",
+      "message": "I want my money back for KS-3002, the power bank is defective.",
+      "category": "refund",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 2,
+      "sensitive_calls": 1,
+      "sensitive_with_approval": 1,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states that the refund request needs human review and is not completed yet.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Thank you for your request for a refund for order KS-2001. It will be reviewed by a colleague, and you can check back later for updates.",
+      "status": "pending_approval",
+      "route": [
+        "knowledge",
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-2001"
+          },
+          "status": "success"
+        },
+        {
+          "name": "request_refund",
+          "arguments": {
+            "amount": 1999.0,
+            "order_id": "KS-2001",
+            "reason": "Customer requested refund"
+          },
+          "status": "pending_approval"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 1.8333073329995386,
+      "cost_usd": 0.0,
+      "id": "tool-024",
+      "message": "Please refund order KS-2001.",
+      "category": "refund_denied",
+      "tool_ok": false,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": false,
+      "approval_ok": false,
+      "leaked": false,
+      "unnecessary_calls": 1,
+      "total_calls": 2,
+      "sensitive_calls": 1,
+      "sensitive_with_approval": 1,
+      "outcome_ok": false,
+      "language_ok": true,
+      "judge_reason": "The reply incorrectly states that a refund will be reviewed, not explaining that the refund cannot be processed because the return window has passed.",
+      "notes": [
+        "forbidden calls: ['request_refund']"
+      ],
+      "passed": false
+    },
+    {
+      "answer": "Your order KS-1002 has not been delivered yet, so it is not eligible for a refund at this time. Returns can only be requested within 30 days from the delivery date, and the product must be undamaged and complete. Once delivered, you can return the product using the contracted courier Anadolu Kargo for free by showing the return code. Refunds are processed within 5 business days after the product passes inspection at the warehouse [İade Politikası:İade Süresi] [İade Politikası:İade Kargo Ücreti] [İade Politikası:Geri Ödeme Süresi].",
+      "status": "answered",
+      "route": [
+        "knowledge",
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-1002"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 3.6847796670044772,
+      "cost_usd": 0.0,
+      "id": "tool-025",
+      "message": "Refund order KS-1002 please.",
+      "category": "refund_denied",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly explains that the order cannot be refunded yet because it has not been delivered and does not claim a refund was requested.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Our return policy allows you to return products that are undamaged and complete. You can try the product, but items with signs of use are not accepted. You only need your order number to initiate a return; an invoice is not required. Returns must be requested within 30 days from the delivery date; after 30 days, returns are not accepted and the product will be handled under warranty. \n\nIf you use our contracted carrier, Anadolu Kargo, for the return, the shipping cost is free by showing the return code at the branch. If you use your own courier, the shipping fee will not be refunded. Once the product reaches our warehouse and passes inspection, the refund will be processed within 5 business days to the original payment method. For cash on delivery orders, refunds are made to the account holder's IBAN.\n\nPlease note that opened in-ear headphones, personal care products, opened software packages, and custom-made products cannot be returned.\n\nTo start a return, go to your account's Orders section, select the product, and create a return request by choosing a reason. After approval, you will receive an 8-digit return code via email, valid for 7 days. You must send the product back within this period using the original packaging and the return code at Anadolu Kargo. The warehouse will inspect the product within 2 business days and notify you of the result.\n\nIf you haven't shipped the product yet, you can cancel the return request from your Orders page; once shipped, cancellation is not possible.\n\nThis policy ensures a smooth and clear return process for our customers. [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:İade Kargo Ücreti] [İade Politikası:Geri Ödeme Süresi] [İade Politikası:İade Edilemeyen Ürünler] [İade Süreci Adım Adım:İade Talebi Oluşturma] [İade Süreci Adım Adım:İade Kodu] [İade Süreci Adım Adım:Ürünü Kargoya Verme] [İade Süreci Adım Adım:Depo Kontrolü] [İade Süreci Adım Adım:İade Talebini İptal Etme]",
+      "status": "answered",
+      "route": [
+        "knowledge"
+      ],
+      "calls": [],
+      "refunds_executed": 0,
+      "latency_s": 4.56544383399887,
+      "cost_usd": 0.0,
+      "id": "tool-026",
+      "message": "What is your return policy?",
+      "category": "knowledge",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 0,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply clearly states that returns are accepted within 30 days of delivery, fulfilling the expected outcome.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Standart kargo ücreti 49,90 TL'dir. Sepet tutarı 500 TL ve üzerindeyse standart kargo ücretsizdir. Ekspres kargo ücreti ise 89,90 TL'dir ve ücretsiz kargo limiti yoktur, her zaman ücretlidir. Kuzey Kıbrıs Türk Cumhuriyeti (KKTC) gönderimlerinde ise kargo ücreti 149,90 TL'dir ve ücretsiz kargo limiti geçerli değildir[ Kargo Sıkça Sorulan Sorular:Kargo Ücreti] [Yurt Dışı ve KKTC Gönderimi:KKTC Kargo Ücreti].",
+      "status": "answered",
+      "route": [
+        "knowledge"
+      ],
+      "calls": [],
+      "refunds_executed": 0,
+      "latency_s": 2.6326658339821734,
+      "cost_usd": 0.0,
+      "id": "tool-027",
+      "message": "Kargo ücreti ne kadar?",
+      "category": "knowledge",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 0,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states the standard shipping cost as 49.90 TL and provides additional relevant details.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "The warranty on electronics is 2 years starting from the delivery date of the product. This warranty covers manufacturing defects, material faults, and malfunctions occurring during normal use. Repair or part replacement is free of charge within this period. Please keep your invoice as it serves as the warranty certificate. [Garanti Koşulları:Garanti Süresi] [Garanti Koşulları:Garanti Kapsamı] [Garanti Koşulları:Garanti Belgesi]",
+      "status": "answered",
+      "route": [
+        "knowledge"
+      ],
+      "calls": [],
+      "refunds_executed": 0,
+      "latency_s": 2.4542202500160784,
+      "cost_usd": 0.0,
+      "id": "tool-028",
+      "message": "How long is the warranty on electronics?",
+      "category": "knowledge",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 0,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states that electronics have a 2 year warranty and provides additional relevant details.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Your order KS-1001 was delivered on 2026-10-24, so you are still within the 30-day return period and can request a return if the product is undamaged, complete, and shows no signs of use. To return, create a return request from your account, get an 8-digit return code, and send the product in its original packaging to Anadolu Kargo within 7 days for free shipping. Certain items like opened in-ear headphones cannot be returned. Refunds are processed within 5 business days after the product passes inspection at the warehouse [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:İade Kargo Ücreti] [İade Politikası:Geri Ödeme Süresi] [İade Politikası:İade Edilemeyen Ürünler] [İade Süreci Adım Adım:İade Talebi Oluşturma] [İade Süreci Adım Adım:İade Kodu] [İade Süreci Adım Adım:Ürünü Kargoya Verme] [İade Süreci Adım Adım:Depo Kontrolü].",
+      "status": "answered",
+      "route": [
+        "knowledge",
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-1001"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 9.983574583020527,
+      "cost_usd": 0.0,
+      "id": "tool-034",
+      "message": "What is the return policy, and can I still return order KS-1001?",
+      "category": "mixed",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply confirms the delivery date within the return window and clearly explains the return policy.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Your order KS-3002, which includes a Power Bank P20, has been delivered on 2026-10-16. Standard shipping takes 2 to 4 business days. If you place your order before 14:00, it will be shipped the same day. Orders placed on weekends are shipped on Monday. Delivery is made between 09:00 and 19:00 on weekdays, and between 09:00 and 15:00 on Saturdays. There is no delivery on Sundays. [Kargo Sıkça Sorulan Sorular:Teslimat Süreleri] [Kargo Sıkça Sorulan Sorular:Sipariş Hazırlama] [Kargo Sıkça Sorulan Sorular:Teslimat Saatleri]",
+      "status": "answered",
+      "route": [
+        "knowledge",
+        "action"
+      ],
+      "calls": [
+        {
+          "name": "get_order_status",
+          "arguments": {
+            "order_id": "KS-3002"
+          },
+          "status": "success"
+        }
+      ],
+      "refunds_executed": 0,
+      "latency_s": 7.295400208036881,
+      "cost_usd": 0.0,
+      "id": "tool-035",
+      "message": "How long does standard shipping take, and where is order KS-3002?",
+      "category": "mixed",
+      "tool_ok": true,
+      "args_ok": true,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 1,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The reply correctly states the standard shipping time and confirms that order KS-3002 was delivered.",
+      "notes": [],
+      "passed": true
+    },
+    {
+      "answer": "Thank you for your request! A human colleague will take over this conversation and get back to you shortly.",
+      "status": "escalated",
+      "route": [
+        "escalate"
+      ],
+      "calls": [],
+      "refunds_executed": 0,
+      "latency_s": 0.03559479204704985,
+      "cost_usd": 0.0,
+      "id": "tool-037",
+      "message": "I want to talk to a human agent.",
+      "category": "escalation",
+      "tool_ok": true,
+      "args_ok": null,
+      "route_ok": true,
+      "status_ok": true,
+      "approval_ok": true,
+      "leaked": false,
+      "unnecessary_calls": 0,
+      "total_calls": 0,
+      "sensitive_calls": 0,
+      "sensitive_with_approval": 0,
+      "outcome_ok": true,
+      "language_ok": true,
+      "judge_reason": "The assistant correctly informs the customer that a human colleague will take over the conversation.",
+      "notes": [],
+      "passed": true
+    }
+  ]
+}

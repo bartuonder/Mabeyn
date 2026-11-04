@@ -1,7 +1,7 @@
 | Check | Value | Limit | Result |
 | --- | ---: | ---: | --- |
 | rag.accuracy | 0.900 | >= 0.870 | pass |
-| rag.faithfulness | 0.933 | >= 0.870 | pass |
+| rag.faithfulness | 0.967 | >= 0.870 | pass |
 | rag.recall@5 | 1.000 | >= 0.950 | pass |
 | rag.accuracy_unanswerable | 0.500 | >= 0.650 | FAIL |
 | tools.scenario_pass_rate | 0.950 | >= 0.850 | pass |
