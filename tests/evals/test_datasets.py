@@ -6,7 +6,13 @@ from evals.datasets import load_questions
 from mabeyn.ingestion.parse import parse_markdown
 from mabeyn.seed import SEED_ROOT, load_seed_documents
 
-RAG_SETS = ["rag.jsonl", "rag_en.jsonl", "rag_heldout.jsonl", "rag_heldout_v2.jsonl"]
+RAG_SETS = [
+    "rag.jsonl",
+    "rag_en.jsonl",
+    "rag_xlang.jsonl",
+    "rag_heldout.jsonl",
+    "rag_heldout_v2.jsonl",
+]
 
 
 def headings() -> dict[str, set[str]]:
