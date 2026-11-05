@@ -1,0 +1,1 @@
+{"text": "{\"outcome_ok\": true, \"reason\": \"The reply correctly explains that the order cannot be refunded yet because it has not been delivered and does not claim a refund was requested.\"}", "in": 193, "out": 38, "latency": 1.2285712080192752}

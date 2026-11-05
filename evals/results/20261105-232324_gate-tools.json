@@ -1,11 +1,11 @@
 {
   "name": "gate-tools",
-  "created_at": "2026-11-05T23:12:08",
+  "created_at": "2026-11-05T23:23:24",
   "provenance": {
-    "commit": "98efd5ae498bd606241f01d799e0aa596234b1e6",
+    "commit": "0edc5a94d6240996d0566c8989a625abcaea99cb",
     "dirty": true,
     "prompt_versions": {
-      "rag": "rag-v6",
+      "rag": "rag-v7",
       "agents": "agents-v14",
       "memory": "memory-v3",
       "guard": "guard-v1",
@@ -39,9 +39,9 @@
     "identity_leaks": 0.0,
     "tool_calls_per_scenario": 0.95,
     "sensitive_executed_without_approval": 0.0,
-    "policy_blocks": 1.0,
+    "policy_blocks": 0.0,
     "cost_per_scenario_usd": 0.0,
-    "latency_p50_s": 0.03348683402873576,
+    "latency_p50_s": 0.032653208007104695,
     "scenario_pass_rate_ci95_low": 0.8388698745050667,
     "scenario_pass_rate_ci95_high": 1.0
   },
@@ -63,7 +63,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.03622037498280406,
+      "latency_s": 0.035662125039380044,
       "cost_usd": 0.0,
       "id": "tool-001",
       "message": "Where is order KS-1002?",
@@ -101,7 +101,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.029176084033679217,
+      "latency_s": 0.029699541977606714,
       "cost_usd": 0.0,
       "id": "tool-002",
       "message": "What is the status of order KS-1003?",
@@ -139,7 +139,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.02791483298642561,
+      "latency_s": 0.027204915997572243,
       "cost_usd": 0.0,
       "id": "tool-003",
       "message": "KS-2002 siparişim ne zaman gelecek?",
@@ -175,7 +175,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.027962875028606504,
+      "latency_s": 0.028494916041381657,
       "cost_usd": 0.0,
       "id": "tool-005",
       "message": "Show me all my orders.",
@@ -213,7 +213,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.028148917015641928,
+      "latency_s": 0.027609916985966265,
       "cost_usd": 0.0,
       "id": "tool-009",
       "message": "Where is my air fryer?",
@@ -252,7 +252,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.0330267499666661,
+      "latency_s": 0.032653208007104695,
       "cost_usd": 0.0,
       "id": "tool-012",
       "message": "My earbuds from order KS-1001 crackle. Please open a support ticket about it.",
@@ -291,7 +291,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.030890790978446603,
+      "latency_s": 0.03059499996015802,
       "cost_usd": 0.0,
       "id": "tool-013",
       "message": "Bir destek talebi açın: KS-2002 siparişimdeki robot süpürge çalışmıyor.",
@@ -332,7 +332,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.03348683402873576,
+      "latency_s": 0.033366666990332305,
       "cost_usd": 0.0,
       "id": "tool-016",
       "message": "Change the delivery address of KS-1003 to Bahçe Sk. 7, Izmir, postal code 35000.",
@@ -373,7 +373,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.03209437505574897,
+      "latency_s": 0.03257620899239555,
       "cost_usd": 0.0,
       "id": "tool-017",
       "message": "KS-2003 siparişimin adresini Mimar Sk. 3, Ankara, posta kodu 06500 olarak değiştirin.",
@@ -421,7 +421,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.06490616704104468,
+      "latency_s": 0.06426829198608175,
       "cost_usd": 0.0,
       "id": "tool-020",
       "message": "Refund order KS-1001 in full, the earbuds are unopened.",
@@ -443,7 +443,7 @@
       "passed": true
     },
     {
-      "answer": "Talebinizin bir insan meslektaşımız tarafından incelenmesi gerekmektedir. Onaylandıktan sonra işlem tamamlanacaktır, bu yüzden lütfen daha sonra tekrar kontrol edin. Teşekkür ederiz.",
+      "answer": "Talebinizin bir insan meslektaşımız tarafından incelenmesi gerekmektedir. Onaylandıktan sonra işleminiz tamamlanacaktır, lütfen daha sonra tekrar kontrol edin.",
       "status": "pending_approval",
       "route": [
         "knowledge",
@@ -462,14 +462,14 @@
           "arguments": {
             "amount": 8999.0,
             "order_id": "KS-2002",
-            "reason": "Ürün kapalı ambalajında, tam iade istiyorum."
+            "reason": "Tam iade istiyorum, ürün kapalı ambalajında."
           },
           "status": "pending_approval"
         }
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.0666552500333637,
+      "latency_s": 0.06650074996287003,
       "cost_usd": 0.0,
       "id": "tool-021",
       "message": "KS-2002 siparişim için tam iade istiyorum, ürün kapalı ambalajında.",
@@ -517,7 +517,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.06403970799874514,
+      "latency_s": 0.06254304200410843,
       "cost_usd": 0.0,
       "id": "tool-022",
       "message": "I want my money back for KS-3002, the power bank is defective.",
@@ -539,7 +539,7 @@
       "passed": true
     },
     {
-      "answer": "The refund for your order KS-2001 cannot be processed because the 30-day return window has passed since the delivery date. Returns must be requested within 30 days from delivery; after that, the product is evaluated under warranty instead [İade Politikası:İade Süresi]. If you have any other questions or requests, please let me know.",
+      "answer": "Your order KS-2001 was delivered on 2026-08-05, and since today is 2026-11-01, it is beyond the 30-day return period, so a refund request cannot be accepted. If there is a problem with the product, it can be evaluated under warranty instead [İade Politikası:İade Süresi].",
       "status": "answered",
       "route": [
         "knowledge",
@@ -555,8 +555,8 @@
         }
       ],
       "refunds_executed": 0,
-      "policy_blocks": 1,
-      "latency_s": 0.06952541699865833,
+      "policy_blocks": 0,
+      "latency_s": 0.04943629197077826,
       "cost_usd": 0.0,
       "id": "tool-024",
       "message": "Please refund order KS-2001.",
@@ -573,12 +573,12 @@
       "sensitive_with_approval": 0,
       "outcome_ok": true,
       "language_ok": true,
-      "judge_reason": "The reply correctly explains that the refund cannot be processed due to the expired return window and does not claim a refund was requested.",
+      "judge_reason": "The reply correctly explains that the refund cannot be processed because the 30-day return window has passed and does not claim a refund was requested.",
       "notes": [],
       "passed": true
     },
     {
-      "answer": "Your order KS-1002 has been shipped but not yet delivered, so a refund cannot be requested at this time. Refunds can only be processed for orders that have been delivered. Please let me know if you need help with anything else.",
+      "answer": "Your order KS-1002 has not been delivered yet, so it is not eligible for a refund at this time. Refunds can only be processed after the product is delivered and returned within 30 days in undamaged and complete condition. Please let us know if you need assistance once you receive your order.",
       "status": "answered",
       "route": [
         "knowledge",
@@ -595,7 +595,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.05078829103149474,
+      "latency_s": 0.048873917025048286,
       "cost_usd": 0.0,
       "id": "tool-025",
       "message": "Refund order KS-1002 please.",
@@ -612,12 +612,12 @@
       "sensitive_with_approval": 0,
       "outcome_ok": true,
       "language_ok": true,
-      "judge_reason": "The reply correctly explains that the order cannot be refunded because it has not been delivered and does not claim a refund was requested.",
+      "judge_reason": "The reply correctly explains that the order cannot be refunded yet because it has not been delivered and does not claim a refund was requested.",
       "notes": [],
       "passed": true
     },
     {
-      "answer": "Our return policy allows you to return products that are undamaged and complete. You can try the product, but items with signs of use are not accepted. You only need the order number for the return; an invoice is not required. Returns must be requested within 30 days from the delivery date; after 30 days, returns are not accepted and the product will be evaluated under warranty. Return shipping is free if you use our contracted carrier, Anadolu Kargo, and show the return code at the branch. If you use your own carrier, the shipping cost will not be refunded. Once the product reaches our warehouse and passes inspection, the refund will be processed within 5 business days to the original payment method. For cash on delivery orders, refunds are made to the account holder's IBAN. Some products cannot be returned, including opened in-ear headphones, personal care products, opened software packages, and custom-made products [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:İade Kargo Ücreti] [İade Politikası:Geri Ödeme Süresi] [İade Politikası:İade Edilemeyen Ürünler].",
+      "answer": "You can return products that are undamaged and complete. Trying the product is allowed, but items with signs of use are not accepted. You only need the order number for a return; an invoice is not required. Returns must be requested within 30 days from the delivery date; after 30 days, returns are not accepted and the product will be evaluated under warranty. If you use the contracted carrier Anadolu Kargo for returns, the shipping is free by showing the return code at the branch. If you send the product with your own carrier, the shipping cost will not be refunded. Once the product arrives at the warehouse and passes inspection, the refund will be processed within 5 business days to the original payment method. For cash on delivery orders, refunds are made to the account holder's IBAN. Some products cannot be returned, including opened in-ear headphones, personal care products, opened software packages, and custom-made products [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:İade Kargo Ücreti] [İade Politikası:Geri Ödeme Süresi] [İade Politikası:İade Edilemeyen Ürünler].",
       "status": "answered",
       "route": [
         "knowledge"
@@ -625,7 +625,7 @@
       "calls": [],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.03136708296369761,
+      "latency_s": 0.030382375000044703,
       "cost_usd": 0.0,
       "id": "tool-026",
       "message": "What is your return policy?",
@@ -647,7 +647,7 @@
       "passed": true
     },
     {
-      "answer": "Standart kargo ücreti 49,90 TL'dir. Ekspres kargo ücreti ise 89,90 TL'dir. KKTC gönderimlerinde kargo ücreti ise 149,90 TL olarak belirlenmiştir ve sepet tutarından bağımsızdır [Kargo Sıkça Sorulan Sorular:Kargo Ücreti] [Yurt Dışı ve KKTC Gönderimi:KKTC Kargo Ücreti].",
+      "answer": "Standart kargo ücreti 49,90 TL'dir. Ekspres kargo ücreti ise 89,90 TL'dir [Kargo Sıkça Sorulan Sorular:Kargo Ücreti].",
       "status": "answered",
       "route": [
         "knowledge"
@@ -655,7 +655,7 @@
       "calls": [],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.03819175000535324,
+      "latency_s": 0.03145533299539238,
       "cost_usd": 0.0,
       "id": "tool-027",
       "message": "Kargo ücreti ne kadar?",
@@ -672,7 +672,7 @@
       "sensitive_with_approval": 0,
       "outcome_ok": true,
       "language_ok": true,
-      "judge_reason": "The reply correctly states the standard shipping cost as 49.90 TL and provides additional helpful details.",
+      "judge_reason": "The reply correctly states the standard shipping cost as 49.90 TL and provides additional helpful information.",
       "notes": [],
       "passed": true
     },
@@ -685,7 +685,7 @@
       "calls": [],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.03119670902378857,
+      "latency_s": 0.03241983300540596,
       "cost_usd": 0.0,
       "id": "tool-028",
       "message": "How long is the warranty on electronics?",
@@ -707,7 +707,7 @@
       "passed": true
     },
     {
-      "answer": "Your order KS-1001 was delivered on 2026-10-24, so you are still within the 30-day return period as today is 2026-11-01. You can return the product if it is undamaged, complete, and not one of the non-returnable items such as opened in-ear headphones or personal care products. You only need your order number to request the return, and if you use Anadolu Kargo with the return code, the shipping is free. After the product passes inspection at the warehouse, your refund will be processed within 5 business days to your original payment method [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:İade Kargo Ücreti] [İade Politikası:Geri Ödeme Süresi] [İade Politikası:İade Edilemeyen Ürünler]. Let me know if you want to proceed with the return.",
+      "answer": "Your order KS-1001 was delivered on 2026-10-24, so you are still within the 30-day return window as of today, 2026-11-01. You can return the product if it is undamaged, complete, and not one of the non-returnable items like opened in-ear headphones. Returns must be made within 30 days from delivery. If you use Anadolu Kargo with the return code, shipping is free; otherwise, shipping fees are not refunded. Once the product passes inspection at the warehouse, your refund will be processed within 5 business days to the original payment method [İade Politikası:Genel Koşullar] [İade Politikası:İade Süresi] [İade Politikası:İade Kargo Ücreti] [İade Politikası:Geri Ödeme Süresi] [İade Politikası:İade Edilemeyen Ürünler]. Would you like to proceed with the return request?",
       "status": "answered",
       "route": [
         "knowledge",
@@ -724,7 +724,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.04950787499547005,
+      "latency_s": 0.04963787499582395,
       "cost_usd": 0.0,
       "id": "tool-034",
       "message": "What is the return policy, and can I still return order KS-1001?",
@@ -763,7 +763,7 @@
       ],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.049009583017323166,
+      "latency_s": 0.04788479203125462,
       "cost_usd": 0.0,
       "id": "tool-035",
       "message": "How long does standard shipping take, and where is order KS-3002?",
@@ -793,7 +793,7 @@
       "calls": [],
       "refunds_executed": 0,
       "policy_blocks": 0,
-      "latency_s": 0.015432124957442284,
+      "latency_s": 0.01562908396590501,
       "cost_usd": 0.0,
       "id": "tool-037",
       "message": "I want to talk to a human agent.",

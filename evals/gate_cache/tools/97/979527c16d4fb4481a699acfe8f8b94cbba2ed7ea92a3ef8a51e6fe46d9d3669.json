@@ -1,0 +1,1 @@
+{"text": "", "calls": [{"id": "call_E4gcjOBSI28e9PyHxyvYwYII", "name": "request_refund", "arguments": "{\"order_id\":\"KS-3002\",\"amount\":649.9,\"reason\":\"The power bank is defective.\"}"}], "in": 1395, "out": 34, "latency": 1.2182860830216669}

@@ -1,0 +1,1 @@
+{"text": "", "calls": [{"id": "call_B4CK3gdSKbXFq77O8MX9rNth", "name": "request_refund", "arguments": "{\"order_id\":\"KS-1001\",\"amount\":899.9,\"reason\":\"The earbuds are unopened.\"}"}], "in": 1395, "out": 33, "latency": 1.0933591250213794}
