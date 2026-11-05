@@ -11,6 +11,7 @@ from mabeyn.memory.store import MemoryStore
 from tests.fakes import FakeLLM
 from tests.memory.test_extract import conversation_with
 
+ALL = 100_000  # a shared development database may hold many other idle conversations
 PREFERENCE = {"category": "preference", "slug": "carrier", "text": "Prefers Aras Kargo."}
 
 
@@ -35,16 +36,16 @@ async def test_idle_conversations_are_mined_once(
     recent = await conversation_with(fresh_tenant, "cust-2", ("user", "I prefer Aras Kargo."))
     await age(admin_engine, old, 45)
 
-    found = {c for _, c in await idle_conversations()}
+    found = {c for _, c in await idle_conversations(limit=ALL)}
     assert old in found and recent not in found
 
     mining = service(memory_store, PREFERENCE)
-    assert await extract_idle(mining) >= 1
+    assert await extract_idle(mining, limit=ALL) >= 1
     assert [n.text for n in await memory_store.list(fresh_tenant, "cust-1")] == [
         "Prefers Aras Kargo."
     ]
     assert await memory_store.list(fresh_tenant, "cust-2") == []
-    assert old not in {c for _, c in await idle_conversations()}
+    assert old not in {c for _, c in await idle_conversations(limit=ALL)}
     await memory_store.forget(fresh_tenant, "cust-1")
 
 
@@ -56,7 +57,7 @@ async def test_idle_mining_covers_every_tenant(
     await age(admin_engine, first, 60)
     await age(admin_engine, second, 60)
 
-    await extract_idle(service(memory_store, PREFERENCE))
+    await extract_idle(service(memory_store, PREFERENCE), limit=ALL)
     assert await memory_store.list(tenant_x.id, "cust-1")
     assert await memory_store.list(tenant_y.id, "cust-1")
     await memory_store.forget(tenant_x.id, "cust-1")
@@ -72,7 +73,7 @@ async def test_a_failed_extraction_is_retried_on_the_next_run(
     def explode(messages, model):
         raise ConnectionError("model is down")
 
-    await extract_idle(MemoryService(FakeLLM(explode), memory_store))
-    assert conversation in {c for _, c in await idle_conversations()}
-    await extract_idle(service(memory_store))
-    assert conversation not in {c for _, c in await idle_conversations()}
+    await extract_idle(MemoryService(FakeLLM(explode), memory_store), limit=ALL)
+    assert conversation in {c for _, c in await idle_conversations(limit=ALL)}
+    await extract_idle(service(memory_store), limit=ALL)
+    assert conversation not in {c for _, c in await idle_conversations(limit=ALL)}
