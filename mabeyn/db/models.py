@@ -69,6 +69,7 @@ class ApprovalStatus(enum.StrEnum):
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
+    EXPIRED = "expired"
 
 
 class ConversationStatus(enum.StrEnum):
@@ -272,6 +273,7 @@ class Approval(TenantModel):
         ForeignKey("admin_users.id", ondelete="SET NULL")
     )
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class SecurityEvent(TenantModel):

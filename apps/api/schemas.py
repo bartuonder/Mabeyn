@@ -166,6 +166,7 @@ class ApprovalOut(Response):
     payload: dict[str, Any]
     decided_by: uuid.UUID | None
     decided_at: datetime | None
+    expires_at: datetime | None
     created_at: datetime
 
 

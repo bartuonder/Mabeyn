@@ -52,6 +52,9 @@ class Settings(BaseSettings):
     chat_rate_per_key: int = 300
     chat_rate_per_tenant: int = 600
 
+    # A pending approval nobody decides within this time is closed as expired.
+    approval_ttl_hours: int = 72
+
     # Answer cache for knowledge questions.
     cache_enabled: bool = True
     cache_ttl_seconds: int = 86400
