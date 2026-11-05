@@ -290,7 +290,7 @@ Rationale and measurements: [ADR-0007](adr/0007-cost-cache-and-eval-gate.md).
 <!-- generated:facts -->
 | Setting | Value |
 | --- | --- |
-| Prompt versions | `rag-v7`, `agents-v14`, `memory-v3`, `guard-v1`, `cache-v1` |
+| Prompt versions | `rag-v6`, `agents-v14`, `memory-v3`, `guard-v1`, `cache-v1` |
 | Answer and action model | `gpt-4.1-mini` |
 | Small model (routing, rewriting, grading, reranking, checks) | `gpt-4o-mini` |
 | Judge model (evaluation) | `gpt-4.1-mini` |
