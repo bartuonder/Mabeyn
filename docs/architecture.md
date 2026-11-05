@@ -331,7 +331,7 @@ See [evaluation.md](evaluation.md) for the datasets, metrics and how to run them
 
 ## 13. Known limitations
 
-- Questions asked in a language the documents do not use retrieve poorly.
+- English questions over Turkish documents work (on 18 translated questions Recall@5 is 1.00 and accuracy 0.94), but the answer can still miss a rule that is only implied by a general statement; the relevance grader states a reason first to reduce this.
 - Time to the first streamed token is about four seconds on the knowledge path (routing, query handling, reranking and grading run before generation).
 - The firewall's rating sees one message at a time, so an attack spread over several messages is judged message by message; rules and the canary catch known phrases and verbatim leaks, not paraphrases.
 - Argument policies exist for the KargoShop tools (`request_refund`, `change_address`); a tenant without a `get_order_status` tool is not checked.

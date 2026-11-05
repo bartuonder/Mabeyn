@@ -168,7 +168,7 @@ Scenarios on the supervisor with the mock shop ([how they are scored](docs/evalu
 - The approval gate, routing and tenant/customer isolation held on every set. The approval rate is 100% by construction (the graph routes every `sensitive` call to approval); the real risk is the model not calling a tool, which tool selection measures.
 - The language fix works: both English knowledge questions in the development and fresh sets are answered in English (language accuracy 1.000).
 - The two failures in the fresh set are scoring artefacts rather than wrong replies, and the set was not changed afterwards. In one the assistant listed the customer's orders instead of calling the status tool for an order number given in the message, and answered correctly (the scenario required the status tool). In the other the judge marked a correct delivery reply wrong because it did not repeat the order number.
-- The development set has one known failure: an English question that finds nothing in Turkish documents (cross-lingual retrieval is weak).
+- The one long-standing development failure, an English question about shipping to Germany that found nothing in Turkish documents, was not a retrieval problem: the right passage was ranked first every time, and the small relevance grader dropped it, because the passage says only that other countries are not served. Asking the grader to state a reason first fixed it (`rag-v7`; with the direct verdict `gpt-4o-mini` returned an empty list on three of three tries, with the reason first it picked the passage on three of three). The tool-use development set is now 40 of 40. The development RAG set was re-measured on `rag-v7` (accuracy 0.950, faithfulness 0.975, one question below the earlier run, within judge noise); the held-out sets were not rerun.
 
 ### Memory
 
@@ -242,7 +242,7 @@ Every assistant message stores its tokens, model calls, estimated cost and laten
 | Messages answered from the cache | 0% | 59% (82% of the knowledge questions) |
 | Cost per message | $0.00177 | $0.00075 |
 
-- The knowledge p95 hardly moves because the remaining 18% of the knowledge questions run the whole pipeline under load, mostly the English question about Germany, which finds nothing in the Turkish documents and is never cached. The median is what the cache changes.
+- The knowledge p95 hardly moves because the remaining 18% of the knowledge questions run the whole pipeline under load, mostly the English question about Germany, which was never cached while it was answered with an apology (it is answered correctly since `rag-v7`, and cached from then on). The median is what the cache changes.
 - The test ran on one machine against the real model, so the latency includes OpenAI and the load generator. It is a comparison between the two settings, not a capacity figure. Three runs were needed: the first showed that answers quoting the shop's own contact details were never cached (fixed), the second started with stale Redis entries (the test now clears the cache first).
 
 **Evaluation gate.** On every pull request from the same repository CI runs 30 RAG questions and 20 tool scenarios (`evals/gate.py`) against thresholds that sit about one failure below the baseline (accuracy 0.97, faithfulness 1.00, 20 of 20 scenarios; limits 0.87, 0.87 and 0.85, plus no sensitive action without approval and no identity leak). The responses of the 50 items are committed, so an unchanged prompt costs nothing.

@@ -9,6 +9,7 @@ All quality, latency and cost numbers in this repository come from the runners i
 | `evals/datasets/rag.jsonl` | 80 (set `v0`: 50, set `v1`: 30) | Turkish, 16 unanswerable, includes questions where an old and a new policy contradict each other |
 | `evals/datasets/rag_en.jsonl` | 20 | English documents for international customers, 3 unanswerable |
 | `evals/datasets/judge_calibration.jsonl` | 20 | Judge verdicts next to manual labels |
+| `evals/datasets/rag_xlang.jsonl` | 18 | English translations of Turkish development questions with the same gold sections, for questions across languages |
 | `evals/datasets/memory.jsonl` | 15 scenarios | Two-session memory scenarios, development set |
 | `evals/datasets/redteam.jsonl` | 80 attacks | Direct injection and jailbreak 20, indirect injection through documents 15, tool abuse 20, data exfiltration 15, memory poisoning 10 |
 | `evals/datasets/redteam_benign.jsonl` | 80 messages | Harmless requests that look suspicious ("how do I cancel a refund?") |
