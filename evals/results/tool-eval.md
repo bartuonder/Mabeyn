@@ -14,7 +14,8 @@
 | identity_leaks | 0.000 |
 | tool_calls_per_scenario | 0.825 |
 | sensitive_executed_without_approval | 0.000 |
-| cost_per_scenario_usd | 0.002 |
-| latency_p50_s | 4.303 |
+| policy_blocks | 0.000 |
+| cost_per_scenario_usd | 0.000 |
+| latency_p50_s | 0.040 |
 | scenario_pass_rate_ci95_low | 0.871 |
 | scenario_pass_rate_ci95_high | 0.996 |
