@@ -236,10 +236,14 @@ async def invalidate_answers(tenant_id: uuid.UUID, kv: KeyValueStore | None = No
     """
     try:
         await (kv or get_kv()).incr(f"cache:epoch:{tenant_id}")
-    except Exception:
-        log.exception("cache_invalidation_failed", tenant_id=str(tenant_id), layer="exact")
+    except Exception as exc:
+        log.warning(
+            "cache_invalidation_failed", tenant_id=str(tenant_id), layer="exact", error=repr(exc)
+        )
     try:
         async with tenant_session(tenant_id) as session:
             await session.execute(delete(AnswerCacheEntry))
-    except Exception:
-        log.exception("cache_invalidation_failed", tenant_id=str(tenant_id), layer="semantic")
+    except Exception as exc:
+        log.warning(
+            "cache_invalidation_failed", tenant_id=str(tenant_id), layer="semantic", error=repr(exc)
+        )
