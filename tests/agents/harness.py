@@ -2,6 +2,7 @@ import json
 import uuid
 from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Any
 
 from httpx import ASGITransport
@@ -24,6 +25,7 @@ from mabeyn.tools.service import ToolRunner
 from tests.fakes import FakeLLM, say
 
 SHOP_URL = "http://shop"
+MOCK_TODAY = date(2026, 11, 1)  # the date of the mock shop data
 
 
 class StubRag:
@@ -126,6 +128,7 @@ class Env:
             customer_id or self.customer_id,
             self.conversation_id,
             "KargoShop",
+            today=MOCK_TODAY,
             summary=summary,
             anonymous=self.anonymous,
         )

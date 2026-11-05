@@ -1,5 +1,6 @@
 import json
 import uuid
+from datetime import date
 from typing import Any
 
 from langgraph.types import interrupt
@@ -162,7 +163,9 @@ class ActionAgent:
         if self.guard is not None:
             context = self._context(state)
             conversation_id = uuid.UUID(state["conversation_id"])
-            if violation := await self.guard.check(context, conversation_id, tool, arguments):
+            if violation := await self.guard.check(
+                context, conversation_id, tool, arguments, today=_today(state)
+            ):
                 await record_event(
                     context.tenant_id,
                     conversation_id,
@@ -289,6 +292,7 @@ class ActionAgent:
                     tool,
                     pending["arguments"],
                     include_rate=False,
+                    today=_today(state),
                 )
             if tool is None:
                 outcome: ToolResult | dict[str, Any] = {"ok": False, "error": "tool was removed"}
@@ -331,6 +335,10 @@ class ActionAgent:
             "pending": None,
             "pending_message": "",
         }
+
+
+def _today(state: SupervisorState) -> date | None:
+    return date.fromisoformat(state["today"]) if state.get("today") else None
 
 
 def _pending_trace(pending: dict[str, Any]) -> dict[str, Any]:

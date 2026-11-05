@@ -1,6 +1,6 @@
 import uuid
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import func, select
@@ -13,8 +13,9 @@ from mabeyn.tools.service import LoadedTool, ToolRunner, load_tools
 
 ORDER_LOOKUP_TOOL = "get_order_status"
 # Argument policies per tool. A tenant without the lookup tool cannot be checked and is not blocked.
+RETURN_WINDOW_DAYS = 30
 ARGUMENT_POLICIES: dict[str, tuple[str, ...]] = {
-    "request_refund": ("own_order", "refund_amount"),
+    "request_refund": ("own_order", "refund_amount", "return_window"),
     "change_address": ("own_order",),
 }
 
@@ -42,6 +43,7 @@ class ToolGuard:
         arguments: dict[str, Any],
         *,
         include_rate: bool = True,
+        today: date | None = None,
     ) -> PolicyViolation | None:
         settings = await load_guard_settings(context.tenant_id)
         if not settings.firewall_enabled:
@@ -55,7 +57,7 @@ class ToolGuard:
                     "rate_limit", "too many changes were requested recently; try again later"
                 )
         for policy in ARGUMENT_POLICIES.get(tool.name, ()):
-            if violation := await self._argument_policy(policy, context, arguments):
+            if violation := await self._argument_policy(policy, context, arguments, today):
                 return violation
         return None
 
@@ -88,7 +90,7 @@ class ToolGuard:
         return ("missing" if result.status_code == 404 else "unavailable"), {}
 
     async def _argument_policy(
-        self, policy: str, context: ToolContext, arguments: dict[str, Any]
+        self, policy: str, context: ToolContext, arguments: dict[str, Any], today: date | None
     ) -> PolicyViolation | None:
         order_id = str(arguments.get("order_id", ""))
         state, order = await self._order(context, order_id)
@@ -98,6 +100,8 @@ class ToolGuard:
             return PolicyViolation(policy, "that order does not belong to this customer")
         if state == "unavailable":
             return PolicyViolation(policy, "the order could not be verified")
+        if policy == "return_window":
+            return _return_window(order, today or date.today())
         if policy == "refund_amount":
             total = order.get("total")
             amount = arguments.get("amount")
@@ -105,3 +109,15 @@ class ToolGuard:
                 if amount > total + 0.005:
                     return PolicyViolation(policy, "the refund is larger than the order total")
         return None
+
+
+def _return_window(order: dict[str, Any], today: date) -> PolicyViolation | None:
+    """A refund needs a delivered order that is still inside the return window."""
+    if order.get("status") != "delivered":
+        return PolicyViolation("return_window", "only delivered orders can be refunded")
+    delivered = order.get("delivered_at")
+    if delivered and (today - date.fromisoformat(str(delivered))).days > RETURN_WINDOW_DAYS:
+        return PolicyViolation(
+            "return_window", f"the {RETURN_WINDOW_DAYS} day return window has passed"
+        )
+    return None

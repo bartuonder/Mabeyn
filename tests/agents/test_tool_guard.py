@@ -150,3 +150,38 @@ async def test_the_runner_refuses_identity_tools_for_anonymous_callers(fresh_ten
         {"order_id": "KS-1001"},
     )
     assert allowed.ok
+
+
+async def test_a_refund_outside_the_return_window_is_blocked_before_any_approval(
+    fresh_tenant, checkpointer
+):
+    call = tool_call("request_refund", order_id="KS-2001", amount=1999.0, reason="Changed my mind")
+    brain = Brain(route=["action"], tool_turns=[call, say("The return window has passed.")])
+    env = await build_env(
+        fresh_tenant, checkpointer, brain, tool_guard=True, customer_id="customer-2"
+    )
+    _, final = await env.ask("Please refund order KS-2001.")
+
+    assert [t["status"] for t in final.trace["tool_trace"]] == ["blocked"]
+    assert await env.approvals() == [] and env.store.refunds == []
+    (event,) = await security_events(fresh_tenant)
+    assert event.category == "return_window" and "30 day" in event.detail["reason"]
+    assert "30 day return window has passed" in env.llm.tool_turns[1][-1]["content"]
+
+
+async def test_an_order_that_is_not_delivered_cannot_be_refunded(fresh_tenant, checkpointer):
+    call = tool_call("request_refund", order_id="KS-1002", amount=2499.0, reason="Too slow")
+    env, final = await blocked_run(fresh_tenant, checkpointer, call, "Refund KS-1002")
+    assert [t["status"] for t in final.trace["tool_trace"]] == ["blocked"]
+    (event,) = await security_events(fresh_tenant)
+    assert event.category == "return_window" and "delivered" in event.detail["reason"]
+
+
+def test_the_window_ends_thirty_days_after_delivery():
+    from datetime import date
+
+    from mabeyn.guard.policies import _return_window
+
+    delivered = {"status": "delivered", "delivered_at": "2026-10-24"}
+    assert _return_window(delivered, date(2026, 11, 23)) is None
+    assert _return_window(delivered, date(2026, 11, 24)) is not None
