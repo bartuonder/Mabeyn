@@ -1,4 +1,4 @@
-PROMPT_VERSION = "rag-v6"
+PROMPT_VERSION = "rag-v7"
 
 ANSWER_SYSTEM = """\
 You are the customer support assistant of {company}.
@@ -54,7 +54,11 @@ For each numbered passage decide whether it contains information useful for answ
 Some passages show an effective_date. When passages cover the same topic but contradict each \
 other, mark only the passage with the latest effective_date as useful; older versions are \
 superseded.
-Return only JSON: {"relevant": [<numbers of the useful passages>]}"""
+The question and the passages may be written in different languages; judge the meaning. State \
+your reason first, so that a passage that answers the question only by a general rule is not \
+missed.
+Return only JSON: {"reason": "<one short sentence about the best passage>", \
+"relevant": [<numbers of the useful passages>]}"""
 
 FAITHFULNESS_SYSTEM = """\
 You verify an answer against its sources.

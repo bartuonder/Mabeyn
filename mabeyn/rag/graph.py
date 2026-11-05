@@ -24,6 +24,7 @@ from mabeyn.rag.service import Final, RagEvent, Retract, Token
 from mabeyn.rag.types import RetrievedChunk
 
 GRADE_PASSAGE_CHARS = 2000
+GRADE_MAX_TOKENS = 160
 FAITHFULNESS_MAX_TOKENS = 300
 
 
@@ -134,7 +135,7 @@ def build_rag_graph(llm: LLM, config: RagConfig, reranker: Reranker | None = Non
                     },
                 ],
                 model=small,
-                max_tokens=100,
+                max_tokens=GRADE_MAX_TOKENS,
             )
             picked = [n for n in data["relevant"] if isinstance(n, int) and 1 <= n <= len(ranked)]
         except (LLMError, KeyError, TypeError):
