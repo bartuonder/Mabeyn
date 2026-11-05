@@ -28,7 +28,7 @@ async def test_worker_delegates_to_pipeline(monkeypatch):
 
 def test_memory_jobs_are_scheduled():
     scheduled = {job.coroutine.__name__ for job in worker.WorkerSettings.cron_jobs}
-    assert scheduled == {"mine_idle_conversations", "sweep_expired_memories"}
+    assert {"mine_idle_conversations", "sweep_expired_memories"} <= scheduled
 
 
 async def test_memory_jobs_use_the_shared_memory_service(monkeypatch):
@@ -50,3 +50,24 @@ async def test_memory_jobs_use_the_shared_memory_service(monkeypatch):
     assert await worker.mine_idle_conversations(ctx) == 3
     assert seen["service"] is ctx["memory"]
     assert await worker.sweep_expired_memories(ctx) == 2
+
+
+def test_approval_expiry_is_scheduled():
+    scheduled = {job.coroutine.__name__ for job in worker.WorkerSettings.cron_jobs}
+    assert "expire_pending_approvals" in scheduled
+
+
+async def test_the_expiry_job_uses_the_agent_runtime(monkeypatch):
+    seen = {}
+
+    async def fake_expire(service):
+        seen["service"] = service
+        return 2
+
+    class Runtime:
+        service = object()
+
+    monkeypatch.setattr(worker, "expire_stale_approvals", fake_expire)
+    ctx = {"runtime": Runtime()}
+    assert await worker.expire_pending_approvals(ctx) == 2
+    assert seen["service"] is Runtime.service
