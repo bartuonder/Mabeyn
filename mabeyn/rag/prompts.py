@@ -1,4 +1,4 @@
-PROMPT_VERSION = "rag-v6"
+PROMPT_VERSION = "rag-v7"
 
 ANSWER_SYSTEM = """\
 You are the customer support assistant of {company}.
@@ -51,6 +51,9 @@ Return only JSON: {"query": "<new query>"}"""
 GRADE_SYSTEM = """\
 You grade search results for a customer support question.
 For each numbered passage decide whether it contains information useful for answering the question.
+A passage is useful when it answers the question directly or states a general rule that covers the \
+case asked about, even if the question names something the passage does not list (a passage that \
+says only some regions are served also answers a question about a region it does not name).
 Some passages show an effective_date. When passages cover the same topic but contradict each \
 other, mark only the passage with the latest effective_date as useful; older versions are \
 superseded.
