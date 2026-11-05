@@ -8,7 +8,7 @@ from datetime import date
 from typing import Any
 
 from httpx import ASGITransport
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from apps.kargoshop_mock.main import Store, create_app
@@ -34,6 +34,7 @@ from mabeyn.core.loop import use_selector_loop_on_windows
 from mabeyn.core.tracking import export_tracking_env
 from mabeyn.db import models as m
 from mabeyn.db.session import tenant_session
+from mabeyn.guard.policies import ToolGuard
 from mabeyn.llm import usage
 from mabeyn.llm.client import ChatMessage, get_llm
 from mabeyn.rag.graph import GraphRag, RagConfig
@@ -79,9 +80,13 @@ async def run_scenario(
         await session.flush()
         conversation_id = conversation.id
 
+    async with tenant_session(tenant_id) as session:
+        # The write rate limit counts earlier scenarios of the same customer otherwise.
+        await session.execute(delete(m.Approval))
+        await session.execute(delete(m.ToolCall))
     store = Store()
     runner = ToolRunner(HttpToolExecutor(transport=ASGITransport(app=create_app(store))))
-    service = SupervisorService(llm, rag, runner, saver)
+    service = SupervisorService(llm, rag, runner, saver, tool_guard=ToolGuard(runner))
     turn = TurnContext(
         tenant_id, scenario.customer_id, conversation_id, "KargoShop", today=MOCK_TODAY
     )
@@ -99,11 +104,14 @@ async def run_scenario(
     if final is None:
         raise RuntimeError(f"{scenario.id}: the agent produced no answer")
 
-    trace = final.trace.get("tool_trace", [])
+    trace: list[dict[str, Any]] = list(final.trace.get("tool_trace", []))  # type: ignore[call-overload]
+    # A call the policies stopped never reached the shop or an approval, so the defence held.
     calls = [
         ObservedCall(t["name"], t.get("arguments", {}), t["status"])
-        for t in trace  # type: ignore[attr-defined]
+        for t in trace
+        if t["status"] != "blocked"
     ]
+    policy_blocks = sum(1 for t in trace if t["status"] == "blocked")
     sensitive, with_approval = await _approval_counts(tenant_id, conversation_id)
     verdict = await judge_outcome(llm, scenario.message, scenario.outcome, final.answer)
     score = score_scenario(
@@ -124,6 +132,7 @@ async def run_scenario(
         "route": final.trace.get("route", []),
         "calls": [asdict(c) for c in calls],
         "refunds_executed": len(store.refunds),
+        "policy_blocks": policy_blocks,
         "latency_s": max(wall + meter.latency_adjustment_s, 0.0),
         "cost_usd": meter.cost_usd,
     }
@@ -176,6 +185,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
     metrics = summarize_scores(scores)
     executed = sum(o["refunds_executed"] for o in outcomes if o["status"] == "pending_approval")
     metrics["sensitive_executed_without_approval"] = float(executed)
+    metrics["policy_blocks"] = float(sum(o["policy_blocks"] for o in outcomes))
     metrics["cost_per_scenario_usd"] = sum(o["cost_usd"] for o in outcomes) / max(len(outcomes), 1)
     metrics["latency_p50_s"] = sorted(o["latency_s"] for o in outcomes)[len(outcomes) // 2]
     low, high = wilson_interval(sum(s.passed for s in scores), len(scores))
