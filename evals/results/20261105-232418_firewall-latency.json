@@ -1,0 +1,33 @@
+{
+  "name": "firewall-latency",
+  "created_at": "2026-11-05T23:24:18",
+  "provenance": {
+    "commit": "3ed6961b161abb21d0866f1537c8bf07ecf9ef68",
+    "dirty": false,
+    "prompt_versions": {
+      "rag": "rag-v7",
+      "agents": "agents-v14",
+      "memory": "memory-v3",
+      "guard": "guard-v1",
+      "cache": "cache-v1"
+    },
+    "models": {
+      "generation": "gpt-4.1-mini",
+      "small": "gpt-4o-mini",
+      "judge": "gpt-4.1-mini",
+      "embedding": "text-embedding-3-small"
+    }
+  },
+  "config": {
+    "model": "gpt-4o-mini",
+    "sequential": true
+  },
+  "metrics": {
+    "messages": 40.0,
+    "rules_p50_ms": 0.07252101204358041,
+    "rules_p95_ms": 0.10983296670019627,
+    "classifier_p50_ms": 987.2457084711641,
+    "classifier_p95_ms": 1461.7334170034155,
+    "cost_per_message_usd": 5.430749999999999e-05
+  }
+}

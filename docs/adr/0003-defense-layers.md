@@ -27,7 +27,7 @@ Independent layers, each logging to `security_events`, each measured separately 
 
 ## Consequences
 
-- Every message costs one extra small-model call and a few hundred milliseconds. Documents cost one call per passage at ingestion.
+- Every message costs one extra small-model call: measured on 40 harmless messages the rules take under a millisecond and the rating about 1.0 s (p95 1.5 s) and $0.0001, one second more before the first token. Documents cost one call per passage at ingestion.
 - The rating sees only the current message, so an attack spread over several messages is judged message by message.
 - Small sections are merged into one passage, so one poisoned sentence withholds its whole passage from retrieval.
 - Rules and canary protect against known phrases and verbatim leaks; paraphrased leaks of instruction content are not detected.
