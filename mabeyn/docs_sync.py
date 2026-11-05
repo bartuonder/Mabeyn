@@ -116,6 +116,7 @@ def facts() -> str:
         ("Notes recalled per message", str(_default("memory_recall_limit"))),
         ("Idle minutes before a conversation is mined", str(_default("memory_idle_minutes"))),
         ("Injection threshold (tenant default)", str(guard_settings.DEFAULT_THRESHOLD)),
+        ("Hours before a pending approval expires", str(_default("approval_ttl_hours"))),
         ("Answer cache lifetime (seconds)", str(_default("cache_ttl_seconds"))),
         ("Answer cache candidate similarity", str(_default("cache_semantic_threshold"))),
         (

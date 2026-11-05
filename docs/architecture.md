@@ -195,7 +195,7 @@ sequenceDiagram
     C->>A: GET /chat/conversation_id (final answer)
 ```
 
-A new customer message while an approval is pending gets a short reminder instead of starting another run. The pending request survives an API restart because the paused state lives in PostgreSQL.
+A new customer message while an approval is pending gets a short reminder instead of starting another run. An approval nobody decides within 72 hours is closed as `expired` by a worker job (every ten minutes): the tool call is rejected, the conversation resumes with a note that the review period ended, and the customer gets that answer as a new message. Deciding an expired request returns `409`. The pending request survives an API restart because the paused state lives in PostgreSQL.
 
 ## 6. Tools
 
@@ -252,7 +252,7 @@ Four layers plus a log, each switched by the tenant's `firewall_enabled` setting
 | --- | --- | --- |
 | Input | `input_guard` | Rules before any model: hidden and tag characters, base64 and hex payloads (decoded and checked again) and known override phrases in English, Turkish and German. Then a small model rates the message from 0 to 1; the tenant threshold (default 0.7) decides, and an unreadable rating blocks. A blocked message gets a fixed bilingual reply and is stored with `blocked = true`, so summaries and memory ignore it. |
 | Indirect injection | ingestion and `generate` | Every passage is rated with a document prompt when it is ingested; passages above the threshold are flagged and excluded from vector and full-text retrieval. Retrieved text sits in `<source>` blocks declared untrusted, and forged source tags inside a document are neutralised. |
-| Tools | `action_tools`, `action_await_approval` | A tenant allowlist hides tools from the model. A refund is checked against the real order, fetched with the customer's injected identity: the order must belong to the customer and the amount may not exceed the total. Write and sensitive calls are rate limited per customer (default 5 per hour). Checks run before an approval is opened and again before an approved call runs. A failed check is an error the model sees, never a call. |
+| Tools | `action_tools`, `action_await_approval` | A tenant allowlist hides tools from the model. A refund is checked against the real order, fetched with the customer's injected identity: the order must belong to the customer, the amount may not exceed the total, and the order must be delivered and still inside the 30 day return window (so an expired refund never opens an approval). Write and sensitive calls are rate limited per customer (default 5 per hour). Checks run before an approval is opened and again before an approved call runs. A failed check is an error the model sees, never a call. |
 | Output | `output_guard` | A per-tenant canary token sits in the agents' prompts; a reply that contains it, even spaced out, is replaced. Validated IBAN, card, national id, e-mail and phone values are masked. While the layer is active, replies are held until checked and released as one token event; with the layer off they stream as before. |
 | Log | everywhere | Each block or flag is a `security_events` row (layers `input`, `ingestion`, `tool`, `output`, `memory`) with a masked excerpt. `GET /security-events` lists them, filtered by layer or action. |
 
@@ -318,6 +318,7 @@ Rationale and measurements: [ADR-0007](adr/0007-cost-cache-and-eval-gate.md).
 | Notes recalled per message | 10 |
 | Idle minutes before a conversation is mined | 30 |
 | Injection threshold (tenant default) | 0.7 |
+| Hours before a pending approval expires | 72 |
 | Answer cache lifetime (seconds) | 86400 |
 | Answer cache candidate similarity | 0.6 |
 | Write tool rate limit per customer (tenant default) | 5 per 60 minutes |
@@ -338,7 +339,7 @@ See [evaluation.md](evaluation.md) for the datasets, metrics and how to run them
 - The firewall adds a small-model call to every message and a call per passage at ingestion.
 - Cached answers can be stale for up to a day when documents change outside the API; the semantic match relies on a small model and was checked on a small pair set.
 - Usage numbers cover the answer path only, and the price table is an estimate.
-- A pending approval never expires, nobody is notified, and a human colleague has no endpoint to answer an escalated conversation yet.
+- Nobody is notified of a pending approval (the admin has to open the queue), and a human colleague has no endpoint to answer an escalated conversation yet.
 - Two simultaneous messages in one conversation are not serialised.
 - Customer identity is only as trustworthy as the API key that opened the session, see [ADR-0005](adr/0005-customer-session-trust.md). Memory inherits this: whoever can open a session as a customer can read and erase that customer's notes.
 - The memory store has no row-level security; isolation rests on the namespace.
