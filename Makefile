@@ -1,4 +1,4 @@
-.PHONY: up down test lint typecheck migrate seed eval ablation experiments docs
+.PHONY: up down test lint typecheck migrate seed eval ablation experiments docs gate redteam memory-eval loadtest
 
 up:
 	docker compose up -d --build
@@ -33,3 +33,15 @@ experiments:
 
 docs:
 	uv run python -m mabeyn.docs_sync
+
+gate:
+	EVAL_CACHE_DIR=evals/gate_cache uv run python -m evals.gate
+
+redteam:
+	uv run python -m evals.runners.redteam_eval
+
+memory-eval:
+	uv run python -m evals.runners.memory_eval
+
+loadtest:
+	uv run python -m loadtest.run
