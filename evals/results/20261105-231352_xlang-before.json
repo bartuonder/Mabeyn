@@ -1,0 +1,1050 @@
+{
+  "name": "xlang-before",
+  "created_at": "2026-11-05T23:13:52",
+  "provenance": {
+    "commit": "3b12c0f65e90ec034e57f3d822b707c54be626e3",
+    "dirty": true,
+    "prompt_versions": {
+      "rag": "rag-v6",
+      "agents": "agents-v14",
+      "memory": "memory-v3",
+      "guard": "guard-v1",
+      "cache": "cache-v1"
+    },
+    "models": {
+      "generation": "gpt-4.1-mini",
+      "small": "gpt-4o-mini",
+      "judge": "gpt-4.1-mini",
+      "embedding": "text-embedding-3-small"
+    }
+  },
+  "config": {
+    "config": "full",
+    "dataset": "rag_xlang.jsonl",
+    "sets": null,
+    "chunk_preset": "default",
+    "embedding_model": "text-embedding-3-small",
+    "llm_model": "gpt-4.1-mini",
+    "llm_model_small": "gpt-4o-mini",
+    "judge_model": "gpt-4.1-mini",
+    "retrieval_only": false
+  },
+  "metrics": {
+    "n": 18.0,
+    "n_answerable": 18.0,
+    "mrr": 0.9166666666666666,
+    "recall@1": 0.8333333333333334,
+    "recall@3": 1.0,
+    "recall@5": 1.0,
+    "recall@8": 1.0,
+    "accuracy": 0.9444444444444444,
+    "accuracy_answerable": 0.9444444444444444,
+    "accuracy_unanswerable": null,
+    "faithfulness": 0.9444444444444444,
+    "accuracy_ci95_low": 0.7424220019799247,
+    "accuracy_ci95_high": 0.9901250641690756,
+    "faithfulness_ci95_low": 0.7424220019799247,
+    "faithfulness_ci95_high": 0.9901250641690756,
+    "latency_p50_s": 5.1571268329862505,
+    "latency_p95_s": 13.342423374997452,
+    "cost_per_query_usd": 0.001749928888888889,
+    "llm_calls_per_query": 5.388888888888889
+  },
+  "accuracy_by_category": {
+    "cross_language": 0.9444444444444444
+  },
+  "questions": [
+    {
+      "id": "xl-001",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "Within how many days can I return a product?",
+      "answer": "You can create a return request within 30 days from the delivery date. After 30 days, return requests are not accepted, and the product will be evaluated under warranty [İade Politikası:İade Süresi].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        },
+        {
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
+        },
+        {
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
+        },
+        {
+          "doc": "degisim-politikasi.md",
+          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
+          "title": "Değişim Politikası"
+        },
+        {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
+        },
+        {
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states the 30-day return period from delivery, matching the reference answer.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 7.430871207965538,
+      "cost_usd": 0.0016818499999999997,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-002",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "Who pays the return shipping fee?",
+      "answer": "If you use the contracted cargo company Anadolu Kargo for returns, the shipping fee is free. You just need to show the return code at the branch. However, if you send the product with your own cargo, the shipping fee will not be refunded. [İade Politikası:İade Kargo Ücreti]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        },
+        {
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
+        },
+        {
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
+        },
+        {
+          "doc": "degisim-politikasi.md",
+          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
+          "title": "Değişim Politikası"
+        },
+        {
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states that using Anadolu Kargo for returns is free, and using your own cargo means the fee is not refunded, matching the reference.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 6.831785833986942,
+      "cost_usd": 0.00164779,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-003",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "In how many business days is the money for a returned product refunded to my account?",
+      "answer": "The refund for a returned product is made within 5 business days after the product arrives at the warehouse and passes inspection [İade Politikası:Geri Ödeme Süresi].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        },
+        {
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
+        },
+        {
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
+        },
+        {
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
+        },
+        {
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference by stating the refund occurs within 5 business days after the product is received and inspected.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 7.627692207985092,
+      "cost_usd": 0.00161359,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-004",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "Is an invoice required for a return?",
+      "answer": "An invoice is not required for a return; the order number is sufficient. However, the product must be undamaged and complete to be eligible for return. You are allowed to try the product, but products with signs of use are not accepted for return [İade Politikası:Genel Koşullar].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
+        },
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        },
+        {
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
+        },
+        {
+          "doc": "fatura-ve-belgeler.md",
+          "section": "Fatura ve Belgeler > E-Fatura ve E-Arşiv | Fatura ve Belgeler > Kurumsal Fatura | Fatura ve Belgeler > Fatura Bilgisi Değişikliği | Fatura ve Belgeler > Garanti ve Fatura",
+          "title": "Fatura ve Belgeler"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 0.5,
+      "correct": true,
+      "judge_reason": "The assistant correctly states that an invoice is not required and the order number is sufficient, matching the reference answer.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 5.164017624978442,
+      "cost_usd": 0.00165841,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-005",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "Can I return wireless earbuds whose packaging has been opened?",
+      "answer": "No, wireless earbuds with opened packaging cannot be returned according to the return policy. Only unopened in-ear headphones are non-returnable. Since your earbuds' packaging is opened, they are not eligible for return [İade Politikası:İade Edilemeyen Ürünler].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
+        },
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
+        },
+        {
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
+        },
+        {
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 0.5,
+      "correct": true,
+      "judge_reason": "The assistant correctly states that wireless earbuds with opened packaging cannot be returned, matching the reference answer.",
+      "faithful": false,
+      "unsupported": [
+        "Only unopened in-ear headphones are non-returnable"
+      ],
+      "latency_s": 5.51518266601488,
+      "cost_usd": 0.0016916599999999998,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-006",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "How many days is my return code valid?",
+      "answer": "Your return code is valid for 7 days. If the product is not shipped within this period, the return request will be automatically closed. [İade Süreci Adım Adım:İade Kodu]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
+        },
+        {
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
+        },
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Yürürlük Tarihi",
+          "title": "İade Politikası"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states the return code is valid for 7 days, matching the reference answer.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 3.9365339999785647,
+      "cost_usd": 0.0017813299999999998,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-007",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "I created a return request but have not shipped the product yet, can I cancel it?",
+      "answer": "Yes, you can cancel the return request if you have not shipped the product yet. You can do this from the Orders page in your account. However, if the product has already been shipped, cancellation is not possible as the warehouse inspection will be completed [İade Süreci Adım Adım:İade Talebini İptal Etme].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
+        },
+        {
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
+        },
+        {
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
+        },
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference by confirming cancellation is possible if the product is not shipped and can be done from the Orders page.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 6.198210209026001,
+      "cost_usd": 0.0016925100000000002,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-008",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "How many days do I have for an exchange?",
+      "answer": "You have 30 days from the delivery date to request an exchange for size, color, or model changes. [Değişim Politikası:Değişim Süresi]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "degisim-politikasi.md",
+          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
+          "title": "Değişim Politikası"
+        },
+        {
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
+        },
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        },
+        {
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
+        },
+        {
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
+        },
+        {
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states the 30-day period from delivery for exchange requests as in the reference.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 5.1571268329862505,
+      "cost_usd": 0.0016044999999999998,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-009",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "What happens to the price difference if I exchange for a cheaper product?",
+      "answer": "If you exchange for a cheaper product, the price difference will be refunded to you using the same payment method within 5 business days. [Değişim Politikası:Fiyat Farkı]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "degisim-politikasi.md",
+          "section": "Değişim Politikası > Değişim Süresi | Değişim Politikası > Değişim Koşulları | Değişim Politikası > Fiyat Farkı | Değişim Politikası > Değişim Kargo Ücreti",
+          "title": "Değişim Politikası"
+        },
+        {
+          "doc": "iade-sureci.md",
+          "section": "İade Süreci Adım Adım > İade Talebi Oluşturma | İade Süreci Adım Adım > İade Kodu | İade Süreci Adım Adım > Ürünü Kargoya Verme | İade Süreci Adım Adım > Depo Kontrolü | İade Süreci Adım Adım > İade Talebini İptal Etme",
+          "title": "İade Süreci Adım Adım"
+        },
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        },
+        {
+          "doc": "iade-politikasi-2023.md",
+          "section": "İade Politikası (2023) > Genel Koşullar | İade Politikası (2023) > İade Süresi | İade Politikası (2023) > İade Kargo Ücreti | İade Politikası (2023) > Geri Ödeme Süresi | İade Politikası (2023) > İade Edilemeyen Ürünler",
+          "title": "İade Politikası (2023)"
+        },
+        {
+          "doc": "urun-kilavuzu-powerbank-p20.md",
+          "section": "Powerbank P20 Kullanım Kılavuzu > Teknik Özellikler | Powerbank P20 Kullanım Kılavuzu > Şarj Göstergeleri | Powerbank P20 Kullanım Kılavuzu > Uçakta Taşıma | Powerbank P20 Kullanım Kılavuzu > Kendi Kendini Şarj Etme | Powerbank P20 Kullanım Kılavuzu > Sorun Giderme",
+          "title": "Powerbank P20 Kullanım Kılavuzu"
+        },
+        {
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer correctly states that the price difference is refunded within 5 business days using the same payment method.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 4.93646129098488,
+      "cost_usd": 0.00159838,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-010",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "How many days does standard delivery take?",
+      "answer": "Standard delivery takes 2 to 4 business days. [Kargo Sıkça Sorulan Sorular:Teslimat Süreleri]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
+        },
+        {
+          "doc": "yurt-disi-ve-kktc-gonderim.md",
+          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
+          "title": "Yurt Dışı ve KKTC Gönderimi"
+        },
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "kargo-takip.md",
+          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
+          "title": "Kargo Takibi"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference answer in delivery time and adds a source without contradicting.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 4.378008499974385,
+      "cost_usd": 0.00154951,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-011",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "My cart is 620 TL, is shipping free?",
+      "answer": "Since your cart total is 620 TL, which is above the 500 TL limit, standard shipping will be free for your order. However, express shipping is always charged regardless of the order amount. [Kargo Sıkça Sorulan Sorular:Ücretsiz Kargo Limiti] [Kargo Sıkça Sorulan Sorular:Kargo Ücreti]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
+        },
+        {
+          "doc": "sadakat-programi.md",
+          "section": "KargoPuan Sadakat Programı > Puan Kazanma | KargoPuan Sadakat Programı > Puan Kullanma | KargoPuan Sadakat Programı > Puan Geçerlilik Süresi | KargoPuan Sadakat Programı > Üyelik Seviyeleri",
+          "title": "KargoPuan Sadakat Programı"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "yurt-disi-ve-kktc-gonderim.md",
+          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
+          "title": "Yurt Dışı ve KKTC Gönderimi"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states that shipping is free for orders over 500 TL, matching the reference answer.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 5.079347207967658,
+      "cost_usd": 0.0016588699999999998,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-012",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "In which cities is express delivery available?",
+      "answer": "Express delivery is available only in Istanbul, Ankara, and Izmir. [Kargo Sıkça Sorulan Sorular:Teslimat Süreleri] [Delivery to Hotels:Where We Deliver]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
+        },
+        {
+          "doc": "teslimat-adres-degisikligi.md",
+          "section": "Teslimat Adresi Değişikliği > Adres Değiştirme Koşulları | Teslimat Adresi Değişikliği > Adres Değişikliği Nasıl Yapılır | Teslimat Adresi Değişikliği > Farklı Şehre Gönderim",
+          "title": "Teslimat Adresi Değişikliği"
+        },
+        {
+          "doc": "yurt-disi-ve-kktc-gonderim.md",
+          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
+          "title": "Yurt Dışı ve KKTC Gönderimi"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 0.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 0.5,
+      "correct": true,
+      "judge_reason": "The assistant correctly lists the same cities as the reference answer.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 5.661179666989483,
+      "cost_usd": 0.0016794599999999998,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-013",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "What happens if the courier cannot find me at home?",
+      "answer": "If the courier cannot find you at home, they will attempt delivery 3 times. If delivery is still not possible, the package will be kept at the nearest branch for 5 days. After this period, the package will be returned to the KargoShop warehouse and your payment will be refunded. [Kargo Takibi:Teslim Edilemeyen Kargo]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "kargo-takip.md",
+          "section": "Kargo Takibi > Takip Numarası | Kargo Takibi > Kargo Durumları | Kargo Takibi > Teslim Edilemeyen Kargo | Kargo Takibi > Gecikme Durumu",
+          "title": "Kargo Takibi"
+        },
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "teslimat-adres-degisikligi.md",
+          "section": "Teslimat Adresi Değişikliği > Adres Değiştirme Koşulları | Teslimat Adresi Değişikliği > Adres Değişikliği Nasıl Yapılır | Teslimat Adresi Değişikliği > Farklı Şehre Gönderim",
+          "title": "Teslimat Adresi Değişikliği"
+        },
+        {
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
+        },
+        {
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
+        },
+        {
+          "doc": "siparis-iptali.md",
+          "section": "Sipariş İptali > İptal Koşulları | Sipariş İptali > İptal Nasıl Yapılır | Sipariş İptali > İptal Sonrası Ödeme İadesi | Sipariş İptali > Kısmi İptal",
+          "title": "Sipariş İptali"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant's answer matches the reference's key facts about delivery attempts, holding period, and refund process.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 4.74026208295254,
+      "cost_usd": 0.00164287,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-014",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "How many days does delivery to KKTC take?",
+      "answer": "Delivery to KKTC takes 5 to 7 business days. Express delivery is not available for KKTC addresses [Yurt Dışı ve KKTC Gönderimi:KKTC Teslimat Süresi].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "yurt-disi-ve-kktc-gonderim.md",
+          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
+          "title": "Yurt Dışı ve KKTC Gönderimi"
+        },
+        {
+          "doc": "kargo-sss.md",
+          "section": "Kargo Sıkça Sorulan Sorular > Teslimat Süreleri | Kargo Sıkça Sorulan Sorular > Kargo Ücreti | Kargo Sıkça Sorulan Sorular > Ücretsiz Kargo Limiti | Kargo Sıkça Sorulan Sorular > Sipariş Hazırlama | Kargo Sıkça Sorulan Sorular > Teslimat Saatleri",
+          "title": "Kargo Sıkça Sorulan Sorular"
+        },
+        {
+          "doc": "stok-ve-on-siparis.md",
+          "section": "Stok ve Ön Sipariş > Stok Bildirimi | Stok ve Ön Sipariş > Ön Sipariş | Stok ve Ön Sipariş > Ön Sipariş İptali | Stok ve Ön Sipariş > Stok Yetersizliği",
+          "title": "Stok ve Ön Sipariş"
+        },
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states the delivery time as 5 to 7 business days and does not contradict the reference.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 4.867773416975979,
+      "cost_usd": 0.0015622999999999998,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-015",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "Can I send an order to Germany?",
+      "answer": "I'm sorry, but I couldn't find reliable information about this in our documents; I suggest contacting our support team for assistance.",
+      "abstained": true,
+      "ranked": [
+        {
+          "doc": "yurt-disi-ve-kktc-gonderim.md",
+          "section": "Yurt Dışı ve KKTC Gönderimi > Teslimat Bölgeleri | Yurt Dışı ve KKTC Gönderimi > KKTC Teslimat Süresi | Yurt Dışı ve KKTC Gönderimi > KKTC Kargo Ücreti | Yurt Dışı ve KKTC Gönderimi > Gümrük",
+          "title": "Yurt Dışı ve KKTC Gönderimi"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "stok-ve-on-siparis.md",
+          "section": "Stok ve Ön Sipariş > Stok Bildirimi | Stok ve Ön Sipariş > Ön Sipariş | Stok ve Ön Sipariş > Ön Sipariş İptali | Stok ve Ön Sipariş > Stok Yetersizliği",
+          "title": "Stok ve Ön Sipariş"
+        },
+        {
+          "doc": "hasarli-ve-eksik-urun.md",
+          "section": "Hasarlı veya Eksik Ürün > Teslimat Anında Kontrol | Hasarlı veya Eksik Ürün > Bildirim Süresi | Hasarlı veya Eksik Ürün > Çözüm Seçenekleri | Hasarlı veya Eksik Ürün > Eksik Parça",
+          "title": "Hasarlı veya Eksik Ürün"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": false,
+      "judge_reason": "The reference answer clearly states that shipping is only to Turkey and KKTC, but the assistant declines to answer instead of providing this information.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 13.342423374997452,
+      "cost_usd": 0.003635249999999999,
+      "llm_calls": 12
+    },
+    {
+      "id": "xl-016",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "How many years of warranty do electronic products have?",
+      "answer": "Electronic products have a warranty period of 2 years starting from the delivery date of the product. [Garanti Koşulları:Garanti Süresi]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "garanti-kosullari.md",
+          "section": "Garanti Koşulları > Garanti Süresi | Garanti Koşulları > Garanti Kapsamı | Garanti Koşulları > Garanti Kapsamı Dışındaki Durumlar | Garanti Koşulları > Garanti Belgesi",
+          "title": "Garanti Koşulları"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
+        },
+        {
+          "doc": "urun-kilavuzu-kablosuz-kulaklik-b300.md",
+          "section": "Kablosuz Kulaklık B300 Kullanım Kılavuzu > Teknik Özellikler | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Eşleştirme Modu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Gürültü Engelleme | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Şarj Kutusu | Kablosuz Kulaklık B300 Kullanım Kılavuzu > Sıfırlama",
+          "title": "Kablosuz Kulaklık B300 Kullanım Kılavuzu"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "iade-politikasi.md",
+          "section": "İade Politikası > Genel Koşullar | İade Politikası > İade Süresi | İade Politikası > İade Kargo Ücreti | İade Politikası > Geri Ödeme Süresi | İade Politikası > İade Edilemeyen Ürünler",
+          "title": "İade Politikası"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states the warranty period as 2 years, matching the reference answer.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 7.169440417026635,
+      "cost_usd": 0.0016178499999999999,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-017",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "My phone fell into water, does the warranty cover it?",
+      "answer": "No, the warranty does not cover damage caused by liquid contact, such as your phone falling into water. This type of damage is excluded from the warranty coverage [Garanti Koşulları:Garanti Kapsamı Dışındaki Durumlar].",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "garanti-kosullari.md",
+          "section": "Garanti Koşulları > Garanti Süresi | Garanti Koşulları > Garanti Kapsamı | Garanti Koşulları > Garanti Kapsamı Dışındaki Durumlar | Garanti Koşulları > Garanti Belgesi",
+          "title": "Garanti Koşulları"
+        },
+        {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "hotel-delivery.md",
+          "section": "Delivery to Hotels > Where We Deliver | Delivery to Hotels > Required Details | Delivery to Hotels > Missed Deliveries",
+          "title": "Delivery to Hotels"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states that liquid damage is not covered by the warranty, matching the reference answer.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 4.991761083016172,
+      "cost_usd": 0.00159249,
+      "llm_calls": 5
+    },
+    {
+      "id": "xl-018",
+      "category": "cross_language",
+      "answerable": true,
+      "question": "What is the maximum repair time in business days for a product under warranty?",
+      "answer": "The maximum repair time for a product under warranty is 20 business days, starting from the day the product is received by the service center. [Garanti Başvuru Süreci:Onarım Süresi]",
+      "abstained": false,
+      "ranked": [
+        {
+          "doc": "garanti-basvuru.md",
+          "section": "Garanti Başvuru Süreci > Başvuru Adımları | Garanti Başvuru Süreci > Yetkili Servis | Garanti Başvuru Süreci > Onarım Süresi | Garanti Başvuru Süreci > Onarımın Gecikmesi",
+          "title": "Garanti Başvuru Süreci"
+        },
+        {
+          "doc": "garanti-kosullari.md",
+          "section": "Garanti Koşulları > Garanti Süresi | Garanti Koşulları > Garanti Kapsamı | Garanti Koşulları > Garanti Kapsamı Dışındaki Durumlar | Garanti Koşulları > Garanti Belgesi",
+          "title": "Garanti Koşulları"
+        },
+        {
+          "doc": "warranty-for-international-buyers.md",
+          "section": "Warranty for International Buyers > Where the Warranty Applies | Warranty for International Buyers > Service Centers | Warranty for International Buyers > Shipping Costs",
+          "title": "Warranty for International Buyers"
+        },
+        {
+          "doc": "tourist-vat-refund.md",
+          "section": "Tourist VAT Refund > Who Is Eligible | Tourist VAT Refund > How to Claim | Tourist VAT Refund > Refund Timing",
+          "title": "Tourist VAT Refund"
+        },
+        {
+          "doc": "corporate-orders.md",
+          "section": "Corporate Orders > Volume Discounts | Corporate Orders > Payment Terms | Corporate Orders > Account Manager",
+          "title": "Corporate Orders"
+        },
+        {
+          "doc": "english-support.md",
+          "section": "English Language Support > Support Hours | English Language Support > Channels | English Language Support > Response Times",
+          "title": "English Language Support"
+        }
+      ],
+      "gold_hit": true,
+      "recall": {
+        "recall@1": 1.0,
+        "recall@3": 1.0,
+        "recall@5": 1.0,
+        "recall@8": 1.0
+      },
+      "mrr": 1.0,
+      "correct": true,
+      "judge_reason": "The assistant correctly states the maximum repair time as 20 business days, matching the reference answer.",
+      "faithful": true,
+      "unsupported": [],
+      "latency_s": 4.529247500002384,
+      "cost_usd": 0.0015901,
+      "llm_calls": 5
+    }
+  ]
+}
