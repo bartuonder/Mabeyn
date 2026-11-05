@@ -16,30 +16,31 @@
       "accuracy_ci95_high": 0.9940915620051425,
       "faithfulness_ci95_low": 0.8864829086095221,
       "faithfulness_ci95_high": 1.0,
-      "latency_p50_s": 4.429277666960843,
-      "latency_p95_s": 8.089980832883157,
+      "latency_p50_s": 4.427418667008169,
+      "latency_p95_s": 8.080871123936959,
       "cost_per_query_usd": 0.001977738666666667,
       "llm_calls_per_query": 5.766666666666667
     },
     "tools": {
       "scenarios": 20.0,
-      "scenario_pass_rate": 0.95,
-      "tool_selection_accuracy": 0.95,
+      "scenario_pass_rate": 1.0,
+      "tool_selection_accuracy": 1.0,
       "argument_accuracy": 1.0,
-      "unnecessary_call_rate": 0.05,
+      "unnecessary_call_rate": 0.0,
       "sensitive_approval_rate": 1.0,
       "route_accuracy": 1.0,
-      "status_accuracy": 0.95,
-      "approval_expectation_accuracy": 0.95,
-      "outcome_accuracy": 0.95,
+      "status_accuracy": 1.0,
+      "approval_expectation_accuracy": 1.0,
+      "outcome_accuracy": 1.0,
       "language_accuracy": 1.0,
       "identity_leaks": 0.0,
-      "tool_calls_per_scenario": 1.0,
+      "tool_calls_per_scenario": 0.95,
       "sensitive_executed_without_approval": 0.0,
+      "policy_blocks": 1.0,
       "cost_per_scenario_usd": 0.0,
-      "latency_p50_s": 0.030667792016174644,
-      "scenario_pass_rate_ci95_low": 0.7638641064874331,
-      "scenario_pass_rate_ci95_high": 0.9911187805671268
+      "latency_p50_s": 0.03348683402873576,
+      "scenario_pass_rate_ci95_low": 0.8388698745050667,
+      "scenario_pass_rate_ci95_high": 1.0
     }
   },
   "checks": [
@@ -69,13 +70,13 @@
     },
     {
       "metric": "tools.scenario_pass_rate",
-      "value": 0.95,
+      "value": 1.0,
       "bound": 0.85,
       "kind": "min"
     },
     {
       "metric": "tools.tool_selection_accuracy",
-      "value": 0.95,
+      "value": 1.0,
       "bound": 0.85,
       "kind": "min"
     },
