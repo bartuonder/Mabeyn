@@ -47,7 +47,9 @@ class AgentService(Protocol):
         self, turn: TurnContext, question: str, history: Sequence[ChatMessage]
     ) -> AsyncIterator[RagEvent]: ...
 
-    async def resume(self, turn: TurnContext, approved: bool, note: str | None) -> Final: ...
+    async def resume(
+        self, turn: TurnContext, approved: bool, note: str | None, expired: bool = False
+    ) -> Final: ...
 
 
 def _usage(meter: usage.UsageMeter, started: float) -> dict[str, Any]:
@@ -177,9 +179,12 @@ class SupervisorService:
             final, usage={**_usage(meter, started), "cached": bool(final.trace.get("cached"))}
         )
 
-    async def resume(self, turn: TurnContext, approved: bool, note: str | None) -> Final:
+    async def resume(
+        self, turn: TurnContext, approved: bool, note: str | None, expired: bool = False
+    ) -> Final:
         config = self._config(turn)
-        decision = {"decision": "approved" if approved else "rejected", "note": note}
+        verdict = "approved" if approved else ("expired" if expired else "rejected")
+        decision = {"decision": verdict, "note": note}
         started = time.perf_counter()
         with usage.measure() as meter:
             async for _ in self.graph.astream(

@@ -1,6 +1,6 @@
 import json
 import uuid
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 from langgraph.types import interrupt
@@ -233,6 +233,7 @@ class ActionAgent:
                 conversation_id=conversation_id,
                 tool_call_id=call_id,
                 status=ApprovalStatus.PENDING,
+                expires_at=datetime.now(UTC) + timedelta(hours=get_settings().approval_ttl_hours),
                 payload={
                     "tool": pending["name"],
                     "arguments": pending["arguments"],
@@ -322,7 +323,12 @@ class ActionAgent:
         else:
             note = str(decision.get("note") or "")
             await reject_call(tenant_id, uuid.UUID(pending["call_id"]), note or "rejected")
-            outcome = {"ok": False, "error": "rejected by a human reviewer", "note": note}
+            reason = (
+                "the review period ended without a decision"
+                if decision.get("decision") == "expired"
+                else "rejected by a human reviewer"
+            )
+            outcome = {"ok": False, "error": reason, "note": note}
             status = "rejected"
 
         messages.append(_tool_message(pending["tool_call_id"], outcome))
