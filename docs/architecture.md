@@ -252,7 +252,7 @@ Four layers plus a log, each switched by the tenant's `firewall_enabled` setting
 
 | Layer | Where it runs | What it does |
 | --- | --- | --- |
-| Input | `input_guard` | Rules before any model: hidden and tag characters, base64 and hex payloads (decoded and checked again) and known override phrases in English, Turkish and German. Then a small model rates the message from 0 to 1; the tenant threshold (default 0.7) decides, and an unreadable rating blocks. A blocked message gets a fixed bilingual reply and is stored with `blocked = true`, so summaries and memory ignore it. |
+| Input | `input_guard` | Rules before any model: hidden and tag characters, base64 and hex payloads (decoded and checked again) and known override phrases in English, Turkish and German. Then a small model rates the message from 0 to 1, reading the customer's last four messages as context; the tenant threshold (default 0.7) decides, and an unreadable rating blocks. A blocked message gets a fixed bilingual reply and is stored with `blocked = true`, so summaries and memory ignore it. |
 | Indirect injection | ingestion and `generate` | Every passage is rated with a document prompt when it is ingested; passages above the threshold are flagged and excluded from vector and full-text retrieval. Retrieved text sits in `<source>` blocks declared untrusted, and forged source tags inside a document are neutralised. |
 | Tools | `action_tools`, `action_await_approval` | A tenant allowlist hides tools from the model. A tool carries argument policies chosen by the tenant (`policies` on the tool definition). Each one fetches the real record through a read tool of the tenant, with the customer's injected identity, and checks it: `owned_record` (the record must belong to the customer), `max_amount` (a money argument may not exceed a field of the record), `required_status` and `time_window`. The KargoShop refund uses all four, so an order that is someone else's, too small, not delivered or older than 30 days never opens an approval. A policy whose lookup tool is missing or unreachable blocks the call. Write and sensitive calls are rate limited per customer (default 5 per hour). Checks run before an approval is opened and again before an approved call runs. A failed check is an error the model sees, never a call. |
 | Output | `output_guard` | A per-tenant canary token sits in the agents' prompts; a reply that contains it, even spaced out, is replaced. Validated IBAN, card, national id, e-mail and phone values are masked. While the layer is active, replies are held until checked and released as one token event; with the layer off they stream as before. |
@@ -292,7 +292,7 @@ Rationale and measurements: [ADR-0007](adr/0007-cost-cache-and-eval-gate.md).
 <!-- generated:facts -->
 | Setting | Value |
 | --- | --- |
-| Prompt versions | `rag-v7`, `agents-v14`, `memory-v3`, `guard-v1`, `cache-v1` |
+| Prompt versions | `rag-v7`, `agents-v14`, `memory-v3`, `guard-v2`, `cache-v1` |
 | Answer and action model | `gpt-4.1-mini` |
 | Small model (routing, rewriting, grading, reranking, checks) | `gpt-4o-mini` |
 | Judge model (evaluation) | `gpt-4.1-mini` |
@@ -335,7 +335,7 @@ See [evaluation.md](evaluation.md) for the datasets, metrics and how to run them
 
 - English questions over Turkish documents work (on 18 translated questions Recall@5 is 1.00 and accuracy 0.94), but the answer can still miss a rule that is only implied by a general statement; the relevance grader states a reason first to reduce this.
 - Time to the first streamed token is about four seconds on the knowledge path (routing, query handling, reranking and grading run before generation).
-- The firewall's rating sees one message at a time, so an attack spread over several messages is judged message by message; rules and the canary catch known phrases and verbatim leaks, not paraphrases.
+- The firewall's rating sees the latest message plus the customer's last four messages (300 characters each), not the whole conversation or the assistant's replies, so an attack spread over more turns than that is judged piece by piece; rules and the canary catch known phrases and verbatim leaks, not paraphrases. The rules still read one message, and known gaps remain (a German "repeat the text above" phrasing, a rule that blocks "enable debug mode" in a product question).
 - Argument policies cover one kind of record per call: a lookup, then equality, amount and date checks. Rules that need several records or the tenant's own business logic are not expressible.
 - Small sections are merged into one passage, so one poisoned sentence withholds its whole passage from retrieval.
 - The firewall adds a small-model call to every message and a call per passage at ingestion.

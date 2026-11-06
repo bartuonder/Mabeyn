@@ -15,6 +15,8 @@ All quality, latency and cost numbers in this repository come from the runners i
 | `evals/datasets/redteam_benign.jsonl` | 80 messages | Harmless requests that look suspicious ("how do I cancel a refund?") |
 | `evals/datasets/redteam_docs.jsonl` | 16 documents | The 15 poisoned documents and the secret document of a second company |
 | `evals/datasets/redteam_public.jsonl` | 100 prompts | Test split of the open `deepset/prompt-injections` set (Apache-2.0, 44 attacks) |
+| `evals/datasets/firewall_dev.jsonl` | 92 messages | Input-layer development set: 48 attacks (multi-turn setups with earlier messages, role-play, German, obfuscated) and 44 harmless messages, some with earlier turns |
+| `evals/datasets/firewall_heldout.jsonl` | 60 messages | Same shape, written before the input layer was changed and measured twice (before and after), never tuned on: 30 attacks, 30 harmless |
 
 Each answerable question lists gold references as `(document file, section heading)`. A retrieved chunk hits a gold item when it comes from that document and covers that section.
 
@@ -122,6 +124,15 @@ JUDGE_MODEL=gpt-4.1 uv run python -m evals.runners.memory_eval --name memory-eva
 Terms are compared case-insensitively and without Turkish diacritics. A scenario passes only when every check that applies to its kind holds.
 
 `evals/datasets/memory_heldout.jsonl` holds 12 fresh scenarios with new statements and facts. It follows the held-out rules below: it is written before tuning is measured, run once per report with the stronger judge, and consumed if a fix is made because of one of its failures.
+
+## Input-layer evaluation
+
+```bash
+uv run python -m evals.runners.firewall_eval --set dev --history --name firewall-dev-history
+uv run python -m evals.runners.firewall_eval --set heldout --history --name firewall-heldout-after
+```
+
+This runs only the input layer (rules and small-model rating, with the tenant threshold) over single messages that carry the customer's earlier turns, and reports blocked attacks and blocked harmless messages with 95% intervals. Without `--history` the layer sees the latest message alone (the behaviour before `guard-v2`). The development set is for iterating; the held-out set is run before and after a change and its failures are not fixed afterwards (a fix because of one of them consumes the set).
 
 ## Red-team evaluation
 
