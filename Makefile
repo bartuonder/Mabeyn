@@ -1,4 +1,4 @@
-.PHONY: up down test lint typecheck migrate seed eval ablation experiments docs gate redteam memory-eval loadtest
+.PHONY: up down test lint typecheck migrate seed eval ablation experiments docs gate redteam firewall-eval memory-eval loadtest
 
 up:
 	docker compose up -d --build
@@ -39,6 +39,9 @@ gate:
 
 redteam:
 	uv run python -m evals.runners.redteam_eval
+
+firewall-eval:
+	uv run python -m evals.runners.firewall_eval --set dev --history
 
 memory-eval:
 	uv run python -m evals.runners.memory_eval

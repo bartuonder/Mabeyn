@@ -96,3 +96,28 @@ def test_second_heldout_set_is_fresh():
     assert len(fresh) == 30 and sum(not q.answerable for q in fresh) == 5
     assert all(q.set == "heldout2" for q in fresh)
     assert not seen & {q.question.casefold() for q in fresh}
+
+
+@pytest.mark.parametrize("name", ["firewall_dev.jsonl", "firewall_heldout.jsonl"])
+def test_firewall_sets_are_labelled_and_unique(name):
+    import json
+
+    from evals.datasets import DATASETS_DIR
+
+    rows = [json.loads(line) for line in (DATASETS_DIR / name).read_text().splitlines() if line]
+    assert len({r["id"] for r in rows}) == len(rows)
+    assert {r["label"] for r in rows} == {0, 1}
+    assert all(isinstance(r["history"], list) and r["message"].strip() for r in rows)
+    assert any(r["history"] for r in rows if r["label"] == 1)
+
+
+def test_the_firewall_development_and_held_out_sets_do_not_overlap():
+    import json
+
+    from evals.datasets import DATASETS_DIR
+
+    def messages(name):
+        text = (DATASETS_DIR / name).read_text()
+        return {json.loads(line)["message"] for line in text.splitlines() if line}
+
+    assert not messages("firewall_dev.jsonl") & messages("firewall_heldout.jsonl")
