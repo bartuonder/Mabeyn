@@ -2,6 +2,7 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from apps.api.routers import (
     api_keys,
@@ -18,6 +19,7 @@ from apps.api.routers import (
     sessions,
     tools,
     usage,
+    widget,
 )
 from mabeyn.agents.runtime import runtime
 from mabeyn.core.config import get_settings
@@ -42,7 +44,17 @@ def create_app() -> FastAPI:
     export_tracking_env()
     configure_logging(get_settings().log_level)
     app = FastAPI(title="Mabeyn", version="0.1.0", lifespan=lifespan)
+    origins = [o.strip() for o in get_settings().cors_allow_origins.split(",") if o.strip()]
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "PUT", "DELETE"],
+        allow_headers=["Authorization", "Content-Type", "X-API-Key"],
+        max_age=600,
+    )
     app.include_router(health.router)
+    app.include_router(widget.router)
     app.include_router(auth.router)
     app.include_router(api_keys.router)
     app.include_router(sessions.router)

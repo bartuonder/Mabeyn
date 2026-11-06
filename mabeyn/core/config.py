@@ -65,6 +65,10 @@ class Settings(BaseSettings):
     cache_semantic_threshold: float = 0.60
     cache_max_entries: int = 500
 
+    # Browsers may call the API from these origins (comma separated, or * for any). Requests carry
+    # bearer tokens or API keys, never cookies; publishable keys also check their own origin list.
+    cors_allow_origins: str = "*"
+
     jwt_secret: SecretStr = Field(
         default=SecretStr("dev-only-secret-change-before-deploying"), min_length=32
     )
