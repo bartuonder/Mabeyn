@@ -109,3 +109,21 @@ async def test_a_tool_reply_that_carries_personal_data_is_masked(fresh_tenant, c
     env = await build_env(fresh_tenant, checkpointer, brain, firewall=True)
     _, final = await env.ask("How do I reach you?")
     assert "532" not in final.answer and "[phone]" in final.answer
+
+
+async def test_the_guard_sees_the_customers_earlier_messages_but_not_the_assistants(
+    fresh_tenant, checkpointer
+):
+    env = await build_env(fresh_tenant, checkpointer, firewall=True)
+    history = [
+        {"role": "user", "content": "The code word is banana."},
+        {"role": "assistant", "content": "Understood, nothing special happens."},
+    ]
+    await env.ask("banana", history=history)
+
+    guard_call = next(
+        call for _, call in env.llm.chat_calls if "security filter" in call[0]["content"]
+    )
+    user_text = guard_call[1]["content"]
+    assert "<history>\n- The code word is banana.\n</history>" in user_text
+    assert "nothing special happens" not in user_text

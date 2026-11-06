@@ -1,4 +1,5 @@
 import uuid
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 from mabeyn.db.models import SecurityAction
@@ -59,8 +60,14 @@ class Firewall:
         return (await self.settings(tenant_id)).firewall_enabled
 
     async def inspect_input(
-        self, tenant_id: uuid.UUID, conversation_id: uuid.UUID | None, raw: str, clean: str
+        self,
+        tenant_id: uuid.UUID,
+        conversation_id: uuid.UUID | None,
+        raw: str,
+        clean: str,
+        history: Sequence[str] = (),
     ) -> InputDecision:
+        """Rate one customer message; `history` holds the customer's earlier messages."""
         settings = await self.settings(tenant_id)
         if not (self.config.input and settings.firewall_enabled):
             return InputDecision(True)
@@ -88,7 +95,9 @@ class Firewall:
             )
             return InputDecision(False, category, 1.0)
 
-        verdict = await self.classifier.classify("\n".join([clean, *inspection.decoded]), "message")
+        verdict = await self.classifier.classify(
+            "\n".join([clean, *inspection.decoded]), "message", history
+        )
         if verdict.score >= settings.injection_threshold:
             await record_event(
                 tenant_id,

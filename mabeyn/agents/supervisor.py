@@ -93,6 +93,7 @@ def build_supervisor_graph(deps: AgentDeps) -> StateGraph[Any, Any, Any, Any]:
                 uuid.UUID(state["conversation_id"]),
                 state["question"],
                 decision.text,
+                [m["content"] for m in state.get("history", []) if m["role"] == "user"],
             )
             category = "" if verdict.allowed else (verdict.category or "blocked")
         if category:

@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal, Protocol
 
@@ -6,6 +7,8 @@ from mabeyn.guard import prompts
 from mabeyn.llm.client import LLM, LLMError, chat_json
 
 MAX_CHARS = 3000
+HISTORY_MESSAGES = 4
+HISTORY_CHARS = 300
 UNREADABLE = "unreadable"
 
 
@@ -17,7 +20,12 @@ class Verdict:
 
 
 class InjectionClassifier(Protocol):
-    async def classify(self, text: str, kind: Literal["message", "document"]) -> Verdict: ...
+    async def classify(
+        self,
+        text: str,
+        kind: Literal["message", "document"],
+        history: Sequence[str] = (),
+    ) -> Verdict: ...
 
 
 class LlmInjectionClassifier:
@@ -27,14 +35,24 @@ class LlmInjectionClassifier:
         self.llm = llm
         self.model = model
 
-    async def classify(self, text: str, kind: Literal["message", "document"]) -> Verdict:
+    async def classify(
+        self,
+        text: str,
+        kind: Literal["message", "document"],
+        history: Sequence[str] = (),
+    ) -> Verdict:
         system = prompts.MESSAGE_SYSTEM if kind == "message" else prompts.DOCUMENT_SYSTEM
+        earlier = [m[:HISTORY_CHARS] for m in history if m.strip()][-HISTORY_MESSAGES:]
+        context = ""
+        if kind == "message" and earlier:
+            system += prompts.HISTORY_NOTE
+            context = "<history>\n" + "\n".join(f"- {m}" for m in earlier) + "\n</history>\n"
         try:
             data = await chat_json(
                 self.llm,
                 [
                     {"role": "system", "content": system},
-                    {"role": "user", "content": f"<data>\n{text[:MAX_CHARS]}\n</data>"},
+                    {"role": "user", "content": f"{context}<data>\n{text[:MAX_CHARS]}\n</data>"},
                 ],
                 model=self.model or get_settings().llm_model_small,
                 max_tokens=80,
