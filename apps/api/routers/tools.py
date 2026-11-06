@@ -7,8 +7,9 @@ from sqlalchemy.exc import IntegrityError
 from apps.api.deps import Admin, TenantDb
 from apps.api.schemas import ToolCreate, ToolOut
 from mabeyn.db.models import ToolDefinition
+from mabeyn.guard.policy_specs import dump_policies
 from mabeyn.tools.schema import ToolSchemaError
-from mabeyn.tools.service import validate_definition
+from mabeyn.tools.service import validate_definition, validate_policies
 
 router = APIRouter(prefix="/tools", tags=["tools"])
 
@@ -17,6 +18,8 @@ router = APIRouter(prefix="/tools", tags=["tools"])
 async def create_tool(body: ToolCreate, admin: Admin, db: TenantDb) -> ToolOut:
     try:
         validate_definition(body.name, body.json_schema, body.http_method, body.url_template)
+        existing = {t.name: t for t in await db.scalars(select(ToolDefinition))}
+        validate_policies(body.json_schema, body.policies, existing)
     except ToolSchemaError as exc:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, str(exc)) from None
 
@@ -29,6 +32,7 @@ async def create_tool(body: ToolCreate, admin: Admin, db: TenantDb) -> ToolOut:
         http_method=body.http_method,
         url_template=body.url_template,
         requires_identity=body.requires_identity,
+        policies=dump_policies(body.policies),
     )
     db.add(tool)
     try:

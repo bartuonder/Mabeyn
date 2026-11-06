@@ -14,6 +14,7 @@ from mabeyn.db.models import (
     RiskLevel,
     SecurityAction,
 )
+from mabeyn.guard.policy_specs import PolicySpec
 from mabeyn.memory.schema import MemoryCategory
 
 
@@ -134,6 +135,7 @@ class ToolCreate(StrictRequest):
     http_method: str = Field(pattern="^(GET|POST|PUT|PATCH|DELETE)$")
     url_template: str = Field(min_length=8, max_length=2048)
     requires_identity: bool = True
+    policies: list[PolicySpec] = Field(default_factory=list, max_length=10)
 
 
 class ToolOut(Response):
@@ -145,6 +147,7 @@ class ToolOut(Response):
     http_method: str
     url_template: str
     requires_identity: bool
+    policies: list[dict[str, Any]]
     created_at: datetime
 
 
