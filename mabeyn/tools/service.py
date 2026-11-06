@@ -39,6 +39,7 @@ class LoadedTool:
     method: str
     url_template: str
     requires_identity: bool = True
+    policies: tuple[dict[str, Any], ...] = ()
 
     @property
     def endpoint(self) -> ToolEndpoint:
@@ -69,10 +70,26 @@ def validate_definition(name: str, schema: dict[str, Any], method: str, url_temp
             raise ToolSchemaError(f"URL parameter {placeholder} must be a required property")
 
 
+def validate_policies(
+    schema: dict[str, Any], policies: list[Any], existing: dict[str, Any]
+) -> None:
+    """A policy must name a read tool of the tenant and arguments the tool really has."""
+    properties = schema.get("properties", {})
+    for spec in policies:
+        lookup = existing.get(spec.lookup_tool)
+        if lookup is None or lookup.risk_level is not RiskLevel.READ:
+            raise ToolSchemaError(f"policy lookup_tool {spec.lookup_tool} must be a read tool")
+        if spec.id_argument not in properties:
+            raise ToolSchemaError(f"policy id_argument {spec.id_argument} is not a property")
+        amount = getattr(spec, "amount_argument", None)
+        if amount is not None and amount not in properties:
+            raise ToolSchemaError(f"policy amount_argument {amount} is not a property")
+
+
 def _loaded(row: ToolDefinition) -> LoadedTool:
     return LoadedTool(
         row.id, row.name, row.description, row.json_schema, row.risk_level, row.http_method,
-        row.url_template, row.requires_identity,
+        row.url_template, row.requires_identity, tuple(row.policies or ()),
     )  # fmt: skip
 
 

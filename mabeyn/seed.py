@@ -114,6 +114,7 @@ async def register_kargoshop_tools(tenant_id: uuid.UUID, shop_url: str = DEFAULT
             tool.risk_level = RiskLevel(str(definition["risk_level"]))
             tool.http_method = str(definition["http_method"])
             tool.url_template = str(definition["url_template"])
+            tool.policies = definition.get("policies", [])  # type: ignore[assignment]
     return len(definitions)
 
 

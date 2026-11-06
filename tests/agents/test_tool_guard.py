@@ -1,4 +1,5 @@
 import uuid
+from datetime import timedelta
 
 from httpx import ASGITransport
 from sqlalchemy import select
@@ -6,9 +7,10 @@ from sqlalchemy import select
 from apps.kargoshop_mock.main import Store, create_app
 from mabeyn.db import models as m
 from mabeyn.db.session import tenant_session
+from mabeyn.guard.policies import ToolGuard
 from mabeyn.guard.settings import save_guard_settings
 from mabeyn.tools.executor import HttpToolExecutor, ToolContext
-from mabeyn.tools.service import ToolRunner, load_tools
+from mabeyn.tools.service import LoadedTool, ToolRunner, load_tools
 from tests.agents.harness import Brain, build_env
 from tests.fakes import say, tool_call
 
@@ -35,7 +37,7 @@ async def test_a_refund_above_the_order_total_never_reaches_approval(fresh_tenan
     assert [t["status"] for t in final.trace["tool_trace"]] == ["blocked"]
     assert await env.approvals() == [] and await env.tool_calls() == []
     (event,) = await security_events(fresh_tenant)
-    assert (event.layer, event.category) == ("tool", "refund_amount")
+    assert (event.layer, event.category) == ("tool", "max_amount")
     assert "larger than the order total" in event.detail["reason"]
     assert "policy:" in env.llm.tool_turns[1][-1]["content"]
 
@@ -47,7 +49,7 @@ async def test_a_refund_for_someone_elses_order_is_blocked(fresh_tenant, checkpo
     assert [t["status"] for t in final.trace["tool_trace"]] == ["blocked"]
     assert await env.approvals() == []
     (event,) = await security_events(fresh_tenant)
-    assert event.category == "own_order" and env.store.refunds == []
+    assert event.category == "owned_record" and env.store.refunds == []
 
 
 async def test_changing_the_address_of_someone_elses_order_is_blocked(fresh_tenant, checkpointer):
@@ -165,7 +167,7 @@ async def test_a_refund_outside_the_return_window_is_blocked_before_any_approval
     assert [t["status"] for t in final.trace["tool_trace"]] == ["blocked"]
     assert await env.approvals() == [] and env.store.refunds == []
     (event,) = await security_events(fresh_tenant)
-    assert event.category == "return_window" and "30 day" in event.detail["reason"]
+    assert event.category == "time_window" and "30 day" in event.detail["reason"]
     assert "30 day return window has passed" in env.llm.tool_turns[1][-1]["content"]
 
 
@@ -174,14 +176,65 @@ async def test_an_order_that_is_not_delivered_cannot_be_refunded(fresh_tenant, c
     env, final = await blocked_run(fresh_tenant, checkpointer, call, "Refund KS-1002")
     assert [t["status"] for t in final.trace["tool_trace"]] == ["blocked"]
     (event,) = await security_events(fresh_tenant)
-    assert event.category == "return_window" and "delivered" in event.detail["reason"]
+    assert event.category == "required_status" and "delivered" in event.detail["reason"]
 
 
-def test_the_window_ends_thirty_days_after_delivery():
+async def test_the_window_ends_thirty_days_after_delivery(fresh_tenant, checkpointer):
+    await build_env(fresh_tenant, checkpointer)
     from datetime import date
 
-    from mabeyn.guard.policies import _return_window
+    tool = next(t for t in await load_tools(fresh_tenant) if t.name == "request_refund")
+    runner = ToolRunner(HttpToolExecutor(transport=ASGITransport(app=create_app(Store()))))
+    guard = ToolGuard(runner)
+    context = ToolContext(fresh_tenant, "customer-2")
+    args = {"order_id": "KS-2001", "amount": 10.0, "reason": "late"}
+    last_day = date.fromisoformat("2026-08-05") + timedelta(days=30)
+    assert await guard.check(context, uuid.uuid4(), tool, args, today=last_day) is None
+    late = await guard.check(context, uuid.uuid4(), tool, args, today=last_day + timedelta(days=1))
+    assert late is not None and late.policy == "time_window"
 
-    delivered = {"status": "delivered", "delivered_at": "2026-10-24"}
-    assert _return_window(delivered, date(2026, 11, 23)) is None
-    assert _return_window(delivered, date(2026, 11, 24)) is not None
+
+async def test_a_tenant_can_attach_policies_to_its_own_tools(fresh_tenant, checkpointer):
+    await build_env(fresh_tenant, checkpointer)
+    """Policies are data on the tool, so a tool with any name is covered."""
+    from mabeyn.guard.policy_specs import MaxAmount, parse_policies
+
+    spec = {
+        "type": "max_amount",
+        "lookup_tool": "get_order_status",
+        "id_argument": "booking",
+        "lookup_argument": "order_id",
+        "amount_argument": "credit",
+        "limit_field": "total",
+    }
+    assert isinstance(parse_policies([spec])[0], MaxAmount)
+    tool = LoadedTool(
+        uuid.uuid4(), "issue_credit", "credit", {"type": "object"}, m.RiskLevel.SENSITIVE,
+        "POST", "http://shop/credits", True, (spec,),
+    )  # fmt: skip
+    runner = ToolRunner(HttpToolExecutor(transport=ASGITransport(app=create_app(Store()))))
+    guard = ToolGuard(runner)
+    context = ToolContext(fresh_tenant, "customer-1")
+    over = {"booking": "KS-1001", "credit": 99999.0}
+    violation = await guard.check(context, uuid.uuid4(), tool, over)
+    assert violation is not None and violation.policy == "max_amount"
+    assert await guard.check(context, uuid.uuid4(), tool, {**over, "credit": 5.0}) is None
+    foreign = await guard.check(context, uuid.uuid4(), tool, {**over, "booking": "KS-2001"})
+    assert foreign is not None
+
+
+async def test_a_policy_with_a_missing_lookup_tool_blocks_instead_of_passing(fresh_tenant):
+    spec = {
+        "type": "owned_record",
+        "lookup_tool": "no_such_tool",
+        "id_argument": "order_id",
+    }
+    tool = LoadedTool(
+        uuid.uuid4(), "cancel_order", "cancel", {"type": "object"}, m.RiskLevel.WRITE,
+        "POST", "http://shop/cancel", True, (spec,),
+    )  # fmt: skip
+    guard = ToolGuard(ToolRunner(HttpToolExecutor()))
+    violation = await guard.check(
+        ToolContext(fresh_tenant, "customer-1"), uuid.uuid4(), tool, {"order_id": "KS-1001"}
+    )
+    assert violation is not None and "could not be verified" in violation.reason

@@ -7,17 +7,16 @@ from sqlalchemy import func, select
 
 from mabeyn.db.models import Conversation, RiskLevel, ToolCall, ToolCallStatus
 from mabeyn.db.session import tenant_session
+from mabeyn.guard.policy_specs import (
+    MaxAmount,
+    PolicySpec,
+    RequiredStatus,
+    TimeWindow,
+    parse_policies,
+)
 from mabeyn.guard.settings import load_guard_settings
 from mabeyn.tools.executor import ToolContext
 from mabeyn.tools.service import LoadedTool, ToolRunner, load_tools
-
-ORDER_LOOKUP_TOOL = "get_order_status"
-# Argument policies per tool. A tenant without the lookup tool cannot be checked and is not blocked.
-RETURN_WINDOW_DAYS = 30
-ARGUMENT_POLICIES: dict[str, tuple[str, ...]] = {
-    "request_refund": ("own_order", "refund_amount", "return_window"),
-    "change_address": ("own_order",),
-}
 
 
 @dataclass(frozen=True)
@@ -56,8 +55,9 @@ class ToolGuard:
                 return PolicyViolation(
                     "rate_limit", "too many changes were requested recently; try again later"
                 )
-        for policy in ARGUMENT_POLICIES.get(tool.name, ()):
-            if violation := await self._argument_policy(policy, context, arguments, today):
+        records: dict[tuple[str, Any], tuple[str, dict[str, Any]]] = {}
+        for spec in parse_policies(tool.policies):
+            if violation := await self._argument_policy(spec, context, arguments, today, records):
                 return violation
         return None
 
@@ -78,46 +78,62 @@ class ToolGuard:
             )
         return int(count or 0)
 
-    async def _order(self, context: ToolContext, order_id: str) -> tuple[str, dict[str, Any]]:
-        lookup = {t.name: t for t in await load_tools(context.tenant_id)}.get(ORDER_LOOKUP_TOOL)
+    async def _record(
+        self,
+        spec: PolicySpec,
+        context: ToolContext,
+        arguments: dict[str, Any],
+        records: dict[tuple[str, Any], tuple[str, dict[str, Any]]],
+    ) -> tuple[str, dict[str, Any]]:
+        value = arguments.get(spec.id_argument)
+        if (spec.lookup_tool, value) in records:
+            return records[(spec.lookup_tool, value)]
+        lookup = {t.name: t for t in await load_tools(context.tenant_id)}.get(spec.lookup_tool)
         if lookup is None:
-            return "unchecked", {}
+            return "unavailable", {}
         result = await self.runner.executor.execute(
-            lookup.endpoint, {"order_id": order_id}, context
+            lookup.endpoint, {spec.lookup_key: value}, context
         )
         if result.ok and isinstance(result.data, dict):
-            return "found", result.data
-        return ("missing" if result.status_code == 404 else "unavailable"), {}
+            found = ("found", result.data)
+        else:
+            found = ("missing" if result.status_code == 404 else "unavailable", {})
+        records[(spec.lookup_tool, value)] = found
+        return found
 
     async def _argument_policy(
-        self, policy: str, context: ToolContext, arguments: dict[str, Any], today: date | None
+        self,
+        spec: PolicySpec,
+        context: ToolContext,
+        arguments: dict[str, Any],
+        today: date | None,
+        records: dict[tuple[str, Any], tuple[str, dict[str, Any]]],
     ) -> PolicyViolation | None:
-        order_id = str(arguments.get("order_id", ""))
-        state, order = await self._order(context, order_id)
-        if state == "unchecked":
-            return None
+        state, record = await self._record(spec, context, arguments, records)
+        name = spec.type
         if state == "missing":
-            return PolicyViolation(policy, "that order does not belong to this customer")
+            return PolicyViolation(
+                name, spec.message or "that record does not belong to this customer"
+            )
         if state == "unavailable":
-            return PolicyViolation(policy, "the order could not be verified")
-        if policy == "return_window":
-            return _return_window(order, today or date.today())
-        if policy == "refund_amount":
-            total = order.get("total")
-            amount = arguments.get("amount")
-            if isinstance(total, int | float) and isinstance(amount, int | float):
-                if amount > total + 0.005:
-                    return PolicyViolation(policy, "the refund is larger than the order total")
+            return PolicyViolation(name, "the record could not be verified")
+        if isinstance(spec, RequiredStatus):
+            if record.get(spec.status_field) != spec.required_status:
+                return PolicyViolation(
+                    name, spec.message or f"only records with status {spec.required_status}"
+                )
+        if isinstance(spec, TimeWindow):
+            start = record.get(spec.date_field)
+            if start and (today or date.today()) - date.fromisoformat(str(start)) > timedelta(
+                days=spec.days
+            ):
+                return PolicyViolation(name, spec.message or f"the {spec.days} day window passed")
+        if isinstance(spec, MaxAmount):
+            limit = record.get(spec.limit_field)
+            amount = arguments.get(spec.amount_argument)
+            if isinstance(limit, int | float) and isinstance(amount, int | float):
+                if amount > limit + 0.005:
+                    return PolicyViolation(
+                        name, spec.message or "the amount is larger than the record allows"
+                    )
         return None
-
-
-def _return_window(order: dict[str, Any], today: date) -> PolicyViolation | None:
-    """A refund needs a delivered order that is still inside the return window."""
-    if order.get("status") != "delivered":
-        return PolicyViolation("return_window", "only delivered orders can be refunded")
-    delivered = order.get("delivered_at")
-    if delivered and (today - date.fromisoformat(str(delivered))).days > RETURN_WINDOW_DAYS:
-        return PolicyViolation(
-            "return_window", f"the {RETURN_WINDOW_DAYS} day return window has passed"
-        )
-    return None

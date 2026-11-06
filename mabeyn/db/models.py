@@ -240,6 +240,10 @@ class ToolDefinition(TenantModel):
     http_method: Mapped[str] = mapped_column(String(10))
     url_template: Mapped[str] = mapped_column(String(2048))
     requires_identity: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
+    # Argument policies checked in code before the call runs (see mabeyn/guard/policy_specs.py).
+    policies: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSONB, server_default=text("'[]'::jsonb")
+    )
 
 
 class ToolCall(TenantModel):
