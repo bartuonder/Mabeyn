@@ -197,6 +197,8 @@ sequenceDiagram
 
 A new customer message while an approval is pending gets a short reminder instead of starting another run. An approval nobody decides within 72 hours is closed as `expired` by a worker job (every ten minutes): the tool call is rejected, the conversation resumes with a note that the review period ended, and the customer gets that answer as a new message. Deciding an expired request returns `409`. The pending request survives an API restart because the paused state lives in PostgreSQL.
 
+A tenant can set an approval webhook (`PUT /settings/notifications`). A worker job (every minute) POSTs each new pending approval to it as a JSON event (`approval.pending`: ids, tool, summary, expiry; no customer data), signed with HMAC-SHA256 in `X-Mabeyn-Signature` using a secret that is shown once when the URL is set. The URL must resolve to a public host. A failed delivery is retried on the next runs, five times at most. Approvals that were already pending when the webhook was set are not announced.
+
 ## 6. Tools
 
 - Tenants register tools with a JSON Schema, an HTTP method, a URL template and a risk level (`read`, `write`, `sensitive`). Registration rejects unsafe definitions: reserved argument names, unsupported schema keywords, relative URLs, path parameters that are not required properties.
@@ -339,7 +341,7 @@ See [evaluation.md](evaluation.md) for the datasets, metrics and how to run them
 - The firewall adds a small-model call to every message and a call per passage at ingestion.
 - Cached answers can be stale for up to a day when documents change outside the API; the semantic match relies on a small model and was checked on a small pair set.
 - Usage numbers cover the answer path only, and the price table is an estimate.
-- Nobody is notified of a pending approval (the admin has to open the queue), and a human colleague has no endpoint to answer an escalated conversation yet.
+- The approval webhook is the only notification channel (no e-mail or chat integration), and a human colleague has no endpoint to answer an escalated conversation yet.
 - Two simultaneous messages in one conversation are not serialised.
 - Customer identity is only as trustworthy as the API key that opened the session, see [ADR-0005](adr/0005-customer-session-trust.md). Memory inherits this: whoever can open a session as a customer can read and erase that customer's notes.
 - The memory store has no row-level security; isolation rests on the namespace.
