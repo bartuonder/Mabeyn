@@ -36,18 +36,24 @@ action agent ── read / write tool ──> executes, audits in tool_calls
 Requirements: Docker, [uv](https://docs.astral.sh/uv/), an OpenAI API key.
 
 ```bash
+git clone https://github.com/bartuonder/Mabeyn.git && cd Mabeyn
 cp .env.example .env                 # add OPENAI_API_KEY
-docker compose up -d --build         # api, worker, mock shop, postgres (pgvector), redis; migrations run first
-uv sync
-uv run python -m mabeyn.cli seed-kargoshop --shop-url http://kargoshop-mock:9000   # demo tenant: 32 documents, 5 tools
+make demo                            # services, migrations, demo tenant, 32 documents, 5 tools
 curl localhost:8000/health
+```
+
+`make demo` needs only Docker. The demo admin is `admin@kargoshop.example` with the password `demo-admin-password` (set `DEMO_ADMIN_PASSWORD` before the first run to change it; an existing tenant keeps its password). The same steps by hand:
+
+```bash
+docker compose up -d --build         # api, worker, mock shop, postgres (pgvector), redis; migrations run first
+docker compose --profile seed run --rm seed
 ```
 
 Create a customer session and chat (streaming Server-Sent Events):
 
 ```bash
 TOKEN=$(curl -s -X POST localhost:8000/auth/login -H 'content-type: application/json' \
-  -d '{"email": "admin@kargoshop.example", "password": "<demo password>"}' | jq -r .access_token)
+  -d '{"email": "admin@kargoshop.example", "password": "demo-admin-password"}' | jq -r .access_token)
 KEY=$(curl -s -X POST localhost:8000/api-keys -H "Authorization: Bearer $TOKEN" \
   -H 'content-type: application/json' -d '{"name": "widget"}' | jq -r .key)
 SESSION=$(curl -s -X POST localhost:8000/sessions -H "X-API-Key: $KEY" \

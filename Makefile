@@ -1,4 +1,7 @@
-.PHONY: up down test lint typecheck migrate seed eval ablation experiments docs gate redteam firewall-eval memory-eval loadtest
+.PHONY: demo up down test lint typecheck migrate seed eval ablation experiments docs gate redteam firewall-eval memory-eval loadtest
+
+demo:
+	./scripts/demo.sh
 
 up:
 	docker compose up -d --build
