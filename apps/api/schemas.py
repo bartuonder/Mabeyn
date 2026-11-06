@@ -193,6 +193,16 @@ class FirewallSettingsUpdate(StrictRequest):
     tool_allowlist: list[str] | None = Field(default=None, max_length=100)
 
 
+class NotificationSettingsOut(Response):
+    approval_webhook_url: str | None
+    # Returned only in the response that sets the URL; use it to verify X-Mabeyn-Signature.
+    signing_secret: str | None = None
+
+
+class NotificationSettingsUpdate(StrictRequest):
+    approval_webhook_url: str | None = Field(default=None, max_length=2048, pattern="^https?://")
+
+
 class SecurityEventOut(Response):
     id: uuid.UUID
     created_at: datetime

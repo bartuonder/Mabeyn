@@ -28,7 +28,7 @@ async def test_worker_delegates_to_pipeline(monkeypatch):
 
 def test_memory_jobs_are_scheduled():
     scheduled = {job.coroutine.__name__ for job in worker.WorkerSettings.cron_jobs}
-    assert {"mine_idle_conversations", "sweep_expired_memories"} <= scheduled
+    assert {"mine_idle_conversations", "sweep_expired_memories", "notify_approvals"} <= scheduled
 
 
 async def test_memory_jobs_use_the_shared_memory_service(monkeypatch):

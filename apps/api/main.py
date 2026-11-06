@@ -13,6 +13,7 @@ from apps.api.routers import (
     documents,
     health,
     memory,
+    notifications,
     security,
     sessions,
     tools,
@@ -51,6 +52,7 @@ def create_app() -> FastAPI:
     app.include_router(chat.router)
     app.include_router(approvals.router)
     app.include_router(memory.router)
+    app.include_router(notifications.router)
     app.include_router(security.router)
     app.include_router(usage.router)
     app.include_router(cache.router)

@@ -14,6 +14,7 @@ from mabeyn.guard.firewall import Firewall
 from mabeyn.ingestion.pipeline import ingest_document
 from mabeyn.llm.client import get_llm
 from mabeyn.memory.idle import extract_idle
+from mabeyn.notify.webhook import notify_pending_approvals
 
 
 async def ingest(ctx: dict[str, Any], tenant_id: str, document_id: str) -> str:
@@ -36,6 +37,10 @@ async def expire_pending_approvals(ctx: dict[str, Any]) -> int:
     return await expire_stale_approvals(ctx["runtime"].service)
 
 
+async def notify_approvals(ctx: dict[str, Any]) -> int:
+    return await notify_pending_approvals()
+
+
 async def startup(ctx: dict[str, Any]) -> None:
     export_tracking_env()
     configure_logging(get_settings().log_level)
@@ -55,6 +60,7 @@ class WorkerSettings:
     cron_jobs = [
         cron(mine_idle_conversations, minute=set(range(0, 60, 5)), run_at_startup=False),
         cron(sweep_expired_memories, minute={17}, run_at_startup=False),
+        cron(notify_approvals, minute=set(range(60)), run_at_startup=False),
         cron(expire_pending_approvals, minute=set(range(3, 60, 10)), run_at_startup=False),
     ]
     on_startup = startup
