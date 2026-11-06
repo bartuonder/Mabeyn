@@ -33,6 +33,6 @@ input_guard → supervisor → dispatch ⇄ {knowledge_agent | action agent | es
 
 - Mixed requests cost more model calls and latency than a single agent.
 - Routing mistakes are possible; routing accuracy is part of the tool-use evaluation.
-- The checkpoint tables have no tenant column, so row-level security cannot protect them. They are only reached through thread ids built from verified identity, and resuming requires an `Approval` row that is itself protected by row-level security.
+- The checkpoint tables have no tenant column. Their thread id is `<tenant>:<conversation>`, and a policy compares its tenant part with `app.tenant_id` (see [ADR-0006](0006-customer-memory.md) for how the setting reaches pooled connections). Resuming also requires an `Approval` row that is protected on its own.
 - Resuming happens inside the approval request. A failure there leaves the approval pending so it can be retried.
 - psycopg's async mode needs the selector event loop on Windows; Linux containers are unaffected.

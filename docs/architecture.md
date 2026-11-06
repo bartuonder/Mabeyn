@@ -279,8 +279,8 @@ Rationale and measurements: [ADR-0007](adr/0007-cost-cache-and-eval-gate.md).
 | Data | Where | Protection |
 | --- | --- | --- |
 | Documents, chunks, conversations, messages, tools, tool calls, approvals | PostgreSQL tables | `tenant_id` column and Row-Level Security; the API role cannot bypass it |
-| Graph checkpoints | `checkpoints*` tables | Thread id carries the tenant; tables have no RLS, resuming requires an approval row that is itself protected |
-| Customer memory | `store` table | Namespace `(tenant_id, customer_id)` built from the verified identity; no RLS ([ADR-0006](adr/0006-customer-memory.md)) |
+| Graph checkpoints | `checkpoints`, `checkpoint_blobs`, `checkpoint_writes` | Thread id `<tenant>:<conversation>`; Row-Level Security on its tenant part, set per borrowed connection (see below) |
+| Customer memory | `store` table | Namespace `(tenant_id, customer_id)` built from the verified identity, plus Row-Level Security on the namespace's tenant part ([ADR-0006](adr/0006-customer-memory.md)) |
 | Firewall settings and security events | `tenant_settings`, `security_events` | `tenant_id` column and Row-Level Security |
 | Cached answers | `answer_cache` table, Redis keys | Table under Row-Level Security; Redis keys carry the tenant id and are dropped with a counter |
 | Conversation summaries | `conversations.summary` | Same as conversations |
@@ -344,7 +344,7 @@ See [evaluation.md](evaluation.md) for the datasets, metrics and how to run them
 - The approval webhook is the only notification channel (no e-mail or chat integration), and a human colleague has no endpoint to answer an escalated conversation yet.
 - Two simultaneous messages in one conversation are not serialised.
 - Customer identity is only as trustworthy as the API key that opened the session, see [ADR-0005](adr/0005-customer-session-trust.md). Memory inherits this: whoever can open a session as a customer can read and erase that customer's notes.
-- The memory store has no row-level security; isolation rests on the namespace.
+- The LangGraph tables have no `tenant_id` column; their policies read the tenant out of the thread id and the namespace, which only holds as long as every writer builds them with `TurnContext.thread_id` and `namespace()`.
 - Notes are statements by the customer and are not verified. A false claim can be stored as a harmless-looking fact and repeated back, but it cannot grant anything.
 - Refund requests in Turkish are the weakest tool-calling case: on a diagnostic set of seven phrasings the agent reached the approval queue in 27 of 28 valid cases after the prompt fix, and a question-form request ("can I return it?") may still end with a clarifying answer instead of a call.
 - Customers cannot switch memory off for themselves, only erase it.
