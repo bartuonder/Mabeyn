@@ -76,6 +76,24 @@ Admins use `GET` and `DELETE /customers/{customer_id}/memory` for the same, for 
 
 Documents are added with `POST /documents` (PDF, Markdown, HTML upload) or `POST /documents/url`. Tools are managed with `POST /tools` and `DELETE /tools/{id}` (a tool can carry `policies` that check its arguments against a real record, see [ADR-0003](docs/adr/0003-defense-layers.md)); pending refunds are listed with `GET /approvals?status=pending` and decided with `POST /approvals/{id}`. Set `PUT /settings/notifications` with an `approval_webhook_url` to get a signed `approval.pending` event for every new request.
 
+### Chat widget and demo storefront
+
+`make demo` also starts a fictional shop at <http://localhost:9100>. Pick a demo customer in the header and open the chat bubble: a visitor gets an anonymous session, a signed-in customer gets order lookups, refunds that wait for a human, and memory. Approve the refund with `POST /approvals/{id}` and the answer appears in the widget by itself.
+
+A tenant embeds the widget with one script tag. For anonymous visitors use a publishable key (it is safe in a page and checks the site's origin):
+
+```html
+<script src="https://YOUR-API/widget.js" data-key="mbn_pub_..." async></script>
+```
+
+For signed-in customers the shop's own server opens the session with its secret key and the page points the widget at that endpoint (see `apps/kargoshop_site`):
+
+```html
+<script src="https://YOUR-API/widget.js" data-session-url="/support/session" async></script>
+```
+
+The widget streams answers, shows the sources an answer cites, lets the customer start a new chat (which stores what is worth remembering) and keeps the conversation across page loads. Optional attributes: `data-title`, `data-greeting`, `data-color`, `data-api`. The API allows browser calls from any origin because every call carries a bearer token or key and never a cookie (`CORS_ALLOW_ORIGINS` narrows it). `make widget-e2e` drives the whole walk-through in a real headless Chromium and leaves screenshots in `tests/e2e/shots`.
+
 ## Development
 
 ```bash
