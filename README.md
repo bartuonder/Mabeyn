@@ -68,7 +68,7 @@ API keys come in two kinds ([ADR-0005](docs/adr/0005-customer-session-trust.md))
 
 Admins use `GET` and `DELETE /customers/{customer_id}/memory` for the same, for example to answer a deletion request.
 
-Documents are added with `POST /documents` (PDF, Markdown, HTML upload) or `POST /documents/url`. Tools are managed with `POST /tools` and `DELETE /tools/{id}`; pending refunds are listed with `GET /approvals?status=pending` and decided with `POST /approvals/{id}`.
+Documents are added with `POST /documents` (PDF, Markdown, HTML upload) or `POST /documents/url`. Tools are managed with `POST /tools` and `DELETE /tools/{id}` (a tool can carry `policies` that check its arguments against a real record, see [ADR-0003](docs/adr/0003-defense-layers.md)); pending refunds are listed with `GET /approvals?status=pending` and decided with `POST /approvals/{id}`.
 
 ## Development
 
