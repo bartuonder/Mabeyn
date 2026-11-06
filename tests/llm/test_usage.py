@@ -45,3 +45,14 @@ def test_ledger_roundtrip(tmp_path, monkeypatch):
 
 def test_ledger_total_of_missing_file_is_zero(tmp_path):
     assert usage.ledger_total(tmp_path / "missing.jsonl") == 0.0
+
+
+def test_a_nested_measure_adds_its_usage_to_the_outer_one():
+    with usage.measure() as outer:
+        usage.record("gpt-4o-mini", 100, 10)
+        with usage.measure() as inner:
+            usage.record("gpt-4.1-mini", 1000, 100)
+            assert outer.calls == 1  # not yet: the inner block is still open
+        assert inner.calls == 1 and outer.calls == 2
+    assert outer.input_tokens == 1100
+    assert outer.cost_usd == inner.cost_usd + usage.cost_usd("gpt-4o-mini", 100, 10)

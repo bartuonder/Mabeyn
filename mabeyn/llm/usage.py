@@ -42,6 +42,13 @@ class UsageMeter:
         self.output_tokens += output_tokens
         self.cost_usd += cost_usd(model, input_tokens, output_tokens)
 
+    def merge(self, other: "UsageMeter") -> None:
+        self.calls += other.calls
+        self.input_tokens += other.input_tokens
+        self.output_tokens += other.output_tokens
+        self.cost_usd += other.cost_usd
+        self.latency_adjustment_s += other.latency_adjustment_s
+
 
 _current: ContextVar[UsageMeter | None] = ContextVar("usage_meter", default=None)
 _ledger_lock = threading.Lock()
@@ -49,13 +56,20 @@ _ledger_lock = threading.Lock()
 
 @contextmanager
 def measure() -> Iterator[UsageMeter]:
-    """Collect usage of every LLM call made inside the block."""
+    """Collect usage of every LLM call made inside the block.
+
+    Blocks nest: what an inner block collected is added to the block around it when it ends, so a
+    service that measures its own turns does not hide them from an evaluation that measures the run.
+    """
+    parent = _current.get()
     meter = UsageMeter()
     token = _current.set(meter)
     try:
         yield meter
     finally:
         _current.reset(token)
+        if parent is not None:
+            parent.merge(meter)
 
 
 def current_meter() -> UsageMeter | None:
