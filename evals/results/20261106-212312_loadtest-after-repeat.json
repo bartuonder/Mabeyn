@@ -1,0 +1,102 @@
+{
+  "name": "loadtest-after-repeat",
+  "created_at": "2026-11-06T21:23:12",
+  "provenance": {
+    "commit": "b21137c1080d435f3cc3dd0ba444d71973a4ce59",
+    "dirty": false,
+    "prompt_versions": {
+      "rag": "rag-v7",
+      "agents": "agents-v14",
+      "memory": "memory-v3",
+      "guard": "guard-v2",
+      "cache": "cache-v1"
+    },
+    "models": {
+      "generation": "gpt-4.1-mini",
+      "small": "gpt-4o-mini",
+      "judge": "gpt-4.1-mini",
+      "embedding": "text-embedding-3-small"
+    }
+  },
+  "config": {
+    "users": 50,
+    "run_time_s": 40,
+    "host": "http://localhost:8000"
+  },
+  "results": [
+    {
+      "mode": "off",
+      "stats": {
+        "POST /sessions": {
+          "requests": 77.0,
+          "failures": 0.0,
+          "p50_ms": 21.0,
+          "p95_ms": 49.0,
+          "mean_ms": 22.43765800898024
+        },
+        "chat: knowledge": {
+          "requests": 74.0,
+          "failures": 0.0,
+          "p50_ms": 8000.0,
+          "p95_ms": 11000.0,
+          "mean_ms": 8303.96110194537
+        },
+        "chat: order lookup": {
+          "requests": 30.0,
+          "failures": 0.0,
+          "p50_ms": 4400.0,
+          "p95_ms": 5200.0,
+          "mean_ms": 4431.005836161785
+        },
+        "Aggregated": {
+          "requests": 181.0,
+          "failures": 0.0,
+          "p50_ms": 4300.0,
+          "p95_ms": 8900.0,
+          "mean_ms": 4138.9557806381345
+        }
+      },
+      "messages": 107.0,
+      "cache_hit_rate": 0.0,
+      "cost_usd": 0.172831,
+      "cost_per_message_usd": 0.0016152429906542058
+    },
+    {
+      "mode": "on",
+      "stats": {
+        "POST /sessions": {
+          "requests": 85.0,
+          "failures": 0.0,
+          "p50_ms": 25.0,
+          "p95_ms": 50.0,
+          "mean_ms": 23.745605387889288
+        },
+        "chat: knowledge": {
+          "requests": 107.0,
+          "failures": 0.0,
+          "p50_ms": 1100.0,
+          "p95_ms": 8100.0,
+          "mean_ms": 1802.4838593729694
+        },
+        "chat: order lookup": {
+          "requests": 45.0,
+          "failures": 0.0,
+          "p50_ms": 4200.0,
+          "p95_ms": 4900.0,
+          "mean_ms": 4184.098880622898
+        },
+        "Aggregated": {
+          "requests": 237.0,
+          "failures": 0.0,
+          "p50_ms": 970.0,
+          "p95_ms": 5100.0,
+          "mean_ms": 1616.7451436240874
+        }
+      },
+      "messages": 153.0,
+      "cache_hit_rate": 0.6339869281045751,
+      "cost_usd": 0.07812900000000006,
+      "cost_per_message_usd": 0.0005106470588235298
+    }
+  ]
+}

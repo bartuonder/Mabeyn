@@ -282,6 +282,35 @@ Every assistant message stores its tokens, model calls, estimated cost and laten
 - The gate found its own flaws too: reruns on a new tenant missed the cache because retrieval ordered equal scores by random ids (now by title and section), and the tool scenario for an expired refund window used to be flaky because only the prompt enforced the return window; a deterministic tool policy now blocks such refunds before an approval opens (the limit still leaves room for one miss).
 - The CI job has not run on GitHub yet; it needs the repository secret `OPENAI_API_KEY` and is skipped for forks.
 
+### Measured again after the later changes
+
+Row-level security on the checkpoint and memory tables, the tenant policies, the approval webhook and the multi-turn firewall came after the numbers above. The development sets were run again from an empty evaluation cache (every model call real). The held-out sets and the public prompt-injection set were **not** rerun: they are single measurements, and rerunning them after changes would turn them into development sets.
+
+| | Before | After | Files |
+| --- | ---: | ---: | --- |
+| Memory, development (15): scenarios passed | 15 of 15 | 15 of 15 | [`memory-eval-after`](evals/results/memory-eval-after.md) |
+| Other customers' notes in an answer / poisoned data stored / refunds without approval | 0 / 0 / 0 | 0 / 0 / 0 | |
+| Red-team, firewall off: attacks that worked | 10 of 80 | 9 of 80 | [`redteam-eval-after`](evals/results/redteam-eval-after.md) |
+| Red-team, firewall on: attacks that worked | 0 of 80 [0-0.05] | 0 of 80 [0-0.05] | |
+| Harmless messages blocked | 1 of 80 (`rt-b26`) | 1 of 80 (`rt-b26`) | |
+| Poisoned documents flagged / genuine passages flagged | 15 of 15 / 0 of 33 | 15 of 15 / 0 of 33 | |
+| Harmless messages handled as expected | 0.963 | 0.950 | |
+
+- The small drop in harmless messages handled as expected is three requests that the assistant handed to a human instead of answering (a charge dispute, a carrier preference, "keep my preferences saved"); the last one was handed over before too. The set is 80 messages, and one more or fewer is inside the noise.
+- The cost columns of the tool and memory runs from 4 November to the fix `8a9cb39` read too low, see the last note of [docs/evaluation.md](docs/evaluation.md); the numbers here come from after it.
+
+**Latency and cost, three load runs.** Same test as above (50 simulated customers, 40 seconds, the live compose stack, real model calls). Each row is one run, so the spread between runs is what the table is for:
+
+| Run | Knowledge, cache off: p50 / p95 | Knowledge, cache on: p50 / p95 | Order lookups: p50 | Cache hit rate | Cost per message (off / on) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Before the changes | 7.6 s / 16 s | 1.1 s / 14 s | 4.3 s | 59% | $0.00177 / $0.00075 |
+| After, run 1 ([`loadtest-after`](evals/results/loadtest-after.md)) | 10.0 s / 16 s | 1.1 s / 8.7 s | 4.6 s | 64% | $0.00163 / $0.00050 |
+| After, run 2 ([`loadtest-after-repeat`](evals/results/loadtest-after-repeat.md)) | 8.0 s / 11 s | 1.1 s / 8.1 s | 4.4 s | 63% | $0.00162 / $0.00051 |
+
+- No request failed in any run. The uncached median of a knowledge question moved between 7.6 and 10.0 s without a change in between, which is the noise of one 40-second run against a model API; the cached median and the order lookups did not move. Nothing here shows a slowdown from the changes, and nothing here is precise enough to show a speed-up either.
+- The part of the change that sits on every request is the tenant-aware connection pool of the checkpoint and memory tables. Measured alone against the local database, borrowing a connection costs 0.36 ms instead of 0.12 ms (two small statements that set and clear the tenant). A single-turn conversation leaves a median of 87 checkpoint and write rows in the development database (1,501 conversations), so even if every row cost one borrow the extra time is about 20 ms in a turn that takes seconds.
+- The cost per message with the cache on is lower than before because the hit rate is higher in the later runs; the uncached cost per message stays at $0.0016-0.0018.
+
 ## Status
 
 - Phase 1 — foundation, tenant isolation, auth: done
