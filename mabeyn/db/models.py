@@ -278,6 +278,8 @@ class Approval(TenantModel):
     )
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    notified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    notify_attempts: Mapped[int] = mapped_column(Integer, server_default=text("0"))
 
 
 class SecurityEvent(TenantModel):
@@ -303,6 +305,8 @@ class TenantSettings(Base):
     write_rate_limit: Mapped[int] = mapped_column(Integer, server_default=text("5"))
     write_rate_window_minutes: Mapped[int] = mapped_column(Integer, server_default=text("60"))
     tool_allowlist: Mapped[list[str] | None] = mapped_column(JSONB)
+    approval_webhook_url: Mapped[str | None] = mapped_column(Text)
+    approval_webhook_secret: Mapped[str | None] = mapped_column(Text)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )

@@ -54,6 +54,9 @@ class Settings(BaseSettings):
 
     # A pending approval nobody decides within this time is closed as expired.
     approval_ttl_hours: int = 72
+    # Pending approvals are announced to the tenant's webhook; failed deliveries are retried.
+    webhook_timeout_seconds: float = 5.0
+    webhook_max_attempts: int = 5
 
     # Answer cache for knowledge questions.
     cache_enabled: bool = True
