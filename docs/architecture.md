@@ -24,6 +24,7 @@ flowchart LR
 | Worker (`apps/worker`) | Background jobs (arq on Redis): document ingestion, memory extraction for idle conversations, expiry sweep |
 | PostgreSQL | Tenant data under Row-Level Security, pgvector index, full text index, graph checkpoints, customer memory |
 | Supervisor and RAG graphs (`mabeyn/agents`, `mabeyn/rag`) | LangGraph workflows described below |
+| Admin panel (`apps/admin`) | Next.js app for tenant admins: approvals, documents, tools, security events and settings, conversations, usage, API keys. Server components call the API with tokens from httpOnly cookies; a proxy renews expired access tokens |
 | Chat widget (`apps/api/static/widget.js`) | One script tag for the tenant's site: opens a session, streams answers over SSE, shows cited sources, and polls for answers that arrive after an approval. Served by the API at `/widget.js` |
 | Tenant backend | The tenant's own API, reached only through registered tools (`apps/kargoshop_mock` in the demo) |
 | Tenant storefront (`apps/kargoshop_site`) | The demo shop that embeds the widget. It plays the tenant's server: it opens customer sessions with a secret key so the browser never holds it |

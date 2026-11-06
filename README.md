@@ -76,6 +76,12 @@ Admins use `GET` and `DELETE /customers/{customer_id}/memory` for the same, for 
 
 Documents are added with `POST /documents` (PDF, Markdown, HTML upload) or `POST /documents/url`. Tools are managed with `POST /tools` and `DELETE /tools/{id}` (a tool can carry `policies` that check its arguments against a real record, see [ADR-0003](docs/adr/0003-defense-layers.md)); pending refunds are listed with `GET /approvals?status=pending` and decided with `POST /approvals/{id}`. Set `PUT /settings/notifications` with an `approval_webhook_url` to get a signed `approval.pending` event for every new request.
 
+### Admin panel
+
+<http://localhost:3100> (Next.js, `apps/admin`) is where a tenant admin runs the assistant: decide pending approvals (with the arguments, the customer and the conversation next to the decision), upload and delete documents and watch them being processed, register tools with their argument policies, read the security events and tune the firewall and the approval webhook, browse conversations (and erase what the assistant remembers about a customer), see usage and cost per day, clear the answer cache, and manage API keys. Sign in with the demo admin login that `make demo` prints.
+
+The panel talks to the API only from its own server, with the admin's tokens kept in httpOnly cookies (an expired access token is renewed with the refresh token before a page renders), so the browser never sees a token and the API needs no CORS rule for it. It is built in Docker, so the machine needs no Node. `make admin-e2e` drives it in a real headless Chromium: sign-in with a wrong and a right password, a refund that a customer asked for and the admin approves, a document upload that is processed and deleted, a tool created and rejected for invalid JSON (the typed fields stay), the firewall and webhook settings, an API key created and revoked, and sign-out.
+
 ### Chat widget and demo storefront
 
 `make demo` also starts a fictional shop at <http://localhost:9100>. Pick a demo customer in the header and open the chat bubble: a visitor gets an anonymous session, a signed-in customer gets order lookups, refunds that wait for a human, and memory. Approve the refund with `POST /approvals/{id}` and the answer appears in the widget by itself.
