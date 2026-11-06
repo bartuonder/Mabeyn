@@ -113,7 +113,7 @@ Tests and evaluations send traces to LangSmith when `.env` enables tracing; test
 
 ## Results
 
-Demo tenant KargoShop: 26 Turkish and 6 English documents, including an old and a new return policy that contradict each other. 80 Turkish golden questions (16 unanswerable). Chunks of 300–600 tokens, `text-embedding-3-small`, `gpt-4.1-mini` for answers and judging, `gpt-4o-mini` for rewriting, grading, reranking and faithfulness checks. Raw runs: [`evals/results`](evals/results).
+Demo tenant KargoShop: 26 Turkish and 6 English documents, including an old and a new return policy that contradict each other. 80 Turkish golden questions (16 unanswerable). Chunks of 300–600 tokens, `text-embedding-3-small`, `gpt-4.1-mini` for answers and judging, `gpt-4o-mini` for rewriting, grading, reranking and faithfulness checks. Raw runs: [`evals/results`](evals/results). Ten failures traced to their causes, with what was fixed and what was not: [docs/error-analysis.md](docs/error-analysis.md).
 
 ### RAG ablation (development set, 80 questions)
 
