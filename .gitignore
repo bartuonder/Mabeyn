@@ -32,3 +32,4 @@ evals/results/*.tmp.json
 evals/.cache/
 evals/.ledger.jsonl
 wandb/
+tests/e2e/shots/
