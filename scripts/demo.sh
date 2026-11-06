@@ -22,15 +22,16 @@ fi
 PASSWORD="${DEMO_ADMIN_PASSWORD:-demo-admin-password}"
 export DEMO_ADMIN_PASSWORD="$PASSWORD"
 
-docker compose up -d --build --wait api worker kargoshop-mock
+docker compose up -d --build --wait api worker kargoshop-mock kargoshop-site
 docker compose --profile seed run --rm seed
 
 cat <<MSG
 
 Mabeyn is running.
   API            http://localhost:8000  (docs: http://localhost:8000/docs)
-  Mock shop      http://localhost:9000
+  Storefront     http://localhost:9100  (demo shop with the chat widget)
+  Mock shop API  http://localhost:9000
   Admin login    admin@kargoshop.example / $PASSWORD
 
-Try a customer chat: see "Quick start" in README.md or docs/demo-scenarios.md.
+Open the storefront, pick a demo customer and chat. Scenarios: docs/demo-scenarios.md.
 MSG

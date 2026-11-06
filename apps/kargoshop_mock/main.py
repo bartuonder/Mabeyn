@@ -95,6 +95,11 @@ def create_app(store: Store | None = None) -> FastAPI:
             orders = [o for o in orders if o["status"] == order_status]
         return sorted(orders, key=lambda o: o["placed_at"], reverse=True)
 
+    @app.get("/refunds")
+    async def list_refunds(customer_id: str) -> list[dict[str, Any]]:
+        owned = {o["id"] for o in store.orders.values() if o["customer_id"] == customer_id}
+        return [r for r in store.refunds if r["order_id"] in owned]
+
     @app.get("/orders/{order_id}")
     async def get_order(order_id: str, customer_id: str) -> dict[str, Any]:
         return store.order_for(order_id, customer_id)

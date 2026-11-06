@@ -33,6 +33,23 @@ services:
     ports:
       - "9000:9000"
 
+  kargoshop-site:
+    build: .
+    command: ["uvicorn", "apps.kargoshop_site.main:app", "--host", "0.0.0.0", "--port", "9100"]
+    ports:
+      - "9100:9100"
+    environment:
+      MABEYN_API_URL: http://api:8000
+      MABEYN_PUBLIC_API_URL: http://localhost:8000
+      SHOP_API_URL: http://kargoshop-mock:9000
+      SITE_ORIGIN: http://localhost:9100
+      DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:-demo-admin-password}
+    depends_on:
+      api:
+        condition: service_healthy
+      kargoshop-mock:
+        condition: service_started
+
   worker:
     build: .
     command: ["arq", "apps.worker.main.WorkerSettings"]

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KargoShop</title>
+  <style>
+    :root { --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --brand:#2563eb; --bg:#f8fafc; }
+    @media (prefers-color-scheme: dark) {
+      :root { --ink:#f3f4f6; --muted:#9ca3af; --line:#374151; --brand:#60a5fa; --bg:#0f172a; --card:#1e293b; }
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:var(--bg); }
+    header { display:flex; align-items:center; gap:16px; padding:14px 24px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+    header h1 { margin:0; font-size:20px; flex:1; }
+    header label { font-size:14px; color:var(--muted); }
+    select { padding:6px 10px; border-radius:8px; border:1px solid var(--line); background:transparent; color:inherit; font-size:14px; }
+    main { max-width:1000px; margin:0 auto; padding:24px 16px 120px; }
+    .hero { padding:28px 0 12px; }
+    .hero h2 { margin:0 0 6px; font-size:28px; }
+    .hero p { margin:0; color:var(--muted); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; margin:20px 0 32px; }
+    .card { border:1px solid var(--line); border-radius:12px; padding:14px; background:var(--card, #fff); }
+    .card .ph { height:90px; border-radius:8px; background:linear-gradient(135deg,#dbeafe,#e0e7ff); margin-bottom:10px; }
+    .card h3 { margin:0 0 4px; font-size:15px; }
+    .card p { margin:0; color:var(--muted); font-size:14px; }
+    h2.section { font-size:18px; margin:24px 0 8px; }
+    table { width:100%; border-collapse:collapse; font-size:14px; background:var(--card, #fff); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+    th, td { text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); }
+    th { color:var(--muted); font-weight:500; }
+    .tag { font-size:12px; padding:2px 8px; border-radius:999px; background:#e0e7ff; color:#3730a3; }
+    .empty { color:var(--muted); font-size:14px; }
+    @media (max-width: 480px) { header { padding:12px 16px; } th:nth-child(3), td:nth-child(3) { display:none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>KargoShop</h1>
+    <label>Demo customer
+      <select id="who" aria-label="Demo customer"></select>
+    </label>
+  </header>
+  <main>
+    <section class="hero">
+      <h2>Everyday tech, delivered.</h2>
+      <p>Ask the support assistant in the corner about delivery, returns, warranty or your orders.</p>
+    </section>
+    <section class="grid" aria-label="Products">
+      <div class="card"><div class="ph"></div><h3>Wireless Earbuds B300</h3><p>899.90 TRY</p></div>
+      <div class="card"><div class="ph"></div><h3>Air Fryer F6</h3><p>2,499.00 TRY</p></div>
+      <div class="card"><div class="ph"></div><h3>Power Bank P20</h3><p>649.90 TRY</p></div>
+      <div class="card"><div class="ph"></div><h3>Smart Watch X2</h3><p>1,999.00 TRY</p></div>
+      <div class="card"><div class="ph"></div><h3>Robot Vacuum R5</h3><p>8,999.00 TRY</p></div>
+    </section>
+    <h2 class="section">My orders</h2>
+    <div id="orders"><p class="empty">Choose a demo customer to see their orders.</p></div>
+  </main>
+
+  <script>
+    var API_URL = "{{API_URL}}";
+    var who = document.getElementById("who");
+    var ordersBox = document.getElementById("orders");
+
+    function clearWidgetState() {
+      Object.keys(sessionStorage).forEach(function (k) {
+        if (k.indexOf("mabeyn-widget:") === 0) sessionStorage.removeItem(k);
+      });
+    }
+
+    function cell(text) {
+      var td = document.createElement("td");
+      td.textContent = text;
+      return td;
+    }
+
+    async function showOrders() {
+      var data = await (await fetch("/api/orders")).json();
+      if (!data.orders.length) {
+        ordersBox.innerHTML = '<p class="empty">Choose a demo customer to see their orders.</p>';
+        return;
+      }
+      var refunds = {};
+      data.refunds.forEach(function (r) { refunds[r.order_id] = r; });
+      var table = document.createElement("table");
+      table.innerHTML = "<thead><tr><th>Order</th><th>Items</th><th>Placed</th><th>Status</th></tr></thead>";
+      var body = document.createElement("tbody");
+      data.orders.forEach(function (o) {
+        var row = document.createElement("tr");
+        row.appendChild(cell(o.id));
+        row.appendChild(cell(o.items.map(function (i) { return i.quantity + " x " + i.name; }).join(", ")));
+        row.appendChild(cell(o.placed_at));
+        var status = cell(o.status);
+        if (refunds[o.id]) {
+          var tag = document.createElement("span");
+          tag.className = "tag";
+          tag.textContent = "refund " + refunds[o.id].status;
+          status.appendChild(document.createTextNode(" "));
+          status.appendChild(tag);
+        }
+        row.appendChild(status);
+        body.appendChild(row);
+      });
+      table.appendChild(body);
+      ordersBox.replaceChildren(table);
+    }
+
+    function loadWidget(me) {
+      var tag = document.createElement("script");
+      tag.src = API_URL + "/widget.js";
+      tag.dataset.api = API_URL;
+      tag.dataset.title = "KargoShop Support";
+      if (me.customer) tag.dataset.sessionUrl = "/support/session";
+      else if (me.publishable_key) tag.dataset.key = me.publishable_key;
+      else return;
+      tag.async = true;
+      document.body.appendChild(tag);
+    }
+
+    async function start() {
+      var me = await (await fetch("/me")).json();
+      who.innerHTML = '<option value="">Not signed in (visitor)</option>';
+      Object.keys(me.customers).forEach(function (id) {
+        var option = document.createElement("option");
+        option.value = id;
+        option.textContent = me.customers[id] + " (" + id + ")";
+        who.appendChild(option);
+      });
+      who.value = me.customer || "";
+      who.addEventListener("change", async function () {
+        await fetch("/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ customer: who.value || null }) });
+        clearWidgetState();
+        location.reload();
+      });
+      loadWidget(me);
+      showOrders();
+      setInterval(showOrders, 5000);
+    }
+    start();
+  </script>
+</body>
+</html>

@@ -150,3 +150,14 @@ async def test_tickets_and_refunds_are_numbered_from_one_so_evaluations_can_repl
 
     assert await create_two_tickets() == ["T-0001", "T-0002"]
     assert await create_two_tickets() == ["T-0001", "T-0002"]
+
+
+async def test_refunds_are_listed_per_customer(shop):
+    created = await shop.post(
+        "/orders/KS-1001/refund",
+        json={"customer_id": "customer-1", "amount": 10.0, "reason": "Changed my mind"},
+    )
+    assert created.status_code == 201
+    mine = (await shop.get("/refunds", params={"customer_id": "customer-1"})).json()
+    assert [r["order_id"] for r in mine] == ["KS-1001"]
+    assert (await shop.get("/refunds", params={"customer_id": "customer-2"})).json() == []
