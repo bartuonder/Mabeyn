@@ -50,6 +50,17 @@ services:
       kargoshop-mock:
         condition: service_started
 
+  admin:
+    build: ./apps/admin
+    ports:
+      - "3100:3000"
+    environment:
+      API_URL: http://api:8000
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    depends_on:
+      api:
+        condition: service_healthy
+
   worker:
     build: .
     command: ["arq", "apps.worker.main.WorkerSettings"]

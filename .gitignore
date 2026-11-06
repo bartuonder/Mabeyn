@@ -33,3 +33,9 @@ evals/.cache/
 evals/.ledger.jsonl
 wandb/
 tests/e2e/shots/
+
+# Admin panel
+apps/admin/node_modules/
+apps/admin/.next/
+apps/admin/next-env.d.ts
+apps/admin/*.tsbuildinfo
