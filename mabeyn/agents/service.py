@@ -16,6 +16,7 @@ from mabeyn.cache.answers import AnswerCache
 from mabeyn.core.config import get_settings
 from mabeyn.db.models import Approval, ApprovalStatus
 from mabeyn.db.session import tenant_session
+from mabeyn.db.tenant_context import tenant_scope
 from mabeyn.guard.firewall import Firewall
 from mabeyn.guard.policies import ToolGuard
 from mabeyn.llm import usage
@@ -166,7 +167,7 @@ class SupervisorService:
         }
         config = self._config(turn)
         started = time.perf_counter()
-        with usage.measure() as meter:
+        with usage.measure() as meter, tenant_scope(turn.tenant_id):
             async for mode, payload in self.graph.astream(
                 initial,
                 config,
@@ -186,7 +187,7 @@ class SupervisorService:
         verdict = "approved" if approved else ("expired" if expired else "rejected")
         decision = {"decision": verdict, "note": note}
         started = time.perf_counter()
-        with usage.measure() as meter:
+        with usage.measure() as meter, tenant_scope(turn.tenant_id):
             async for _ in self.graph.astream(
                 Command(resume=decision),
                 config,
