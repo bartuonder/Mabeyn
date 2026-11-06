@@ -33,7 +33,7 @@ action agent ── read / write tool ──> executes, audits in tool_calls
 
 ## Quick start
 
-Requirements: Docker, [uv](https://docs.astral.sh/uv/), an OpenAI API key.
+Requirements: Docker and an OpenAI API key. ([uv](https://docs.astral.sh/uv/) is only needed to run the tests and evaluations.)
 
 ```bash
 git clone https://github.com/bartuonder/Mabeyn.git && cd Mabeyn

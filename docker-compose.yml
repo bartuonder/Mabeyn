@@ -68,6 +68,7 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://mabeyn_app:mabeyn_app@postgres:5432/mabeyn
       ADMIN_DATABASE_URL: postgresql+asyncpg://mabeyn:mabeyn@postgres:5432/mabeyn
+      REDIS_URL: redis://redis:6379/0
       DEMO_ADMIN_PASSWORD: ${DEMO_ADMIN_PASSWORD:-demo-admin-password}
     env_file:
       - path: .env
@@ -75,6 +76,8 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
+      redis:
+        condition: service_healthy
 
   postgres:
     image: pgvector/pgvector:pg17
