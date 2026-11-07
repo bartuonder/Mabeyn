@@ -95,7 +95,7 @@ Two things are worth knowing before reading the cases. The pipeline is: retrieve
 
 **Request.** "Please refund order KS-2001", delivered 2026-08-05, with today 2026-11-01. The return window is 30 days.
 
-**What happened.** Most runs refused correctly; some opened an approval anyway. The saved result files only hold passing runs of this scenario (the flaky ones were rerun and not kept, the README records them). The one saved failure is incidental: in the gate run whose RAG prompt had been damaged for another purpose (`gate-tools-broken`) the same request ended as `pending_approval` with `request_refund` called.
+**What happened.** Most runs refused correctly; some opened an approval anyway. The saved result files only hold passing runs of this scenario (the flaky ones were rerun and not kept; [results.md](results.md) records them). The one saved failure is incidental: in the gate run whose RAG prompt had been damaged for another purpose (`gate-tools-broken`) the same request ended as `pending_approval` with `request_refund` called.
 
 **Why.** The window was written in the prompt and in the knowledge base, and the model had to notice the dates. A language model computing "88 days is more than 30" is right most of the time, which is the wrong standard for a rule about money.
 
@@ -131,7 +131,7 @@ Two things are worth knowing before reading the cases. The pipeline is: retrieve
 
 **Why.** A phrase list cannot tell a customer asking about a product feature from a jailbreak that uses the same words, and the rules hold a single German pattern against several English ones. Fixing the first case did not fix the class.
 
-**Status.** The first is fixed, the other two are left alone deliberately: they come from a held-out set, and fixing them would consume it. They are listed in the README as measured limits.
+**Status.** The first is fixed, the other two are left alone deliberately: they come from a held-out set, and fixing them would consume it. They are listed in [results.md](results.md) as measured limits.
 
 **Lesson.** Every rule that was added after seeing a false block fixed that case and left its neighbours.
 
