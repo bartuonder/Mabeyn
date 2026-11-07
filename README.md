@@ -1,28 +1,60 @@
 # Mabeyn
 
-A secure, multi-tenant agentic support layer between businesses and their customers.
+**A multi-tenant support agent a business can embed with one script tag: it answers from the company's documents with citations, gets work done through the company's APIs, asks a human before anything risky, remembers returning customers, and sits behind an LLM firewall. Every claim below is measured, and the measurements link to the files they came from.**
 
-Businesses connect their documents and APIs and embed a support agent in their site. The agent answers from the documents with citations, calls tools to get work done, waits for human approval on risky actions, remembers returning customers, and is guarded by an LLM firewall.
+## Try it in five minutes
 
-See [docs/ROADMAP.md](docs/ROADMAP.md) for the plan, [docs/adr](docs/adr) for design decisions and [docs/evaluation.md](docs/evaluation.md) for how every number below is produced.
+You need Docker and an OpenAI API key.
+
+```bash
+git clone https://github.com/bartuonder/Mabeyn.git && cd Mabeyn
+cp .env.example .env        # add OPENAI_API_KEY
+make demo                   # services, migrations, a demo shop, 32 documents, 5 tools
+```
+
+Then open the storefront at <http://localhost:9100>, pick a demo customer and use the chat bubble; decide approvals in the admin panel at <http://localhost:3100> (the login is printed by `make demo`). Details, API examples and the widget snippet are under [Quick start](#quick-start).
+
+## What the numbers say
+
+| What was measured | Result | Where it comes from |
+| --- | --- | --- |
+| Answers from the documents, 80 development questions | accuracy 0.95 [0.88-0.98], faithfulness 0.975, the right passage in the top 5 for every question | [`devfull-v7`](evals/results/20261105-232023_devfull-v7.json) |
+| The same on 30 fresh held-out questions, judged by a stronger model, measured once | accuracy 0.97 [0.83-0.99], faithfulness 1.00 | [`heldout2-full`](evals/results/20261101-171719_heldout2-full.json) |
+| Tool use on 15 fresh held-out scenarios | 13 of 15 passed [0.62-0.96]; no sensitive action without approval, no identity leak | [`tool-eval-heldout2`](evals/results/tool-eval-heldout2.md) |
+| Memory across two sessions, 12 fresh scenarios | 11 of 12 passed [0.65-0.99]; no data of another customer, no poisoned note stored | [`memory-eval-heldout-v2`](evals/results/memory-eval-heldout-v2.md) |
+| 80 attacks (injection, tool abuse, poisoned documents, exfiltration, memory poisoning) | firewall on: 0 worked [0-0.05]; firewall off: 9 worked; 1 of 80 harmless messages blocked | [`redteam-eval-after`](evals/results/redteam-eval-after.md) |
+| The open `deepset/prompt-injections` test set | only 23 of 44 attacks blocked, 1 of 56 harmless blocked: the input layer is not a general jailbreak detector | [`redteam-eval`](evals/results/redteam-eval.md) |
+| 50 simulated customers, answer cache off and on | knowledge questions 7.6-10 s -> 1.1 s median, $0.0016-0.0018 -> $0.0005-0.0008 per message, no failed request | [`loadtest-after`](evals/results/loadtest-after.md), [`loadtest-after-repeat`](evals/results/loadtest-after-repeat.md) |
+| Pull-request evaluation gate | 20 of 20 scenarios and 29 of 30 questions pass; a deliberately broken prompt fails it | [`gate`](evals/results/gate.md) |
+
+Intervals are 95% Wilson intervals, the sets are small, and the attacks were written by the team that wrote the defences; [Results](#results) says what each number does and does not show. Ten failures traced to their causes, fixed and not: [docs/error-analysis.md](docs/error-analysis.md). Design decisions: [docs/adr](docs/adr). How every number is produced: [docs/evaluation.md](docs/evaluation.md). The plan: [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Architecture
 
+```mermaid
+flowchart LR
+    Customer([Customer]) -->|chat, SSE| Guard[input guard<br/>rules and classifier]
+    Guard --> Cache{answer cache}
+    Cache -->|miss| Memory[recall memories]
+    Memory --> Supervisor{supervisor}
+    Supervisor --> Knowledge[knowledge agent<br/>documents only]
+    Supervisor --> Action[action agent<br/>tenant tools]
+    Supervisor --> Human[hand over to a human]
+    Action -->|sensitive tool| Approval[[approval queue]]
+    Approval -->|admin decides| Action
+    Knowledge --> Reply[output guard<br/>canary, PII masking]
+    Action --> Reply
+    Human --> Reply
+    Cache -->|hit| Reply
+    Reply --> Customer
+    Admin([Admin panel]) --> Approval
+    Docs[documents] --> Worker[worker: parse, chunk, embed] --> PG[(PostgreSQL<br/>pgvector, RLS)]
+    Knowledge --> PG
 ```
-upload ──> API ──> Redis queue ──> worker: parse → chunk → embed ──> PostgreSQL (pgvector, full text, RLS)
-                                    worker: mine idle conversations for memories, expire old ones
 
-customer ──> /chat (SSE) ──> supervisor graph (LangGraph, Postgres checkpointer)
-              input_guard (firewall) → recall_memories → supervisor ──> knowledge agent: RAG subgraph (documents only, no tools)
-                                       ──> action agent: ReAct over tenant tools (never sees documents)
-                                       ──> escalate: hand over to a human
-              → compose → output_guard (canary, PII masking)
+The assistant answers only from retrieved documents, only acts through registered tools, and never executes a sensitive action without a recorded human decision.
 
-action agent ── read / write tool ──> executes, audits in tool_calls
-              └─ sensitive tool ──> Approval record + interrupt ... admin POST /approvals/{id} resumes
-```
-
-- Tenant isolation is enforced by PostgreSQL Row-Level Security ([ADR-0001](docs/adr/0001-row-level-security.md)).
+- Tenant isolation is enforced by PostgreSQL Row-Level Security ([ADR-0001](docs/adr/0001-row-level-security.md)), including the checkpoint and memory tables ([ADR-0008](docs/adr/0008-reaching-the-platform.md)).
 - Answers cite `[document:section]`; the citation points at the section inside the retrieved chunk that holds the fact.
 - The full workflow, with diagrams generated from the code, is in [docs/architecture.md](docs/architecture.md).
 - Retrieval combines pgvector similarity with Turkish/English full text search (Reciprocal Rank Fusion), then an LLM reranker narrows 30 candidates to 6.
@@ -320,4 +352,4 @@ Row-level security on the checkpoint and memory tables, the tenant policies, the
 - Phase 5 — memory: done
 - Phase 6 — LLM firewall and red-team: done
 - Phase 7 — LLMOps, cache, performance: done
-- Phase 8 — product polish: planned, see the roadmap
+- Phase 8 — productization: `make demo`, chat widget, demo storefront, admin panel, error analysis and the README are done. The recorded demo video, the README GIF and the blog post are the last items; deployment was left out on purpose (the demo runs locally).
