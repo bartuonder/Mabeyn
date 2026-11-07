@@ -2,6 +2,10 @@
 
 **A multi-tenant support agent a business can embed with one script tag: it answers from the company's documents with citations, gets work done through the company's APIs, asks a human before anything risky, remembers returning customers, and sits behind an LLM firewall. Every claim below is measured, and the measurements link to the files they came from.**
 
+![A refund request waits for a human, the admin approves it, and the answer reaches the customer](docs/media/demo.gif)
+
+The clip above is the heart of the demo: a customer asks for a refund, the assistant stops and waits, the shop's admin reads the request and approves it, and the answer reaches the customer's chat without a reload. The full two-minute recording (a Turkish question answered from the documents, an order lookup, a blocked prompt injection and its security event) is [docs/media/demo.mp4](docs/media/demo.mp4); both are produced by `make demo-video`, see [demo/README.md](demo/README.md).
+
 ## Try it in five minutes
 
 You need Docker and an OpenAI API key.
@@ -352,4 +356,4 @@ Row-level security on the checkpoint and memory tables, the tenant policies, the
 - Phase 5 — memory: done
 - Phase 6 — LLM firewall and red-team: done
 - Phase 7 — LLMOps, cache, performance: done
-- Phase 8 — productization: `make demo`, chat widget, demo storefront, admin panel, error analysis and the README are done. The recorded demo video, the README GIF and the blog post are the last items; deployment was left out on purpose (the demo runs locally).
+- Phase 8 — productization: `make demo`, chat widget, demo storefront, admin panel, error analysis and the README are done. The recorded demo ([video](docs/media/demo.mp4), README GIF) is done; the blog post is the last item. Deployment was left out on purpose (the demo runs locally).

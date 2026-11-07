@@ -15,7 +15,7 @@ Do not start a phase before the previous one meets its definition of done.
 | 5 Memory | done | ADR-0006, [architecture.md](architecture.md#7-memory) |
 | 6 LLM firewall and red-team | done | [ADR-0003](adr/0003-defense-layers.md), [ADR-0005](adr/0005-customer-session-trust.md) implemented; the memory and checkpoint tables got row-level security later ([ADR-0008](adr/0008-reaching-the-platform.md)) |
 | 7 LLMOps, cache, performance | done | [ADR-0007](adr/0007-cost-cache-and-eval-gate.md); no Weights & Biases report |
-| 8 Productization | done except the recording | `make demo`, widget, storefront, admin panel (Next.js), error analysis, README; deployment left out on purpose; the demo video, the README GIF and the blog post are still to do. [ADR-0008](adr/0008-reaching-the-platform.md) |
+| 8 Productization | done except the blog post | `make demo`, widget, storefront, admin panel (Next.js), error analysis, README, the recorded demo and its GIF (`make demo-video`); deployment left out on purpose; the blog post is still to do. [ADR-0008](adr/0008-reaching-the-platform.md) |
 | 8 Productization | planned | The widget uses publishable keys ([ADR-0005](adr/0005-customer-session-trust.md)) |
 
 Deliberate differences from the plan below:
