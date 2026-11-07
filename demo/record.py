@@ -244,10 +244,11 @@ class Director:
         )
         self.click(self.right.locator("form:has(input[name=file]) button[type=submit]"))
         self.right.locator("p.ok").first.wait_for(timeout=30000)
-        self.right.locator("tr", has_text=title).locator(".badge", has_text="ready").wait_for(
-            timeout=90000
-        )
-        self.page.wait_for_timeout(1200)
+        row = self.right.locator("tr", has_text=title)
+        row.wait_for(timeout=30000)
+        row.scroll_into_view_if_needed()  # the new row is at the bottom: show it going to ready
+        row.locator(".badge", has_text="ready").wait_for(timeout=90000)
+        self.page.wait_for_timeout(1800)
 
 
 def chapter_intro(d: Director) -> None:

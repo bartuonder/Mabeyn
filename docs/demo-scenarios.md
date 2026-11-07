@@ -4,7 +4,7 @@ Five end-to-end scenarios on the KargoShop demo tenant. They run against the rea
 
 ## Setup
 
-A recorded walk-through of the refund scenario, a Turkish question, an order lookup and a blocked injection is in [`docs/media`](media) (`make demo-video` records it again, see [demo/README.md](../demo/README.md)).
+A recorded walk-through of the refund scenario, a Turkish question, an order lookup and a blocked injection is in [`docs/media`](media) (`make demo-media` records it again, see [demo/README.md](../demo/README.md)).
 
 The quickest way to try the scenarios is the storefront at <http://localhost:9100> after `make demo` (pick a customer, use the chat bubble). The commands below do the same through the API.
 

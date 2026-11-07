@@ -39,5 +39,5 @@ apps/admin/node_modules/
 apps/admin/.next/
 apps/admin/next-env.d.ts
 apps/admin/*.tsbuildinfo
-# Demo recordings are rebuilt with make demo-video
+# Demo recordings are rebuilt with make demo-media
 demo/out/
