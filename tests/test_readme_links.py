@@ -14,7 +14,9 @@ def test_every_file_the_readme_links_to_exists():
 
 def test_every_anchor_the_readme_links_to_is_a_heading():
     headings = {
-        re.sub(r"[^a-z0-9 -]", "", h.lower()).strip().replace(" ", "-")
+        re.sub(r"[^a-z0-9 _-]", "", h.lower()).replace(
+            " ", "-"
+        )  # GitHub keeps the leading hyphen of an emoji
         for h in re.findall(r"^#+ (.+)$", README, flags=re.MULTILINE)
     }
     anchors = set(re.findall(r"\]\(#([^)]+)\)", README))
