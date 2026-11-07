@@ -10,6 +10,7 @@
 ![Redis](https://img.shields.io/badge/Redis-DC382D?logo=redis&logoColor=white)
 ![LangGraph](https://img.shields.io/badge/LangGraph-1C3C3C?logo=langchain&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Answers from a company's own documents, does real work through its APIs, asks a human before anything risky, remembers returning customers, and sits behind an LLM firewall. The quality claims below are measured, and each measurement links to the file it came from.**
 
@@ -228,3 +229,7 @@ The full list is in [docs/architecture.md](docs/architecture.md#13-known-limitat
 | `loadtest/`, `demo/` | The load test and the scripts that record the demo video and the screenshots |
 | `migrations/`, `seed/` | Database migrations and the demo tenant's documents, tools and orders |
 | `docs/` | [Architecture](docs/architecture.md), [design decisions](docs/adr), [evaluation method](docs/evaluation.md), [results](docs/results.md), [error analysis](docs/error-analysis.md), [demo scenarios](docs/demo-scenarios.md), [roadmap](docs/ROADMAP.md) |
+
+## 📄 License
+
+[MIT](LICENSE) © 2026 Bartu Önder

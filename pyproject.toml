@@ -1,6 +1,7 @@
 [project]
 name = "mabeyn"
 version = "0.1.0"
+license = { text = "MIT" }
 description = "A secure, multi-tenant agentic support layer between businesses and their customers."
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
