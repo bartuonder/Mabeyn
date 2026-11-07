@@ -176,7 +176,6 @@ Storytelling
 - Error analysis: 10 examples where the agent was wrong, with a LangSmith trace screenshot and the cause
 - Link the ADRs under `docs/adr/` from the README
 - 2–3 minute demo video: knowledge question → order lookup → approved refund → blocked injection attempt visible in the panel
-- A blog post: how a multi-tenant agent's LLM firewall was built and measured
 
 Done when: `git clone && make demo` works in 5 minutes on a clean machine and every number in the README links to an eval result in the repo.
 
