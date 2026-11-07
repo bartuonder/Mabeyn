@@ -356,4 +356,4 @@ Row-level security on the checkpoint and memory tables, the tenant policies, the
 - Phase 5 — memory: done
 - Phase 6 — LLM firewall and red-team: done
 - Phase 7 — LLMOps, cache, performance: done
-- Phase 8 — productization: `make demo`, chat widget, demo storefront, admin panel, error analysis and the README are done. The recorded demo ([video](docs/media/demo.mp4), README GIF) is done; the blog post is the last item. Deployment was left out on purpose (the demo runs locally).
+- Phase 8 — productization: `make demo`, chat widget, demo storefront, admin panel, error analysis and the README are done. The recorded demo ([video](docs/media/demo.mp4), README GIF) and a [blog draft](docs/blog/llm-firewall.md) are done; the author still has to rework the draft in their own voice and publish it. Deployment was left out on purpose (the demo runs locally).
