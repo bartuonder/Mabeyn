@@ -1,7 +1,7 @@
 #!/bin/sh
 # Runs inside the Playwright container (see `make demo-media`): record, take screenshots, convert.
 set -eu
-pip install -q playwright==1.49.0 2>&1 | grep -v -i "notice\|warning" || true
+pip install -q playwright==1.49.0 >/dev/null 2>&1 || pip install playwright==1.49.0
 apt-get update -qq >/dev/null && apt-get install -y -qq ffmpeg >/dev/null
 export OUT=/work/out
 mkdir -p "$OUT"
