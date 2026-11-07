@@ -13,6 +13,7 @@ import time
 import urllib.request
 
 from playwright.sync_api import FrameLocator, Page, sync_playwright
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 WIDTH, HEIGHT = 1920, 1080
 TOP = 84
@@ -325,7 +326,14 @@ def chapter_approval(d: Director) -> None:
     d.chapter(4, "A human decides risky actions", "A refund never runs on its own.")
     d.caption("A refund is a sensitive action. The assistant stops and asks a human.", 2.8)
     d.ask("Please refund order KS-1001. I changed my mind.")
-    d.left.locator(".note", has_text="Waiting for a human").wait_for(timeout=20000)
+    waiting = d.left.locator(".note", has_text="Waiting for a human")
+    try:
+        waiting.wait_for(timeout=12000)
+    except PlaywrightTimeoutError:
+        # The model sometimes promises the refund in words without calling the tool (a known
+        # weakness, see docs/error-analysis.md); a natural follow-up gets the call made.
+        d.ask("Yes, please submit the refund request for KS-1001 now.")
+        waiting.wait_for(timeout=30000)
     d.caption("Nothing was sent to the shop yet. The paused conversation survives restarts.", 3.0)
     d.caption("The admin sees exactly what was requested and decides.", 2.6)
     d.nav("Approvals")
