@@ -10,7 +10,7 @@ if [ -z "${SKIP_RECORD:-}" ]; then
   python /work/record.py
 fi
 python /work/screenshots.py
-ffmpeg -y -loglevel error -i "$OUT/demo.webm" -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p \
+ffmpeg -y -loglevel error -i "$OUT/demo.webm" -c:v libx264 -preset slow -crf 24 -pix_fmt yuv420p \
   -movflags +faststart "$OUT/demo.mp4"
 
 # The README clip is chapter 4 (the refund and the human decision), a little faster than real time.

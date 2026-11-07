@@ -296,6 +296,8 @@ def chapter_language(d: Director) -> None:
         "Retrieval is hybrid (vectors and full text), reranked, and every answer is checked against its sources.",
         4.4,
     )
+    d.nav("Conversations")
+    d.caption("Meanwhile the admin sees every conversation as it happens.", 3.0)
 
 
 def chapter_orders(d: Director) -> None:
@@ -312,6 +314,10 @@ def chapter_orders(d: Director) -> None:
         "The assistant called the shop's order API. The customer id comes from the session, never from the model.",
         4.4,
     )
+    d.nav("Conversations")
+    d.click(d.right.locator("table tbody tr td a").first)
+    d.right.get_by_text("Customer ·").first.wait_for(timeout=15000)
+    d.caption("The admin can open the full conversation, with the sources of every answer.", 3.6)
 
 
 def chapter_approval(d: Director) -> None:

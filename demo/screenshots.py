@@ -47,11 +47,11 @@ def request_a_refund() -> None:
     if api("/approvals?status=pending", headers=auth):
         return  # an earlier run already left one in the queue
     key = api("/api-keys", "POST", {"name": "screenshots"}, auth)["key"]  # type: ignore[index]
-    session = api("/sessions", "POST", {"customer_id": "customer-3"}, {"X-API-Key": key})["token"]  # type: ignore[index]
+    session = api("/sessions", "POST", {"customer_id": "customer-2"}, {"X-API-Key": key})["token"]  # type: ignore[index]
     api(
         "/chat",
         "POST",
-        {"message": "Please refund order KS-3002, I changed my mind."},
+        {"message": "Please refund order KS-2002, I changed my mind."},
         {"Authorization": f"Bearer {session}"},
     )
     for item in api("/api-keys", headers=auth):  # type: ignore[union-attr]
