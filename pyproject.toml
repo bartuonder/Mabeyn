@@ -64,7 +64,7 @@ select = ["E", "F", "I", "UP", "B", "ASYNC", "S"]
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "S105", "S106", "S107"]
 "tests/e2e/*" = ["E501", "S108", "S310"]
-"demo/*" = ["E501", "S101"]
+"demo/*" = ["E501", "S101", "S108", "S310"]
 
 [tool.mypy]
 python_version = "3.12"

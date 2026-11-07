@@ -32,13 +32,20 @@ def api(
     )
     with urllib.request.urlopen(request) as response:  # noqa: S310
         raw = response.read()
-    return json.loads(raw) if raw else None
+    if not raw:
+        return None
+    try:
+        return json.loads(raw)
+    except ValueError:  # the chat endpoint streams server-sent events
+        return raw.decode()
 
 
 def request_a_refund() -> None:
     """A customer asks for a refund through the API so that the approval queue is not empty."""
     login = api("/auth/login", "POST", {"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD})
     auth = {"Authorization": f"Bearer {login['access_token']}"}  # type: ignore[index]
+    if api("/approvals?status=pending", headers=auth):
+        return  # an earlier run already left one in the queue
     key = api("/api-keys", "POST", {"name": "screenshots"}, auth)["key"]  # type: ignore[index]
     session = api("/sessions", "POST", {"customer_id": "customer-3"}, {"X-API-Key": key})["token"]  # type: ignore[index]
     api(
@@ -58,8 +65,8 @@ def new_page(browser: Browser, scheme: str = "light") -> Page:
 
 
 def shot(page: Page, name: str, *, full: bool = False) -> None:
-    page.wait_for_load_state("networkidle")
-    page.wait_for_timeout(900)
+    page.wait_for_load_state("load")
+    page.wait_for_timeout(1800)  # the panel keeps prefetching, so "networkidle" never comes
     page.screenshot(path=os.path.join(OUT, name), full_page=full)
     print("saved", name)
 
@@ -82,7 +89,7 @@ def sign_in(page: Page) -> None:
     page.fill("input[name=email]", ADMIN_EMAIL)
     page.fill("input[name=password]", ADMIN_PASSWORD)
     page.click("button[type=submit]")
-    page.get_by_role("heading", name="Overview").wait_for(timeout=30000)
+    page.get_by_role("heading", name="Overview").wait_for(timeout=90000)
 
 
 def main() -> None:

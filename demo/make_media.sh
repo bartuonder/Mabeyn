@@ -5,8 +5,10 @@ pip install -q playwright==1.49.0 2>&1 | grep -v -i "notice\|warning" || true
 apt-get update -qq >/dev/null && apt-get install -y -qq ffmpeg >/dev/null
 export OUT=/work/out
 mkdir -p "$OUT"
-find "$OUT" -name '*.webm' -delete
-python /work/record.py
+if [ -z "${SKIP_RECORD:-}" ]; then
+  find "$OUT" -name '*.webm' -delete
+  python /work/record.py
+fi
 python /work/screenshots.py
 ffmpeg -y -loglevel error -i "$OUT/demo.webm" -c:v libx264 -preset slow -crf 22 -pix_fmt yuv420p \
   -movflags +faststart "$OUT/demo.mp4"
