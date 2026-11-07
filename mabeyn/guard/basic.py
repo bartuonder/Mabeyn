@@ -27,5 +27,5 @@ def check_input(text: str) -> GuardDecision:
 
 
 def check_output(text: str) -> GuardDecision:
-    """Placeholder for PII masking and canary checks."""
+    """Trim the reply; masking and the canary check run in the firewall's output layer."""
     return GuardDecision(True, text.strip())
