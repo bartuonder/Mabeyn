@@ -269,7 +269,7 @@ Secret API keys (`mbn_sec_…`) stay on the tenant's server and open sessions fo
 
 ## 9. Cost, cache and limits
 
-Rationale and measurements: [ADR-0007](adr/0007-cost-cache-and-eval-gate.md).
+Rationale and measurements: [ADR-0007](adr/0007-cost-cache-and-eval-gate.md). How browsers, the admin panel and the approval webhook reach the platform: [ADR-0008](adr/0008-reaching-the-platform.md).
 
 - **Cost per message.** `SupervisorService` measures every run and the reply is stored with its input and output tokens, model calls, estimated cost (USD per million tokens from a price table), latency and a `cached` flag. `GET /usage?days=7` returns one row per day for the tenant. Summaries of long conversations and memory extraction are not part of it.
 - **Answer cache.** `cache_lookup` and `cache_store` surround the graph (see the node table). Exact entries live in Redis under a key made of tenant, an invalidation counter, the prompt versions and the normalised question; semantic candidates live in the `answer_cache` table (pgvector, row-level security) and a small model confirms that the cached question needs the same answer. Entries expire after a day, change with every prompt version, and are dropped when a document is added, changed or deleted. Only first questions that the knowledge agent answered alone, without personal data or order numbers, are stored, and the firewall checks run on both sides of the cache.

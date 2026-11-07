@@ -29,5 +29,5 @@ Every message costs model calls and takes seconds. Without numbers the cost cann
 - A semantic hit costs one embedding and one small-model call (a fraction of a cent) instead of a full run, so a hit is much cheaper but not free.
 - Documents that change outside the API (direct database edits) do not invalidate the cache until the entry expires.
 - The confirmation step can still be wrong for questions that differ in a subtle way; the pair set is small and was written by the same team.
-- The gate's tool scenario for an expired refund window is flaky (the model sometimes requests the refund); the thresholds leave room for one such miss.
+- The gate's tool scenario for an expired refund window used to be flaky because only the prompt enforced the window; a tool policy now blocks such a refund in code (see ADR-0008), and the thresholds still leave room for one miss.
 - The snapshot has to be refreshed when a prompt changes on purpose: run the gate once with the API key and commit the new files.
