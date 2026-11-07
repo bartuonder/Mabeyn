@@ -1,4 +1,4 @@
-.PHONY: demo up down test lint typecheck migrate seed eval ablation experiments docs gate redteam widget-e2e admin-e2e firewall-eval memory-eval loadtest
+.PHONY: demo up down test lint typecheck migrate seed eval ablation experiments docs gate redteam widget-e2e admin-e2e demo-video firewall-eval memory-eval loadtest
 
 demo:
 	./scripts/demo.sh
@@ -56,6 +56,13 @@ admin-e2e:
 		-e ADMIN_PASSWORD=$${DEMO_ADMIN_PASSWORD:-demo-admin-password} \
 		--add-host=host.docker.internal:host-gateway mcr.microsoft.com/playwright/python:v1.49.0-noble \
 		sh -c "pip install -q playwright==1.49.0 && python /work/admin_e2e.py"
+
+demo-video:
+	docker compose restart kargoshop-mock
+	mkdir -p demo/out
+	docker run --rm -v "$(CURDIR)/demo:/work" -e ADMIN_PASSWORD=$${DEMO_ADMIN_PASSWORD:-demo-admin-password} \
+		--add-host=host.docker.internal:host-gateway mcr.microsoft.com/playwright/python:v1.49.0-noble \
+		sh /work/make_video.sh
 
 firewall-eval:
 	uv run python -m evals.runners.firewall_eval --set dev --history
