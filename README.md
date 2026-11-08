@@ -211,6 +211,7 @@ Tests and evaluations send traces to LangSmith when `.env` enables tracing; test
 - The input layer of the firewall is not a general jailbreak detector: it blocked 23 of 44 attacks of an open prompt-injection set. Rules and the classifier catch known phrases and context-dependent triggers, not every paraphrase.
 - The small models that grade passages and verify answers are the weak point of answer quality: they sometimes drop the passage that answers a question or reject a correct answer ([error analysis](docs/error-analysis.md)).
 - Argument policies check one record per call (a lookup, then equality, amount and date checks).
+- Refund requests are the weakest tool-calling case: the agent sometimes promises a refund in words without calling the tool. Nothing is executed then, and a follow-up message gets the call made.
 - An approval webhook is the only notification channel, and a human colleague has no endpoint yet to answer an escalated conversation.
 - A customer's identity is only as trustworthy as the API key that opened the session ([ADR-0005](docs/adr/0005-customer-session-trust.md)).
 - The demo is meant for a local machine: default passwords and secrets are for the demo only, there is no TLS or deployment configuration, and the load tests are one-machine comparisons, not capacity figures.

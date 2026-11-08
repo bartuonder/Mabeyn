@@ -22,7 +22,7 @@ input_guard → supervisor → dispatch ⇄ {knowledge_agent | action agent | es
 - **Risk levels** `read`, `write`, `sensitive` are stored per tool. A `sensitive` call never runs directly: the action agent creates a pending `ToolCall` and an `Approval`, then pauses with a LangGraph `interrupt`.
 - **Durability**: graph state lives in a PostgreSQL checkpointer, keyed by `tenant:conversation`. An admin decision (`POST /approvals/{id}`) resumes the thread, even after a restart. The customer receives the result as a new message in the conversation.
 - **Escalation** is a node of its own. The supervisor can choose it, and the action agent forces it after three consecutive tool failures. The conversation is marked `escalated` and later customer messages are stored for a human instead of being answered.
-- The input and output guards are hooks. Today they only normalise text; the firewall phase fills them in.
+- The input and output guards are graph nodes of their own: `input_guard` normalises the message and runs the firewall's input layer, `output_guard` runs the output layer before anything is shown ([ADR-0003](0003-defense-layers.md)).
 
 ## Alternatives considered
 
@@ -33,6 +33,6 @@ input_guard → supervisor → dispatch ⇄ {knowledge_agent | action agent | es
 
 - Mixed requests cost more model calls and latency than a single agent.
 - Routing mistakes are possible; routing accuracy is part of the tool-use evaluation.
-- The checkpoint tables have no tenant column. Their thread id is `<tenant>:<conversation>`, and a policy compares its tenant part with `app.tenant_id` (see [ADR-0006](0006-customer-memory.md) for how the setting reaches pooled connections). Resuming also requires an `Approval` row that is protected on its own.
+- The checkpoint tables have no tenant column. Their thread id is `<tenant>:<conversation>`, and a policy compares its tenant part with `app.tenant_id` (see [ADR-0008](0008-reaching-the-platform.md) for how the setting reaches pooled connections). Resuming also requires an `Approval` row that is protected on its own.
 - Resuming happens inside the approval request. A failure there leaves the approval pending so it can be retried.
 - psycopg's async mode needs the selector event loop on Windows; Linux containers are unaffected.

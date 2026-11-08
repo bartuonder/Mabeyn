@@ -5,7 +5,7 @@
 
 ## Context
 
-The first seven phases built the assistant. Phase 8 puts people in front of it: a customer in a browser, a tenant admin in a panel, a tenant system that wants to hear about approvals. Each of them is a new way to reach tenant data, and four earlier decisions were left open on purpose: the checkpoint and memory tables had no row-level security (ADR-0001, ADR-0006), argument policies existed only for the demo shop's tool names (ADR-0003), nobody was told about a pending approval (ADR-0002), and a widget needed keys that are safe in a page (ADR-0005).
+The assistant came first. Putting people in front of it adds new ways to reach tenant data: a customer in a browser, a tenant admin in a panel, a tenant system that wants to hear about approvals. Four earlier decisions had been left open on purpose: the checkpoint and memory tables had no row-level security (ADR-0001, ADR-0006), argument policies existed only for the demo shop's tool names (ADR-0003), nobody was told about a pending approval (ADR-0002), and a widget needed keys that are safe in a page (ADR-0005).
 
 ## Decision
 

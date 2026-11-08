@@ -349,7 +349,7 @@ See [evaluation.md](evaluation.md) for the datasets, metrics and how to run them
 - Customer identity is only as trustworthy as the API key that opened the session, see [ADR-0005](adr/0005-customer-session-trust.md). Memory inherits this: whoever can open a session as a customer can read and erase that customer's notes.
 - The LangGraph tables have no `tenant_id` column; their policies read the tenant out of the thread id and the namespace, which only holds as long as every writer builds them with `TurnContext.thread_id` and `namespace()`.
 - Notes are statements by the customer and are not verified. A false claim can be stored as a harmless-looking fact and repeated back, but it cannot grant anything.
-- Refund requests in Turkish are the weakest tool-calling case: on a diagnostic set of seven phrasings the agent reached the approval queue in 27 of 28 valid cases after the prompt fix, and a question-form request ("can I return it?") may still end with a clarifying answer instead of a call.
+- Refund requests are the weakest tool-calling case. On a diagnostic set of seven Turkish phrasings the agent reached the approval queue in 27 of 28 valid cases after the prompt fix, and a question-form request ("can I return it?") may still end with a clarifying answer instead of a call. The agent also sometimes promises the refund in words ("I will proceed with your request") without calling the tool, in English as well; nothing is executed in that case, and a follow-up message ("please submit it now") gets the call made.
 - Customers cannot switch memory off for themselves, only erase it.
 
 ## Keeping this page current

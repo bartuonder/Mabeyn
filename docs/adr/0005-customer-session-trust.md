@@ -1,6 +1,6 @@
 # ADR-0005: Who vouches for the customer identity?
 
-- Status: accepted and implemented in Phase 6
+- Status: accepted and implemented
 - Date: 2026-11-01
 
 ## Context
