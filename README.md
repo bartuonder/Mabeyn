@@ -43,7 +43,7 @@ Also included: a semantic answer cache, per-customer and per-key rate limits, to
   </tr>
   <tr>
     <td><a href="docs/media/screenshots/04-admin-approval.png"><img src="docs/media/screenshots/04-admin-approval.png" alt="An approval request" width="100%"></a><br><sub><b>Approvals.</b> Every sensitive action waits here with its exact arguments.</sub></td>
-    <td><a href="docs/media/screenshots/05-admin-conversation-memory.png"><img src="docs/media/screenshots/05-admin-conversation-memory.png" alt="A conversation and the customer's memory" width="100%"></a><br><sub><b>Conversations.</b> The full thread and exactly what the assistant remembers.</sub></td>
+    <td><a href="docs/media/screenshots/05-admin-conversation-memory.png"><img src="docs/media/screenshots/05-admin-conversation-memory.png" alt="A conversation with its security events and the customer's memory" width="100%"></a><br><sub><b>Conversations.</b> The full thread, the security events it triggered and exactly what the assistant remembers.</sub></td>
   </tr>
   <tr>
     <td><a href="docs/media/screenshots/08-admin-security.png"><img src="docs/media/screenshots/08-admin-security.png" alt="Security events and firewall settings" width="100%"></a><br><sub><b>Security.</b> Every block and flag, and the firewall's settings.</sub></td>
