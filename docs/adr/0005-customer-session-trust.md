@@ -7,7 +7,7 @@
 
 `POST /sessions` takes a tenant API key and a free-text `customer_id` and returns a short-lived customer token. The platform then injects that `customer_id` into every tool call, and the shop backend trusts it. Anyone who holds the API key can therefore ask for a session as any customer and read that customer's orders with `get_order_status`.
 
-Row-Level Security separates tenants from each other; it does not separate the customers of one tenant. The planned chat widget is a script on the tenant's public site, so a key embedded in it is visible to every visitor.
+Row-Level Security separates tenants from each other; it does not separate the customers of one tenant. The chat widget is a script on the tenant's public site, so a key embedded in it is visible to every visitor.
 
 ## Decision
 
@@ -32,4 +32,4 @@ Split the keys by what they are allowed to vouch for.
 
 - Breaking change to `POST /sessions` and the `ApiKey` model (a `kind` column, a migration, hashed prefixes that show the kind).
 - The widget snippet, the admin panel's key page and the demo scripts change accordingly.
-- Secret keys must stay on the tenant's server. The widget phase builds on publishable keys.
+- Secret keys must stay on the tenant's server. The widget builds on publishable keys.

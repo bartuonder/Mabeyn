@@ -16,12 +16,14 @@ Do not start a phase before the previous one meets its definition of done.
 | 6 LLM firewall and red-team | done | [ADR-0003](adr/0003-defense-layers.md), [ADR-0005](adr/0005-customer-session-trust.md) implemented; the memory and checkpoint tables got row-level security later ([ADR-0008](adr/0008-reaching-the-platform.md)) |
 | 7 LLMOps, cache, performance | done | [ADR-0007](adr/0007-cost-cache-and-eval-gate.md); no Weights & Biases report |
 | 8 Productization | done | `make demo`, widget, storefront, admin panel (Next.js), error analysis, README, the recorded demo and its GIF (`make demo-media`); deployment left out on purpose. [ADR-0008](adr/0008-reaching-the-platform.md) |
-| 8 Productization | planned | The widget uses publishable keys ([ADR-0005](adr/0005-customer-session-trust.md)) |
 
 Deliberate differences from the plan below:
 - Embeddings come from the OpenAI API instead of a local bge-m3, and the reranker is an LLM listwise reranker instead of a cross-encoder.
 - Gold references in the evaluation sets point to a document and a section heading instead of chunk ids, so chunk size experiments reuse the same questions ([ADR-0004](adr/0004-evaluation-driven-rag.md)).
 - The demo documents and the golden set are Turkish, with a small English set.
+- The admin panel is a Next.js app; deployment to a server was left out on purpose, and the demo runs locally with `make demo`.
+- The error analysis traces failures by replaying questions through the real pipeline with every model call printed (`evals/runners/diagnose.py`) instead of using LangSmith screenshots.
+- Phase 8 has no blog post: the README, the recorded demo and the screenshots carry the story.
 - The plan's phases 0 and 1 are one phase here, and weeks are not tracked.
 - The classifier is a small OpenAI model instead of Llama Prompt Guard, and personal data is masked with validated regular expressions instead of Presidio ([ADR-0003](adr/0003-defense-layers.md)).
 - The semantic answer cache keeps its vectors in pgvector (per tenant, row-level security) next to a Redis exact-match layer, and a small model confirms each semantic candidate because similarity alone cannot separate look-alike questions ([ADR-0007](adr/0007-cost-cache-and-eval-gate.md)). The shareable Weights & Biases report was dropped, as the scope cuts allow.

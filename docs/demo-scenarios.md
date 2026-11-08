@@ -9,16 +9,14 @@ A recorded walk-through of the refund scenario, a Turkish question, an order loo
 The quickest way to try the scenarios is the storefront at <http://localhost:9100> after `make demo` (pick a customer, use the chat bubble). The commands below do the same through the API.
 
 ```bash
-docker compose up -d --build                      # api, worker, mock shop, postgres, redis
-uv sync
-uv run python -m mabeyn.cli seed-kargoshop --shop-url http://kargoshop-mock:9000
+make demo                                         # services, demo tenant, 32 documents, 5 tools
 ```
 
-The seed prompts for the demo admin password (`admin@kargoshop.example`) and registers the five shop tools. Get an admin token and a customer session:
+The demo admin is `admin@kargoshop.example` with the password `demo-admin-password`. Get an admin token and a customer session:
 
 ```bash
 ADMIN=$(curl -s -X POST localhost:8000/auth/login -H 'content-type: application/json' \
-  -d '{"email": "admin@kargoshop.example", "password": "<demo password>"}' | jq -r .access_token)
+  -d '{"email": "admin@kargoshop.example", "password": "demo-admin-password"}' | jq -r .access_token)
 KEY=$(curl -s -X POST localhost:8000/api-keys -H "Authorization: Bearer $ADMIN" \
   -H 'content-type: application/json' -d '{"name": "demo"}' | jq -r .key)
 CUSTOMER=$(curl -s -X POST localhost:8000/sessions -H "X-API-Key: $KEY" \

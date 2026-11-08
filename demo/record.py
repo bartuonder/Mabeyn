@@ -16,7 +16,8 @@ from playwright.sync_api import FrameLocator, Page, sync_playwright
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 WIDTH, HEIGHT = 1920, 1080
-TOP = 84
+TOP = 60  # slim header: brand and chapter
+BOTTOM = 104  # subtitle strip under the screens, so captions never cover the interface
 LEFT_WIDTH = 900
 SHOP = "http://localhost:9100"
 PANEL = "http://localhost:3100"
@@ -59,9 +60,11 @@ HTML = f"""<!doctype html><html><head><meta charset="utf-8"><title>Mabeyn demo</
   #chap{{font-size:15px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;padding:6px 14px;border-radius:999px;
         background:#ffffff22;opacity:0;transition:opacity .4s;white-space:nowrap}}
   #chap.on{{opacity:1}}
-  #caption{{font-size:25px;line-height:1.25;opacity:0;transition:opacity .35s;flex:1}}
+  #subs{{position:fixed;left:0;right:0;bottom:0;height:{BOTTOM}px;display:flex;align-items:center;justify-content:center;
+        box-sizing:border-box;padding:0 90px;background:#0b1020;border-top:2px solid #1d3a8a}}
+  #caption{{font-size:30px;line-height:1.3;color:#fff;text-align:center;opacity:0;transition:opacity .35s}}
   #caption.on{{opacity:1}}
-  #stage{{display:flex;height:{HEIGHT - TOP}px}}
+  #stage{{display:flex;height:{HEIGHT - TOP - BOTTOM}px}}
   iframe{{border:0;height:100%;background:#fff}}
   #left{{width:{LEFT_WIDTH}px}} #right{{flex:1;border-left:2px solid #0b1020}}
   #card{{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px;
@@ -77,8 +80,9 @@ HTML = f"""<!doctype html><html><head><meta charset="utf-8"><title>Mabeyn demo</
         z-index:59;pointer-events:none;opacity:0}}
   #ring.pop{{animation:pop .45s ease-out}} @keyframes pop{{from{{opacity:1;transform:scale(.4)}}to{{opacity:0;transform:scale(1.5)}}}}
 </style></head><body>
-<div id="bar"><b>Mabeyn</b><span id="chap"></span><div id="caption"></div></div>
+<div id="bar"><b>Mabeyn</b><span id="chap"></span></div>
 <div id="stage"><iframe id="shop" src="{SHOP}"></iframe><iframe id="right" src="{PANEL}/login"></iframe></div>
+<div id="subs"><div id="caption"></div></div>
 <div id="card"><div class="num" id="card-num"></div><h1 id="card-title"></h1><p id="card-text"></p><ul id="card-items"></ul><p id="card-code"></p></div>
 <svg id="cursor" viewBox="0 0 26 26"><path d="M3 2l17 9-7 2-3 7z" fill="#fff" stroke="#111" stroke-width="1.6" stroke-linejoin="round"/></svg>
 <div id="ring"></div>
